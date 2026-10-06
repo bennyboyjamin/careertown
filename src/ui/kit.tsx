@@ -70,6 +70,48 @@ export function Coin({ className = '' }: { className?: string }) {
   return <span className={`inline-flex items-center justify-center rounded-full bg-sun border-[2.5px] border-ink w-6 h-6 text-[13px] font-display font-extrabold text-ink ${className}`}>C</span>;
 }
 
+const isStandalone = () =>
+  (typeof window !== 'undefined' && (window.matchMedia?.('(display-mode: standalone)').matches || window.matchMedia?.('(display-mode: fullscreen)').matches)) ||
+  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+/** Full screen: real Fullscreen API where it exists; on iPhone, explain Add to Home Screen. */
+export function FullscreenButton() {
+  const [help, setHelp] = useState(false);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const f = () => setOn(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', f);
+    return () => document.removeEventListener('fullscreenchange', f);
+  }, []);
+  if (isStandalone()) return null;
+  const canFs = !!document.fullscreenEnabled && !!document.documentElement.requestFullscreen;
+  const toggle = () => {
+    if (!canFs) { setHelp(true); return; }
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void document.documentElement.requestFullscreen().catch(() => setHelp(true));
+  };
+  return (
+    <>
+      <Btn tone="white" onClick={toggle} aria-label={on ? 'Exit full screen' : 'Full screen'} className="!px-3">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2B2350" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          {on ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /> : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
+        </svg>
+      </Btn>
+      {help && (
+        <Modal title="Play full screen" onClose={() => setHelp(false)}>
+          <p className="font-body text-ink text-lg">On iPhone, add CareerTown to your Home Screen. Then it opens full screen, like a real app.</p>
+          <ol className="mt-3 space-y-2 font-body text-ink">
+            <li className="rounded-2xl border-[3px] border-ink bg-sky/30 p-3"><b className="font-display">1.</b> Tap the <b>Share</b> button in Safari (the square with an arrow).</li>
+            <li className="rounded-2xl border-[3px] border-ink bg-sky/30 p-3"><b className="font-display">2.</b> Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+            <li className="rounded-2xl border-[3px] border-ink bg-sky/30 p-3"><b className="font-display">3.</b> Open CareerTown from its new icon on your Home Screen.</li>
+          </ol>
+          <p className="font-body text-ink/70 mt-3 text-sm">Your progress stays on this device.</p>
+        </Modal>
+      )}
+    </>
+  );
+}
+
 export function HUD({ onPassport, onMap, onShop, onCreator, title }: { onPassport: () => void; onMap?: () => void; onShop: () => void; onCreator: () => void; title?: string }) {
   const { game, dispatch } = useGame();
   const lvl = playerLevel(game.xp);
@@ -98,6 +140,7 @@ export function HUD({ onPassport, onMap, onShop, onCreator, title }: { onPasspor
       <Btn tone="sky" onClick={onCreator} aria-label="Characters" className="!px-2.5 sm:!px-3">🧑‍🎨</Btn>
       <Btn tone="berry" onClick={onShop} aria-label="Shop" className="!px-2.5 sm:!px-3">🛍️</Btn>
       <Btn tone="white" onClick={() => dispatch({ type: 'TOGGLE_SOUND' })} aria-label="Sound" className="!px-3 hidden sm:block">{game.settings.sound ? '🔊' : '🔇'}</Btn>
+      <FullscreenButton />
       {showDaily && (
         <Modal title="Today’s challenge" onClose={() => setShowDaily(false)}>
           <div className="flex items-center gap-4">
