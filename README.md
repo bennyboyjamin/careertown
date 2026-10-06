@@ -4,6 +4,11 @@ A kid-friendly (ages 6–12) open-ended town where children create characters, p
 in rooms, and explore careers through short missions. All art, characters and sounds are
 original (SVG + synthesized WebAudio). No accounts, chat, ads or real purchases.
 
+## Publish on GitHub Pages
+`.github/workflows/deploy.yml` builds the game and publishes it on every push to `main`.
+One-time setup: in your GitHub repo open *Settings → Pages* and set **Source** to **GitHub Actions**.
+Your game will be at `https://YOUR-USERNAME.github.io/REPO-NAME/`.
+
 ## Publish on GitLab
 The included `.gitlab-ci.yml` builds the game and deploys it to **GitLab Pages** whenever you push
 to the default branch. After the first pipeline finishes, find the link under
