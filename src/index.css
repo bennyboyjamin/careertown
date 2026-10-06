@@ -40,7 +40,14 @@ button { touch-action: manipulation; }
   max-height: 100%;
   container-type: size;
 }
-.town { --stage-w: min(100%, calc((100dvh - 110px) * 10 / 7)); }
+.town-full {
+  --tw: max(100vw, calc(100dvh * 10 / 7));
+  width: var(--tw);
+  height: calc(var(--tw) * 0.7);
+  min-height: 100%;
+}
+.map-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; scrollbar-width: none; }
+.map-scroll::-webkit-scrollbar { display: none; }
 @media (max-height: 520px) { .room { --stage-w: min(100%, calc((100dvh - 130px) * 10 / 7)); } }
 
 .entity { touch-action: none; }
@@ -162,7 +169,6 @@ button { touch-action: manipulation; }
   .room-tabs { padding-bottom: 4px; }
   .room-tabs button { height: 36px; min-height: 36px; font-size: 14px; }
   .room { --stage-w: min(100%, calc((100dvh - 104px) * 10 / 7)); }
-  .town { --stage-w: min(100%, calc((100dvh - 64px) * 10 / 7)); }
   .scene-actions { position: absolute; left: 6px; bottom: 6px; flex-direction: column; align-items: flex-start; padding: 0; z-index: 30; }
   .scene-actions > button { min-height: 40px; padding: 4px 10px; font-size: 14px; }
   .scene-actions p { display: none; }

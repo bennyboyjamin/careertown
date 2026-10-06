@@ -58,8 +58,9 @@ function Game() {
   }
 
   return (
-    <div className="app h-[100dvh] flex flex-col overflow-hidden">
+    <div className="app relative h-[100dvh] flex flex-col overflow-hidden">
       {screen.name !== 'mission' && (
+        <div className={screen.name === 'map' ? 'absolute inset-x-0 top-0 z-40 pointer-events-none [&>*]:pointer-events-auto' : ''}>
         <HUD
           title={title}
           onMap={screen.name === 'map' ? undefined : () => setScreen({ name: 'map' })}
@@ -67,6 +68,7 @@ function Game() {
           onShop={() => setShop(true)}
           onCreator={() => setScreen({ name: 'creator' })}
         />
+        </div>
       )}
       {screen.name === 'mission' && <div className="h-3" />}
       <main className="flex-1 min-h-0">{body}</main>

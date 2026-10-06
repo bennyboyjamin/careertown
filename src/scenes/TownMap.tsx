@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BUILDINGS, type BuildingDef } from '../data/buildings';
 import { useGame } from '../engine/store';
 import { INK, CharacterArt } from '../components/art/Character';
@@ -55,6 +55,11 @@ function BuildingArt({ b }: { b: BuildingDef }) {
 export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
   const { game, dispatch } = useGame();
   const [bump, setBump] = useState<string | null>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scroller.current; if (!el) return;
+    el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) * 0.15);
+  }, []);
   const walker = game.characters.find((c) => c.id === game.activeCharacterId) ?? game.characters[0];
   const pet = game.pets[0];
 
@@ -67,8 +72,8 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
   };
 
   return (
-    <div className="h-full grid place-items-center p-2 sm:p-3">
-      <div className="room town relative overflow-hidden rounded-[22px] sm:rounded-[30px] border-[4px] border-ink shadow-chunky select-none">
+    <div ref={scroller} className="map-scroll h-full w-full overflow-auto">
+      <div className="town town-full relative overflow-hidden select-none">
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden>
           <rect width="1000" height="700" fill="#8BD46E" />
           <rect width="1000" height="96" fill="#BDEBFF" />
