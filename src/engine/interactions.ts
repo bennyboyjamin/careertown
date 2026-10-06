@@ -1,0 +1,242 @@
+import type { CharacterData, Entity, PetData, SceneId } from './types';
+import { ITEMS, has, type ItemDef } from '../data/items';
+import type { SfxName } from './sfx';
+
+// ── Geometry ───────────────────────────────────────────
+export const ROOM_W = 1000;
+export const ROOM_H = 700;
+
+export interface Lookup {
+  character: (id: string) => CharacterData | undefined;
+  pet: (id: string) => PetData | undefined;
+}
+
+export function sizeOf(e: Entity, look: Lookup): { w: number; h: number } {
+  if (e.kind === 'item') { const d = ITEMS[e.ref]; return { w: d?.w ?? 60, h: d?.h ?? 60 }; }
+  if (e.kind === 'pet') return e.pose === 'sleep' ? { w: 150, h: 88 } : { w: 135, h: 123 };
+  const adult = look.character(e.ref)?.age === 'adult';
+  const w = adult ? 175 : 165, h = adult ? 257 : 212;
+  if (e.pose === 'sit') return { w, h: h * (adult ? 0.85 : 0.92) };
+  if (e.pose === 'sleep') return { w: h, h: w * 0.75 };
+  return { w, h };
+}
+
+export const getState = <T,>(e: Entity, k: string) => e.state?.[k] as T | undefined;
+export const withState = (e: Entity, patch: Record<string, unknown>) => ({ ...(e.state ?? {}), ...patch });
+
+/** Depth for back-to-front sorting. Things resting on furniture sort just in front of it. */
+export function depthOf(e: Entity, byId: Map<string, Entity>, guard = 0): number {
+  if (e.heldBy && byId.has(e.heldBy) && guard < 8) return depthOf(byId.get(e.heldBy)!, byId, guard + 1) + 0.3;
+  const on = getState<string>(e, 'on');
+  const t = on ? byId.get(on) : undefined;
+  if (t && guard < 8) {
+    const base = depthOf(t, byId, guard + 1);
+    return has(ITEMS[t.ref], 'behind') ? base - 0.5 : base + 0.5;
+  }
+  if (e.kind === 'item' && has(ITEMS[e.ref], 'floor')) return e.y - 1000;
+  return e.y;
+}
+
+/** All entities resting on `id`, directly or indirectly (things on a table that is on…). */
+export function dependentsOf(id: string, all: Entity[]): Set<string> {
+  const out = new Set<string>();
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const e of all) {
+      const on = getState<string>(e, 'on');
+      if (!out.has(e.id) && on && (on === id || out.has(on))) { out.add(e.id); grew = true; }
+    }
+  }
+  return out;
+}
+
+// ── Drop resolution ────────────────────────────────────
+export interface Effect {
+  patches: { id: string; patch: Partial<Entity> }[];
+  remove: string[];
+  events: string[];
+  sfx?: SfxName;
+  bubble?: { id: string; text: string };
+  anim?: { id: string; anim: string; ms: number };
+  later?: { ms: number; patches: { id: string; patch: Partial<Entity> }[]; sfx?: SfxName; bubble?: { id: string; text: string }; events?: string[] };
+  moveTo?: { scene: SceneId; entity: Entity };
+}
+
+const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+function contains(e: Entity, x: number, y: number, look: Lookup, pad: number) {
+  const { w, h } = sizeOf(e, look);
+  return x >= e.x - w / 2 - pad && x <= e.x + w / 2 + pad && y >= e.y - h - pad && y <= e.y + pad;
+}
+
+/**
+ * Work out what happens when `d` is released. (hx, hy) is where the finger lifted
+ * (used to find the target); (x, y) is where the entity's feet would land.
+ */
+export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: number, all: Entity[], look: Lookup, horizon: number): Effect {
+  const fx: Effect = { patches: [], remove: [], events: [] };
+  const byId = new Map(all.map((e) => [e.id, e]));
+  const deps = dependentsOf(d.id, all);
+  const dd: ItemDef | undefined = d.kind === 'item' ? ITEMS[d.ref] : undefined;
+  const P = (id: string, patch: Partial<Entity>) => fx.patches.push({ id, patch });
+
+  const candidates = all
+    .filter((e) => e.id !== d.id && !deps.has(e.id) && !e.heldBy && e.id !== d.heldBy)
+    .filter((e) => contains(e, hx, hy, look, e.kind === 'item' ? 0 : 18))
+    .sort((a, b) => depthOf(b, byId) - depthOf(a, byId));
+
+  const tryRule = (t: Entity): boolean => {
+    const td = t.kind === 'item' ? ITEMS[t.ref] : undefined;
+    const ts = sizeOf(t, look);
+    const top = t.y - ts.h + 8;
+
+    // ── People ──
+    if (d.kind === 'character' || d.kind === 'pet') {
+      if (has(td, 'door')) {
+        const to = getState<SceneId>(t, 'to');
+        if (!to) return false;
+        fx.moveTo = { scene: to, entity: { ...d, x: 500, y: 660, pose: 'stand', state: {} } };
+        fx.sfx = 'whoosh'; fx.events.push('door');
+        return true;
+      }
+      if (has(td, 'bed')) {
+        P(d.id, { pose: 'sleep', x: t.x + (d.kind === 'pet' ? (x > t.x ? 60 : -60) : 0), y: t.y - ts.h * 0.42, state: withState(d, { on: t.id }) });
+        fx.sfx = 'snore'; fx.events.push(d.kind === 'pet' ? 'pet-nap' : 'sleep');
+        return true;
+      }
+      if (d.kind === 'character' && has(td, 'shower')) {
+        P(d.id, { pose: 'stand', x: t.x, y: t.y - 30, state: withState(d, { on: t.id }) });
+        fx.anim = { id: d.id, anim: 'shower', ms: 2600 }; fx.sfx = 'splash';
+        fx.bubble = { id: d.id, text: pick(['La la la! 🫧', 'So bubbly!', 'Squeaky clean!']) }; fx.events.push('shower');
+        return true;
+      }
+      if (has(td, 'seat')) {
+        const wide = ts.w > 200;
+        const taken = all.some((o) => o.id !== d.id && o.kind !== 'item' && getState<string>(o, 'on') === t.id);
+        if (taken && !wide) return false; // one sitter per chair
+        P(d.id, {
+          pose: d.kind === 'pet' ? 'sleep' : 'sit',
+          x: wide ? clamp(x, t.x - ts.w / 2 + 60, t.x + ts.w / 2 - 60) : t.x,
+          y: t.y - (td?.seatLift ?? 40), state: withState(d, { on: t.id }),
+        });
+        fx.sfx = 'pop'; fx.events.push('sit');
+        return true;
+      }
+      return false;
+    }
+
+    // ── Objects ──
+    if (!dd) return false;
+    if (t.kind === 'character') {
+      if (has(dd, 'food')) {
+        fx.remove.push(d.id); fx.anim = { id: t.id, anim: 'eat', ms: 1400 };
+        fx.bubble = { id: t.id, text: pick(['Yum!', 'Delicious!', 'Mmm, tasty!', 'Crunch crunch!']) };
+        fx.sfx = 'munch'; fx.events.push('eat');
+        return true;
+      }
+      if (has(dd, 'brush')) {
+        P(d.id, { x: t.x + 60, y: t.y, state: withState(d, { on: undefined }) });
+        fx.anim = { id: t.id, anim: 'brush', ms: 1600 }; fx.bubble = { id: t.id, text: '✨ Sparkly teeth!' };
+        fx.sfx = 'sparkle'; fx.events.push('brush');
+        return true;
+      }
+      if (dd.medical) {
+        fx.events.push('medical');
+        if (dd.medical === 'bandage') {
+          fx.remove.push(d.id); P(t.id, { state: withState(t, { bandage: true }) });
+          fx.bubble = { id: t.id, text: 'All patched up!' }; fx.sfx = 'pop';
+        } else if (dd.medical === 'thermometer') {
+          P(d.id, { x: t.x + 70, y: t.y });
+          fx.bubble = { id: t.id, text: `🌡️ ${(36.6 + Math.random() * 0.6).toFixed(1)}°C. Nice and normal!` }; fx.sfx = 'beep';
+        } else {
+          P(d.id, { x: t.x + 70, y: t.y });
+          fx.bubble = { id: t.id, text: '💓 ba-dum, ba-dum!' }; fx.sfx = 'heartbeat';
+        }
+        fx.anim = { id: t.id, anim: 'check', ms: 900 };
+        return true;
+      }
+      if (has(dd, 'small')) {
+        const prev = t.holding && byId.get(t.holding);
+        if (prev) P(prev.id, { heldBy: undefined, x: t.x + 70, y: t.y });
+        P(d.id, { heldBy: t.id, state: withState(d, { on: undefined }) });
+        P(t.id, { holding: d.id });
+        fx.sfx = 'pop'; fx.events.push('hold');
+        return true;
+      }
+      return false;
+    }
+    if (t.kind === 'pet') {
+      if (dd.medical || has(dd, 'groom')) {
+        fx.events.push('pet-care');
+        fx.anim = { id: t.id, anim: 'check', ms: 900 };
+        if (has(dd, 'groom')) { P(d.id, { x: t.x + 70, y: t.y }); fx.bubble = { id: t.id, text: 'So fluffy! ✨' }; fx.sfx = 'sparkle'; }
+        else if (dd.medical === 'bandage') { fx.remove.push(d.id); P(t.id, { state: withState(t, { bandage: true }) }); fx.bubble = { id: t.id, text: 'All patched up! 💕' }; fx.sfx = 'pop'; }
+        else if (dd.medical === 'stethoscope') { P(d.id, { x: t.x + 70, y: t.y }); fx.bubble = { id: t.id, text: '💓 thump-thump-thump! (pets’ hearts are fast)' }; fx.sfx = 'heartbeat'; }
+        else { P(d.id, { x: t.x + 70, y: t.y }); fx.bubble = { id: t.id, text: '🌡️ Normal for a pet!' }; fx.sfx = 'beep'; }
+        return true;
+      }
+      if (has(dd, 'food') || has(dd, 'petfood')) {
+        fx.remove.push(d.id); fx.anim = { id: t.id, anim: 'eat', ms: 1400 };
+        fx.bubble = { id: t.id, text: 'Nom nom!' }; fx.sfx = 'munch'; fx.events.push('feed-pet');
+        return true;
+      }
+      if (has(dd, 'toy')) {
+        P(d.id, { x: t.x + 70, y: t.y });
+        const sp = look.pet(t.ref)?.species;
+        fx.anim = { id: t.id, anim: 'play', ms: 1500 };
+        fx.bubble = { id: t.id, text: sp === 'kitten' ? 'Mew mew! 💕' : 'Woof woof! 💕' }; fx.sfx = 'pop'; fx.events.push('pet-play');
+        return true;
+      }
+      return false;
+    }
+    if (has(td, 'stove') && has(dd, 'cookable') && dd.cooksInto) {
+      P(d.id, { x: t.x, y: top, state: withState(d, { on: t.id, cooking: true }) });
+      fx.sfx = 'whoosh'; fx.bubble = { id: d.id, text: 'Sizzle…' };
+      fx.later = { ms: 1900, patches: [{ id: d.id, patch: { ref: dd.cooksInto, state: { on: t.id } } }], sfx: 'pop', bubble: { id: d.id, text: 'Ding! Ready!' }, events: ['cook'] };
+      return true;
+    }
+    if (has(td, 'sink') && has(dd, 'washable')) {
+      P(d.id, { x: t.x, y: top, state: withState(d, { on: t.id }) });
+      fx.anim = { id: d.id, anim: 'wash', ms: 1300 }; fx.bubble = { id: d.id, text: 'Washed! ✨' };
+      fx.sfx = 'splash'; fx.events.push('wash');
+      return true;
+    }
+    if (has(td, 'block') && has(dd, 'block')) {
+      P(d.id, { x: t.x, y: t.y - ts.h + 3, state: withState(d, { on: t.id }) });
+      let height = 2; let cur: Entity | undefined = t;
+      while (cur && getState<string>(cur, 'on')) { cur = byId.get(getState<string>(cur, 'on')!); if (cur && ITEMS[cur.ref]?.tags.includes('block')) height++; else break; }
+      fx.sfx = 'pop';
+      if (height === 4) { fx.events.push('tower4'); fx.bubble = { id: d.id, text: '4 blocks tall! 🏗️' }; }
+      return true;
+    }
+    if ((has(td, 'table') || has(td, 'stove')) && (has(dd, 'small') || has(dd, 'decor'))) {
+      P(d.id, { x: clamp(x, t.x - ts.w / 2 + 25, t.x + ts.w / 2 - 25), y: top, state: withState(d, { on: t.id }) });
+      fx.sfx = 'tap';
+      return true;
+    }
+    return false;
+  };
+
+  if (!candidates.some(tryRule)) {
+    const actor = d.kind !== 'item';
+    const floorOnly = actor || has(dd, 'floor');
+    const ny = clamp(y, floorOnly ? horizon + 70 : 40, 695);
+    P(d.id, { x: clamp(x, 30, 970), y: ny, ...(actor ? { pose: 'stand' as const } : {}), state: withState(d, { on: undefined }) });
+    fx.sfx = 'tap';
+  }
+
+  // things resting on the dragged entity travel with it
+  const mine = fx.patches.find((p) => p.id === d.id)?.patch;
+  if (mine && mine.x !== undefined && mine.y !== undefined && !fx.moveTo) {
+    const dx = mine.x - d.x, dy = mine.y - d.y;
+    for (const id of deps) {
+      const e = byId.get(id)!;
+      if (!fx.patches.some((p) => p.id === id)) P(id, { x: e.x + dx, y: e.y + dy });
+    }
+  } else if (fx.moveTo || fx.remove.includes(d.id)) {
+    for (const id of deps) { const e = byId.get(id)!; P(id, { state: withState(e, { on: undefined }), y: clamp(e.y + 40, horizon + 70, 695) }); }
+  }
+  return fx;
+}

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/
+tools/sheets/out/
+*.cjs.map
+tools/sheets/*.out.cjs
+.DS_Store

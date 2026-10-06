@@ -1,0 +1,41 @@
+import type { BuildingId, CareerId, SceneId } from '../engine/types';
+
+export interface BuildingDef {
+  id: BuildingId;
+  name: string;
+  icon: string;
+  career?: CareerId;
+  playable: boolean;
+  /** Map placement, room units (1000 x 700). x/y is the building's bottom-centre. */
+  x: number; y: number; w: number;
+  wall: string; roof: string; shape: 'house' | 'civic' | 'tower' | 'lab' | 'shop';
+  rooms: { sceneId: SceneId; label: string; icon: string }[];
+  missions: string[];
+}
+
+export const BUILDINGS: BuildingDef[] = [
+  { id: 'home', name: 'My House', icon: '🏠', playable: true, x: 115, y: 280, w: 175, wall: '#FFE08A', roof: '#FF5D8F', shape: 'house',
+    rooms: [
+      { sceneId: 'home-kitchen', label: 'Kitchen', icon: '🍳' },
+      { sceneId: 'home-bedroom', label: 'Bedroom', icon: '🛏️' },
+      { sceneId: 'home-living', label: 'Living room', icon: '🛋️' },
+      { sceneId: 'home-bathroom', label: 'Bathroom', icon: '🛁' },
+    ], missions: [] },
+  { id: 'school', name: 'School', icon: '🏫', career: 'teacher', playable: true, x: 325, y: 280, w: 200, wall: '#FFB27A', roof: '#C9473A', shape: 'civic',
+    rooms: [{ sceneId: 'school-classroom', label: 'Classroom', icon: '🍎' }], missions: [] },
+  { id: 'hospital', name: 'Hospital', icon: '🏥', career: 'doctor', playable: true, x: 540, y: 280, w: 185, wall: '#FFFFFF', roof: '#FF5D8F', shape: 'tower',
+    rooms: [{ sceneId: 'hospital-exam', label: 'Exam room', icon: '🩺' }], missions: ['doctor-checkup'] },
+  { id: 'courthouse', name: 'Courthouse', icon: '⚖️', career: 'lawyer', playable: true, x: 750, y: 280, w: 190, wall: '#E8E4FF', roof: '#A98BFF', shape: 'civic',
+    rooms: [{ sceneId: 'courthouse-room', label: 'Courtroom', icon: '⚖️' }], missions: ['lawyer-trophy'] },
+  { id: 'engineering', name: 'Engineering Lab', icon: '🔧', career: 'engineer', playable: true, x: 150, y: 610, w: 215, wall: '#BFF0FF', roof: '#FF8A3D', shape: 'lab',
+    rooms: [{ sceneId: 'engineering-lab', label: 'Workshop', icon: '🧱' }], missions: ['engineer-bridge'] },
+  { id: 'animal-hospital', name: 'Animal Hospital', icon: '🐾', career: 'vet', playable: true, x: 375, y: 610, w: 165, wall: '#D4F7E8', roof: '#5FE0B7', shape: 'house',
+    rooms: [{ sceneId: 'vet-clinic', label: 'Pet clinic', icon: '🐾' }], missions: ['vet-checkup'] },
+  { id: 'tech-lab', name: 'Technology Lab', icon: '💻', career: 'software', playable: true, x: 550, y: 610, w: 150, wall: '#DCE6FF', roof: '#3D7BFF', shape: 'lab',
+    rooms: [{ sceneId: 'tech-lab', label: 'Coding lab', icon: '💻' }], missions: ['software-robot'] },
+  { id: 'restaurant', name: 'Restaurant', icon: '🍕', playable: false, x: 715, y: 610, w: 150, wall: '#FFE3D1', roof: '#FF8A3D', shape: 'shop', rooms: [], missions: [] },
+  { id: 'shopping', name: 'Shopping Center', icon: '🛍️', career: 'entrepreneur', playable: false, x: 880, y: 610, w: 160, wall: '#FFE0F0', roof: '#FF7FB5', shape: 'shop', rooms: [], missions: [] },
+  { id: 'bank', name: 'Bank', icon: '🏦', playable: false, x: 925, y: 280, w: 120, wall: '#EFEFEF', roof: '#8E8E9A', shape: 'civic', rooms: [], missions: [] },
+];
+
+export const building = (id: string) => BUILDINGS.find((b) => b.id === id)!;

@@ -1,0 +1,19 @@
+# Builds CareerTown and publishes it to GitLab Pages on every push to the default branch.
+image: node:20
+
+cache:
+  key: npm
+  paths:
+    - .npm/
+
+pages:
+  stage: deploy
+  script:
+    - npm install --cache .npm --prefer-offline --no-audit --no-fund
+    - npm run build
+    - rm -rf public && mv dist public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

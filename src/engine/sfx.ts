@@ -1,0 +1,64 @@
+// Tiny synthesized sound effects (WebAudio) — original, no audio files needed.
+export type SfxName =
+  | 'pop' | 'tap' | 'coin' | 'success' | 'fail' | 'bang' | 'ring' | 'munch' | 'splash'
+  | 'sparkle' | 'whoosh' | 'click' | 'heartbeat' | 'beep' | 'tick' | 'snore' | 'crack';
+
+let ctx: AudioContext | null = null;
+let enabled = true;
+export const setSoundEnabled = (on: boolean) => { enabled = on; };
+
+function ac() {
+  if (!ctx) {
+    const C = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!C) return null;
+    ctx = new C();
+  }
+  if (ctx.state === 'suspended') void ctx.resume();
+  return ctx;
+}
+
+function tone(freq: number, dur: number, type: OscillatorType = 'sine', when = 0, vol = 0.18, slideTo?: number) {
+  const a = ac(); if (!a) return;
+  const t = a.currentTime + when;
+  const o = a.createOscillator(); const g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+}
+
+function noise(dur: number, vol = 0.15, when = 0) {
+  const a = ac(); if (!a) return;
+  const buf = a.createBuffer(1, a.sampleRate * dur, a.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  const s = a.createBufferSource(); const g = a.createGain();
+  s.buffer = buf; g.gain.value = vol; s.connect(g).connect(a.destination); s.start(a.currentTime + when);
+}
+
+export function sfx(name: SfxName) {
+  if (!enabled) return;
+  try {
+    switch (name) {
+      case 'pop': tone(520, 0.12, 'sine', 0, 0.2, 900); break;
+      case 'tap': tone(700, 0.06, 'triangle', 0, 0.12); break;
+      case 'click': tone(1200, 0.04, 'square', 0, 0.06); break;
+      case 'coin': tone(988, 0.08, 'square', 0, 0.08); tone(1319, 0.2, 'square', 0.08, 0.08); break;
+      case 'success': [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, 'triangle', i * 0.1, 0.16)); break;
+      case 'fail': tone(330, 0.2, 'sawtooth', 0, 0.08, 220); tone(247, 0.3, 'sawtooth', 0.18, 0.08, 160); break;
+      case 'bang': noise(0.12, 0.3); tone(140, 0.15, 'sine', 0, 0.3, 60); break;
+      case 'ring': for (let i = 0; i < 6; i++) tone(1568, 0.06, 'square', i * 0.07, 0.06); break;
+      case 'munch': noise(0.05, 0.12); noise(0.05, 0.12, 0.12); noise(0.05, 0.12, 0.24); break;
+      case 'splash': noise(0.4, 0.12); tone(400, 0.3, 'sine', 0, 0.06, 900); break;
+      case 'sparkle': [1568, 2093, 2637].forEach((f, i) => tone(f, 0.15, 'sine', i * 0.06, 0.08)); break;
+      case 'whoosh': noise(0.3, 0.07); break;
+      case 'heartbeat': tone(70, 0.12, 'sine', 0, 0.4); tone(65, 0.12, 'sine', 0.18, 0.35); break;
+      case 'beep': tone(880, 0.08, 'square', 0, 0.06); tone(1175, 0.08, 'square', 0.1, 0.06); tone(988, 0.1, 'square', 0.2, 0.06); break;
+      case 'tick': tone(2000, 0.02, 'square', 0, 0.06); break;
+      case 'snore': tone(110, 0.5, 'sawtooth', 0, 0.04, 90); break;
+      case 'crack': noise(0.25, 0.3); tone(90, 0.4, 'sawtooth', 0, 0.15, 40); break;
+    }
+  } catch { /* audio is optional */ }
+}

@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────── CareerTown visual system ─────────
+   Sticker style: chunky plum outlines + hard offset shadows.
+   Palette: sky #7FD3F7, grass #8BD46E, sun #FFC93C, berry #FF5D8F, lilac #A98BFF, ink #2B2350. */
+
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: #7FD3F7;
+  background-image: radial-gradient(circle at 20% 10%, #BDEBFF 0 18%, transparent 19%), radial-gradient(circle at 85% 25%, #BDEBFF 0 12%, transparent 13%);
+  font-family: Lexend, ui-rounded, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button { touch-action: manipulation; }
+:focus-visible { outline: 4px solid #2B2350; outline-offset: 3px; border-radius: 12px; }
+
+.logo-type { letter-spacing: -0.01em; text-shadow: 3px 3px 0 #FFC93C; }
+.logo-big { font-size: clamp(56px, 13vw, 150px); color: #fff; -webkit-text-stroke: 5px #2B2350; paint-order: stroke fill; text-shadow: 0 8px 0 #2B2350; letter-spacing: -0.02em; }
+.logo-big { transform: rotate(-3deg); }
+
+.chunky-btn { transition: transform .08s, box-shadow .08s; }
+.chunky-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 0 0 #2B2350; }
+
+/* rooms + town keep a fixed 10:7 stage that fits the screen */
+.room {
+  --stage-w: min(100%, calc((100dvh - 190px) * 10 / 7));
+  width: var(--stage-w);
+  aspect-ratio: 10 / 7;
+  max-height: 100%;
+  container-type: size;
+}
+.town { --stage-w: min(100%, calc((100dvh - 110px) * 10 / 7)); }
+@media (max-height: 520px) { .room { --stage-w: min(100%, calc((100dvh - 130px) * 10 / 7)); } }
+
+.entity { touch-action: none; }
+.entity.movable { transition: left .22s ease-out, top .22s ease-out; cursor: grab; }
+.entity.fixed-item { cursor: pointer; }
+.entity.walking { transition: left 2.6s ease-in-out, top 2.6s ease-in-out; }
+.entity.dragging { transition: none !important; filter: drop-shadow(0 14px 6px rgba(43,35,80,.3)); cursor: grabbing; }
+.entity.dragging > div { transform: scale(1.06); }
+.active-ring { background: radial-gradient(ellipse, rgba(255,201,60,.9), rgba(255,201,60,0) 70%); }
+.sticker .emoji { filter: drop-shadow(0 3px 3px rgba(91,58,94,.28)); }
+.entity:not(.dragging) > div > svg, .entity:not(.dragging) > div > div > svg { filter: drop-shadow(0 6px 6px rgba(91,58,94,.16)); }
+.building svg { filter: drop-shadow(0 6px 8px rgba(91,58,94,.18)); }
+
+/* entity reactions */
+@keyframes hop { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-12%) } }
+@keyframes wiggle { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-6deg) } 75% { transform: rotate(6deg) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes bang { 0%,100% { transform: rotate(0) } 40% { transform: rotate(-35deg) } 60% { transform: rotate(10deg) } }
+@keyframes dance { 0%,100% { transform: rotate(0) translateY(0) } 25% { transform: rotate(-10deg) translateY(-8%) } 75% { transform: rotate(10deg) translateY(-8%) } }
+@keyframes pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
+.anim-hop, .anim-play, .anim-check { animation: hop .45s ease-in-out 2; }
+.anim-eat, .anim-brush, .anim-shake, .anim-wash { animation: wiggle .3s ease-in-out 4; }
+.anim-spin { animation: spin .8s ease-in-out; }
+.anim-bang { animation: bang .35s ease-in-out 2; transform-origin: 80% 80%; }
+.anim-dance { animation: dance .5s ease-in-out 2; }
+.anim-pulse, .anim-shine, .anim-tilt, .anim-shower { animation: pulse .5s ease-in-out 2; }
+.anim-shower::after { content: '🫧 🫧'; position: absolute; top: -10%; left: 10%; font-size: 3cqh; animation: hop .6s infinite; }
+.chomp { animation: pulse .25s infinite; transform-origin: center; transform-box: fill-box; }
+
+.zzz { animation: float 2s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); opacity: .6 } 50% { transform: translateY(-30%); opacity: 1 } }
+.steam { font-size: 50%; animation: float 1s ease-in-out infinite; }
+
+.bubble { animation: bubble-in .25s cubic-bezier(.3,1.6,.6,1); }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -10px; width: 14px; height: 14px; background: #fff; border-right: 3px solid #2B2350; border-bottom: 3px solid #2B2350; transform: translateX(-50%) rotate(45deg); }
+@keyframes bubble-in { from { transform: translate(-50%, 10px) scale(.5); opacity: 0 } to { transform: translate(-50%, 0) scale(1); opacity: 1 } }
+
+/* furniture life */
+.glow { animation: glow 1.2s ease-in-out infinite; }
+@keyframes glow { 50% { opacity: .55 } }
+.tv-on { animation: tv 4s linear infinite; }
+@keyframes tv { to { filter: hue-rotate(360deg) } }
+.bounce { animation: hop .8s ease-in-out infinite; transform-box: fill-box; }
+.drops { animation: drip .4s linear infinite; }
+@keyframes drip { from { transform: translateY(-6px) } to { transform: translateY(10px) } }
+.twinkle { animation: glow 1.4s ease-in-out infinite; }
+.swim { animation: swim 3s ease-in-out infinite; transform-box: fill-box; }
+@keyframes swim { 50% { transform: translateX(14px) } }
+.hands { transform-origin: 50px 50px; }
+.anim-spin .hands { animation: spin .6s linear 2; }
+.robot-bob { animation: hop 2s ease-in-out infinite; }
+.anim-dance .robot-bob { animation: none; }
+.pulse-art { transform-origin: center; transform-box: fill-box; }
+.anim-pulse .pulse-art { animation: pulse .4s 3; }
+.tilt-art { transform-origin: 65px 40px; }
+.anim-tilt .tilt-art { animation: wiggle .4s 2; }
+
+/* town */
+.building { transition: transform .15s; transform-origin: 50% 100%; }
+.building:hover { transform: translateY(-3px) scale(1.03); }
+.building.bump { animation: squash .35s ease-out; }
+@keyframes squash { 30% { transform: scale(1.1, .9) } 60% { transform: scale(.95, 1.06) } }
+.building.soon svg { filter: saturate(.35) brightness(1.05); }
+.mission-dot { animation: pulse 1s ease-in-out infinite; }
+.cloud { background: #fff; border: 3px solid #2B2350; border-radius: 999px; animation: drift 40s linear infinite; }
+.cloud::before { content: ''; position: absolute; width: 50%; height: 120%; left: 20%; top: -60%; background: #fff; border: 3px solid #2B2350; border-bottom: none; border-radius: 999px 999px 0 0; }
+.cloud2 { animation-duration: 55s; animation-delay: -20s; }
+@keyframes drift { from { transform: translateX(-30vw) } to { transform: translateX(110vw) } }
+.balloon { animation: balloon 26s linear infinite; left: -8%; }
+@keyframes balloon { 0% { left: -8%; transform: translateY(0) } 25% { transform: translateY(20%) } 50% { transform: translateY(0) } 75% { transform: translateY(15%) } 100% { left: 104%; transform: translateY(0) } }
+.car { animation: drive 12s linear infinite; left: -10%; }
+@keyframes drive { from { left: -10% } to { left: 105% } }
+.walker { animation: walk 22s linear infinite; left: 2%; }
+@keyframes walk { 0% { left: 2% } 48% { left: 88%; transform: scaleX(1) } 50% { left: 88%; transform: scaleX(-1) } 98% { left: 2%; transform: scaleX(-1) } 100% { left: 2%; transform: scaleX(1) } }
+.walker > *:first-child { animation: hop .5s ease-in-out infinite; }
+
+/* panels and overlays */
+.modal-in { animation: fade .2s ease-out; }
+@keyframes fade { from { opacity: 0 } }
+.pop-in, .tray-in { animation: pop .28s cubic-bezier(.3,1.5,.6,1); }
+@keyframes pop { from { transform: scale(.85) translateY(20px); opacity: 0 } }
+.reward-in { animation: pop .45s cubic-bezier(.3,1.7,.5,1); }
+.star-spin { animation: spin 1.2s ease-out; }
+.toast-in { animation: pop .25s ease-out; }
+.feedback-in, .statement-in { animation: pop .25s ease-out; }
+.confetti { position: absolute; top: -20px; height: 14px; border: 2px solid #2B2350; border-radius: 3px; animation: confetti 1.8s ease-in forwards; }
+@keyframes confetti { to { transform: translateY(110vh) rotate(720deg) } }
+.star-pop { animation: pop .5s cubic-bezier(.3,1.7,.5,1) both; }
+.idle-bob { animation: idle 2.4s ease-in-out infinite; }
+@keyframes idle { 50% { transform: translateY(-2%) } }
+.heartbeat-big { animation: pulse .75s ease-in-out infinite; }
+.drop-zone-armed { outline: 4px dashed #FF5D8F; outline-offset: 2px; background: rgba(255,93,143,.12); cursor: pointer; }
+.drag-chip { transition: transform .1s; }
+.mode-card { transition: transform .12s; }
+.mode-card:hover { transform: translateY(-3px) rotate(-.5deg); }
+.magnify { animation: pulse 1s ease-in-out 2; }
+.car-drive { animation: car-in .8s ease-out forwards; }
+@keyframes car-in { from { transform: translateX(-40px) } to { transform: translateX(var(--to)) } }
+.bridge-break { animation: wiggle .2s 3; transform-box: fill-box; transform-origin: center; }
+.waves { animation: drip 2s ease-in-out infinite alternate; }
+
+.intro { background: #7FD3F7; background-image: radial-gradient(circle at 50% 120%, #8BD46E 0 38%, transparent 38.2%), radial-gradient(circle at 15% 20%, #BDEBFF 0 10%, transparent 10.5%), radial-gradient(circle at 80% 15%, #FFF36B 0 7%, transparent 7.5%); }
+.intro-wave { animation: hop 1s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media (prefers-reduced-motion: reduce) { .balloon { animation: none !important; left: 78%; } .walker { animation: none !important; left: 45%; } }
+
+/* compact phone layouts */
+.town { container-type: size; }
+.rotate-hint { display: none; }
+@media (orientation: portrait) and (max-width: 600px) { .rotate-hint { display: flex; } }
+.rotate-phone { animation: turn 2s ease-in-out infinite; }
+@keyframes turn { 0%, 30% { transform: rotate(0) } 60%, 100% { transform: rotate(-90deg) } }
+@media (max-height: 520px) {
+  .hud { padding-top: 4px; padding-bottom: 4px; }
+  .hud > button, .hud > div:not(.logo-type) { min-height: 40px !important; height: 40px; }
+  .room-tabs { padding-bottom: 4px; }
+  .room-tabs button { height: 36px; min-height: 36px; font-size: 14px; }
+  .room { --stage-w: min(100%, calc((100dvh - 104px) * 10 / 7)); }
+  .town { --stage-w: min(100%, calc((100dvh - 64px) * 10 / 7)); }
+  .scene-actions { position: absolute; left: 6px; bottom: 6px; flex-direction: column; align-items: flex-start; padding: 0; z-index: 30; }
+  .scene-actions > button { min-height: 40px; padding: 4px 10px; font-size: 14px; }
+  .scene-actions p { display: none; }
+}

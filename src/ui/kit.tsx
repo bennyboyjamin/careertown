@@ -1,0 +1,183 @@
+import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useGame, playerLevel, levelProgress } from '../engine/store';
+import { BADGES, TOPS, HATS, GLASSES, ACCESSORIES } from '../data/catalog';
+import { ITEMS } from '../data/items';
+import { CharacterArt, charViewBox } from '../components/art/Character';
+import type { CharacterData, Reward } from '../engine/types';
+import { sfx } from '../engine/sfx';
+import { dailyFor } from '../data/daily';
+
+type Tone = 'sun' | 'berry' | 'mint' | 'sky' | 'lilac' | 'white';
+const TONES: Record<Tone, string> = {
+  sun: 'bg-sun text-ink', berry: 'bg-berry text-white', mint: 'bg-mint text-ink',
+  sky: 'bg-sky text-ink', lilac: 'bg-lilac text-white', white: 'bg-white text-ink',
+};
+
+export function Btn({ tone = 'sun', className = '', children, onClick, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { tone?: Tone }) {
+  return (
+    <button
+      {...rest}
+      onClick={(e) => { sfx('tap'); onClick?.(e); }}
+      className={`chunky-btn ${TONES[tone]} font-display font-extrabold rounded-2xl border-[3px] border-ink shadow-chunkysm px-4 py-2 min-h-[48px] disabled:opacity-50 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function Modal({ children, onClose, title, wide = false }: { children: ReactNode; onClose?: () => void; title?: string; wide?: boolean }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-ink/50 modal-in" onPointerDown={(e) => e.target === e.currentTarget && onClose?.()}>
+      <div className={`relative w-full ${wide ? 'max-w-3xl' : 'max-w-md'} max-h-[92dvh] overflow-auto rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4 sm:p-6 pop-in`}>
+        {title && <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-ink pr-12 mb-3">{title}</h2>}
+        {onClose && (
+          <button aria-label="Close" onClick={() => { sfx('tap'); onClose(); }} className="absolute top-3 right-3 w-11 h-11 rounded-full border-[3px] border-ink bg-berry text-white font-display text-xl shadow-chunkysm">✕</button>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function Bubble({ text }: { text: string }) {
+  return (
+    <div className="bubble pointer-events-none absolute left-1/2 bottom-full mb-1 -translate-x-1/2 whitespace-nowrap rounded-2xl border-[3px] border-ink bg-white px-3 py-1 font-display font-bold text-ink text-[clamp(11px,1.6vw,18px)] shadow-chunkysm z-[60]">
+      {text}
+    </div>
+  );
+}
+
+/** Crops a character to head-and-shoulders. */
+export function HeadCrop({ look, age = 'child', size }: { look: CharacterData['look']; age?: 'child' | 'adult'; size: number }) {
+  const k = size / 82;
+  const vbH = charViewBox(age, 'stand', look.build ?? 'average').h;
+  return (
+    <div style={{ width: 120 * k, height: vbH * k, marginLeft: -21 * k, marginTop: -10 * k }}>
+      <CharacterArt look={look} age={age} />
+    </div>
+  );
+}
+
+export function Face({ c, size = 56 }: { c: CharacterData; size?: number }) {
+  return (
+    <div style={{ width: size, height: size }} className="rounded-full overflow-hidden border-[3px] border-ink bg-sky/40 shrink-0">
+      <HeadCrop look={c.look} age={c.age} size={size} />
+    </div>
+  );
+}
+
+export function Coin({ className = '' }: { className?: string }) {
+  return <span className={`inline-flex items-center justify-center rounded-full bg-sun border-[2.5px] border-ink w-6 h-6 text-[13px] font-display font-extrabold text-ink ${className}`}>C</span>;
+}
+
+export function HUD({ onPassport, onMap, onShop, onCreator, title }: { onPassport: () => void; onMap?: () => void; onShop: () => void; onCreator: () => void; title?: string }) {
+  const { game, dispatch } = useGame();
+  const lvl = playerLevel(game.xp);
+  const daily = dailyFor(game.daily.date);
+  const [showDaily, setShowDaily] = useState(false);
+  return (
+    <header className="hud relative z-40 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2">
+      {onMap
+        ? <Btn tone="white" onClick={onMap} aria-label="Back to town" className="!px-3">🗺️<span className="hidden sm:inline ml-1">Town</span></Btn>
+        : <div className="hidden sm:block font-display font-extrabold text-2xl sm:text-3xl text-ink logo-type px-1">CareerTown</div>}
+      {title && <div className="hidden sm:block font-display font-extrabold text-lg sm:text-2xl text-ink truncate">{title}</div>}
+      <div className="flex-1" />
+      <button onClick={() => setShowDaily(true)} className="hidden md:flex items-center gap-2 rounded-2xl border-[3px] border-ink bg-white px-3 py-1 shadow-chunkysm max-w-[300px]">
+        <span className="text-xl">{game.daily.done ? '✅' : daily.icon}</span>
+        <span className="font-body text-sm text-ink truncate">{daily.text}</span>
+      </button>
+      <button onClick={() => setShowDaily(true)} className="md:hidden rounded-2xl border-[3px] border-ink bg-white w-12 h-12 text-xl shadow-chunkysm" aria-label="Daily challenge">{game.daily.done ? '✅' : '📅'}</button>
+      <div className="flex items-center gap-1 rounded-2xl border-[3px] border-ink bg-white pl-1 pr-3 h-12 shadow-chunkysm">
+        <Coin /><span className="font-display font-extrabold text-ink text-lg tabular-nums">{game.coins}</span>
+      </div>
+      <button onClick={onPassport} className="flex items-center gap-2 rounded-2xl border-[3px] border-ink bg-lilac pl-1 pr-2 h-12 shadow-chunkysm" aria-label="Career passport">
+        <span className="w-9 h-9 rounded-xl bg-white border-[2.5px] border-ink grid place-items-center font-display font-extrabold text-ink">{lvl}</span>
+        <span className="hidden sm:block w-16 h-3 rounded-full bg-white border-2 border-ink overflow-hidden"><span className="block h-full bg-mint" style={{ width: `${levelProgress(game.xp) * 100}%` }} /></span>
+        <span className="text-xl">🛂</span>
+      </button>
+      <Btn tone="sky" onClick={onCreator} aria-label="Characters" className="!px-2.5 sm:!px-3">🧑‍🎨</Btn>
+      <Btn tone="berry" onClick={onShop} aria-label="Shop" className="!px-2.5 sm:!px-3">🛍️</Btn>
+      <Btn tone="white" onClick={() => dispatch({ type: 'TOGGLE_SOUND' })} aria-label="Sound" className="!px-3 hidden sm:block">{game.settings.sound ? '🔊' : '🔇'}</Btn>
+      {showDaily && (
+        <Modal title="Today’s challenge" onClose={() => setShowDaily(false)}>
+          <div className="flex items-center gap-4">
+            <div className="text-6xl">{daily.icon}</div>
+            <div>
+              <p className="font-display text-xl text-ink">{daily.text}</p>
+              <p className="font-body text-ink/70 mt-1">Reward: {daily.coins} coins</p>
+            </div>
+          </div>
+          <div className="mt-4 h-5 rounded-full border-[3px] border-ink bg-white overflow-hidden">
+            <div className="h-full bg-mint" style={{ width: `${Math.min(1, game.daily.progress / daily.target) * 100}%` }} />
+          </div>
+          <p className="font-body text-ink mt-2">{game.daily.done ? 'Done! Come back tomorrow for a new one.' : `${game.daily.progress} of ${daily.target}`}</p>
+        </Modal>
+      )}
+    </header>
+  );
+}
+
+function rewardLines(r: Reward) {
+  const lines: { icon: ReactNode; text: string }[] = [];
+  if (r.coins) lines.push({ icon: <Coin />, text: `+${r.coins} coins` });
+  if (r.xp) lines.push({ icon: '⭐', text: `+${r.xp} XP` });
+  if (r.career && r.careerXp) lines.push({ icon: '🛂', text: `+${r.careerXp} career points` });
+  if (r.badge) lines.push({ icon: BADGES[r.badge]?.icon, text: `Badge: ${BADGES[r.badge]?.label}` });
+  for (const u of r.unlocks ?? []) {
+    if (u === 'pet:puppy') lines.push({ icon: '🐶', text: 'A puppy moved into your living room!' });
+    else if (u === 'pet:bunny') lines.push({ icon: '🐰', text: 'A bunny moved into your living room!' });
+    else if (u === 'pet:kitten') lines.push({ icon: '🐱', text: 'A kitten moved into your living room!' });
+    else if (u.startsWith('pet:')) lines.push({ icon: '🎀', text: 'New pet accessory' });
+    else if (u.startsWith('wear:')) { const [, slot, id] = u.split(':'); const list = { top: TOPS, hat: HATS, glasses: GLASSES, accessory: ACCESSORIES }[slot] ?? []; lines.push({ icon: slot === 'hat' ? '🎩' : '👕', text: `New in the closet: ${list.find((o) => o.id === id)?.label ?? id}` }); }
+    else lines.push({ icon: '🎁', text: `New item: ${ITEMS[u]?.name ?? u}` });
+  }
+  return lines;
+}
+
+export function RewardPopup() {
+  const { queue, dispatch } = useGame();
+  const p = queue[0];
+  if (!p) return null;
+  return (
+    <div className="fixed inset-0 z-[70] grid place-items-center bg-ink/55 p-4 modal-in">
+      <Confetti />
+      <div key={p.id} className="relative w-full max-w-sm rounded-[32px] border-[4px] border-ink bg-sun shadow-chunky p-6 text-center reward-in">
+        <div className="text-6xl -mt-14 mb-1 star-spin">🌟</div>
+        <h2 className="font-display text-3xl font-extrabold text-ink">{p.title}</h2>
+        <ul className="mt-4 space-y-2 text-left">
+          {rewardLines(p.reward).map((l, i) => (
+            <li key={i} className="flex items-center gap-3 rounded-2xl bg-white border-[3px] border-ink px-3 py-2 font-body text-ink">
+              <span className="text-2xl w-8 grid place-items-center">{l.icon}</span>{l.text}
+            </li>
+          ))}
+        </ul>
+        <Btn tone="berry" className="mt-5 w-full text-xl" onClick={() => { sfx('coin'); dispatch({ type: 'DISMISS_POPUP' }); }}>Yay!</Btn>
+      </div>
+    </div>
+  );
+}
+
+function Confetti() {
+  const bits = Array.from({ length: 28 }, (_, i) => i);
+  const colors = ['#FF5D8F', '#FFC93C', '#5FE0B7', '#7FD3F7', '#A98BFF'];
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      {bits.map((i) => (
+        <span key={i} className="confetti" style={{ left: `${(i * 37) % 100}%`, background: colors[i % 5], animationDelay: `${(i % 7) * 0.12}s`, width: 10 + (i % 3) * 4 }} />
+      ))}
+    </div>
+  );
+}
+
+export function Toast() {
+  const { toast } = useGame();
+  const [shown, setShown] = useState<typeof toast>();
+  useEffect(() => {
+    if (!toast) return;
+    setShown(toast);
+    const t = window.setTimeout(() => setShown(undefined), 2200);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+  if (!shown) return null;
+  return <div key={shown.id} className="fixed z-[80] left-1/2 top-20 -translate-x-1/2 rounded-2xl border-[3px] border-ink bg-white px-4 py-2 font-display font-bold text-ink shadow-chunkysm toast-in">{shown.text}</div>;
+}
