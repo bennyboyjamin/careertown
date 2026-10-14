@@ -11,6 +11,7 @@ export const DAILY: DailyDef[] = [
   { id: 'artist', text: 'Draw a picture on the chalkboard', event: 'draw', target: 1, coins: 20, icon: '🖍️' },
   { id: 'vet', text: 'Help 3 animals at the Animal Hospital', event: 'pet-care', target: 3, coins: 25, icon: '🐾' },
   { id: 'robot', text: 'Program the robot to reach the charger', event: 'mission:software-robot', target: 1, coins: 30, icon: '🤖' },
+  { id: 'friends', text: 'Give 3 hugs to friends', event: 'hug', target: 3, coins: 20, icon: '🤗' },
   { id: 'tower', text: 'Stack a tower 4 blocks tall', event: 'tower4', target: 1, coins: 25, icon: '🧱' },
 ];
 

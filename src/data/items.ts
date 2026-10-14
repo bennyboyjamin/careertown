@@ -4,7 +4,7 @@ import type { SfxName } from '../engine/sfx';
 export type ItemTag =
   | 'food' | 'cookable' | 'washable' | 'small' | 'toy' | 'tool' | 'medical'
   | 'seat' | 'bed' | 'table' | 'stove' | 'sink' | 'door' | 'behind'
-  | 'block' | 'floor' | 'shower' | 'petfood' | 'brush' | 'decor' | 'groom';
+  | 'block' | 'floor' | 'shower' | 'petfood' | 'brush' | 'decor' | 'groom' | 'wall' | 'float';
 
 export type TapAction =
   | { type: 'toggle'; sfx?: SfxName }
@@ -12,7 +12,9 @@ export type TapAction =
   | { type: 'wardrobe' }
   | { type: 'custom'; id: string }
   | { type: 'anim'; anim: string; sfx?: SfxName; bubble?: string[] }
-  | { type: 'secret'; secretId: string; taps: number; anim?: string; sfx?: SfxName };
+  | { type: 'secret'; secretId: string; taps: number; anim?: string; sfx?: SfxName }
+  | { type: 'roll'; bubble?: string[]; sfx?: SfxName }
+  | { type: 'pop' };
 
 export interface ItemDef {
   id: string;
@@ -62,12 +64,14 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     prop('toothbrush', 'Toothbrush', '🪥', ['brush']),
     prop('backpack', 'Backpack', '🎒', ['tool']),
     prop('book', 'Book', '📘', ['toy']),
-    prop('teddy', 'Teddy bear', '🧸', ['toy']),
-    prop('ball', 'Ball', '⚽', ['toy']),
+    prop('teddy', 'Teddy bear', '🧸', ['toy'], { tap: { type: 'anim', anim: 'hop', sfx: 'pop', bubble: ['Hug me!', 'I love you!', 'Squishy!'] } }),
+    prop('ball', 'Ball', '⚽', ['toy'], { tap: { type: 'roll', sfx: 'pop' } }),
     prop('yarn', 'Yarn ball', '🧶', ['toy']),
-    prop('train', 'Toy train', '🚂', ['toy']),
+    prop('train', 'Toy train', '🚂', ['toy'], { tap: { type: 'roll', sfx: 'ring', bubble: ['Choo choo!', 'All aboard!'] } }),
     prop('paints', 'Paint set', '🎨', ['toy']),
-    prop('duck', 'Rubber duck', '🦆', ['toy']),
+    prop('duck', 'Rubber duck', '🦆', ['toy'], { tap: { type: 'anim', anim: 'shake', sfx: 'beep', bubble: ['Squeak!', 'Quack quack!'] } }),
+    prop('balloon', 'Balloon', '🎈', ['toy', 'float'], { tap: { type: 'pop' } }),
+    prop('drum', 'Drum', '🥁', ['toy'], { tap: { type: 'anim', anim: 'shake', sfx: 'bang', bubble: ['Boom boom!', 'Ba-dum tss!'] } }),
     prop('soap', 'Soap', '🧼', ['tool']),
     prop('clock', 'Alarm clock', '⏰', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'ring', bubble: ['Rise and shine!'] } }),
     prop('globe', 'Globe', '🌍', ['toy'], { tap: { type: 'anim', anim: 'spin', sfx: 'whoosh' } }),
@@ -107,16 +111,16 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     { id: 'cupboard', name: 'Cupboard', art: 'cupboard', w: 230, h: 110, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: true, items: ['plate', 'cup', 'cupcake'] } },
     { id: 'table', name: 'Table', art: 'table', w: 280, h: 125, tags: ['table'] },
-    { id: 'chair', name: 'Chair', art: 'chair', w: 90, h: 150, tags: ['seat'], seatLift: 62 },
-    { id: 'bed', name: 'Bed', art: 'bed', w: 330, h: 170, tags: ['bed'] },
+    { id: 'chair', name: 'Chair', art: 'chair', w: 90, h: 150, tags: ['seat'], seatLift: 62, tap: { type: 'anim', anim: 'spin', sfx: 'whoosh' } },
+    { id: 'bed', name: 'Bed', art: 'bed', w: 330, h: 170, tags: ['bed'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So fluffy!', 'Boing boing!'] } },
     { id: 'closet', name: 'Closet', art: 'closet', w: 175, h: 305, fixed: true, tags: [], tap: { type: 'wardrobe' } },
     { id: 'toybox', name: 'Toy box', art: 'toybox', w: 160, h: 115, tags: [],
-      tap: { type: 'spawn', toggle: true, items: ['teddy', 'ball', 'train', 'paints', 'book', 'yarn'] } },
+      tap: { type: 'spawn', toggle: true, items: ['teddy', 'ball', 'train', 'balloon', 'drum', 'paints', 'book', 'yarn'] } },
     { id: 'lamp', name: 'Lamp', art: 'lamp', w: 85, h: 195, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'tv', name: 'TV', art: 'tv', w: 210, h: 185, tags: [], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'window', name: 'Window', art: 'window', w: 200, h: 165, fixed: true, tags: [], tap: { type: 'toggle', sfx: 'whoosh' } },
     { id: 'rug', name: 'Rug', art: 'rug', w: 340, h: 70, tags: ['floor'] },
-    { id: 'couch', name: 'Couch', art: 'couch', w: 360, h: 170, tags: ['seat'], seatLift: 70 },
+    { id: 'couch', name: 'Couch', art: 'couch', w: 360, h: 170, tags: ['seat'], seatLift: 70, tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Comfy!', 'Pillow fort time?'] } },
     { id: 'bookshelf', name: 'Bookshelf', art: 'bookshelf', w: 170, h: 265, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: false, items: ['book', 'paints', 'clock'] } },
     { id: 'shower', name: 'Shower', art: 'shower', w: 190, h: 340, fixed: true, tags: ['shower'] },
@@ -129,11 +133,11 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
       tap: { type: 'secret', secretId: 'underbed', taps: 1, sfx: 'sparkle' } },
 
     // ── Shop / reward decor ───────────────────────────
-    { id: 'plant', name: 'Leafy plant', art: 'plant', w: 95, h: 160, tags: ['decor'] },
+    { id: 'plant', name: 'Leafy plant', art: 'plant', w: 95, h: 160, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ['Rustle rustle', 'Thanks for the water!'] } },
     { id: 'beanbag', name: 'Beanbag', art: 'beanbag', w: 140, h: 100, tags: ['seat', 'decor'], seatLift: 38 },
     { id: 'fishbowl', name: 'Fishbowl', art: 'fishbowl', w: 110, h: 110, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'splash', bubble: ['Blub blub!'] } },
     { id: 'starrug', name: 'Star rug', art: 'starrug', w: 300, h: 70, tags: ['floor', 'decor'] },
-    { id: 'rocketposter', name: 'Rocket poster', art: 'rocketposter', w: 130, h: 160, tags: ['decor'] },
+    { id: 'rocketposter', name: 'Rocket poster', art: 'rocketposter', w: 130, h: 160, tags: ['decor', 'wall'] },
     { id: 'trophy', name: 'Gold trophy', emoji: '🏆', w: 80, h: 80, tags: ['small', 'decor'] },
     { id: 'petbed', name: 'Pet bed', art: 'petbed', w: 150, h: 70, tags: ['bed', 'decor'] },
 

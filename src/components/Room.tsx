@@ -48,6 +48,13 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   const [bubbles, setBubbles] = useState<Record<string, { text: string; key: string }>>({});
   const [anims, setAnims] = useState<Record<string, string>>({});
   const [spawnFor, setSpawnFor] = useState<string | null>(null);
+  const [bursts, setBursts] = useState<{ key: string; id: string; emoji: string }[]>([]);
+  const tapLog = useRef<Record<string, number[]>>({});
+  const burst = (id: string, emoji: string) => {
+    const key = uid('p');
+    setBursts((b) => [...b, { key, id, emoji }]);
+    window.setTimeout(() => setBursts((b) => b.filter((x) => x.key !== key)), 1100);
+  };
 
   // first visit: persist the default layout so later edits have a base
   useEffect(() => {
@@ -81,6 +88,22 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       }
       patch(patches);
     }, 3200);
+    return () => window.clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game, sceneId]);
+
+  // ── Idle life: characters do little things on their own ──
+  useEffect(() => {
+    const t = window.setInterval(() => {
+      if (dragRef.current) return;
+      const people = sceneOf(game, sceneId).filter((e) => e.kind === 'character' && e.pose !== 'sleep');
+      if (!people.length || Math.random() < 0.4) return;
+      const who = people[Math.floor(Math.random() * people.length)];
+      const r = Math.random();
+      if (r < 0.45) { play(who.id, 'hop', 600); burst(who.id, ['🎵', '✨', '💭', '⭐'][Math.floor(Math.random() * 4)]); }
+      else if (r < 0.75) { play(who.id, 'happy', 1400); say(who.id, ['La la la 🎵', 'What a nice day!', 'I’m hungry…', 'Let’s play!', 'Hmm…'][Math.floor(Math.random() * 5)]); }
+      else play(who.id, 'wave', 1200);
+    }, 6500);
     return () => window.clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game, sceneId]);
@@ -179,6 +202,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     if (fx.sfx) sfx(fx.sfx);
     if (fx.bubble) say(fx.bubble.id, fx.bubble.text);
     if (fx.anim) play(fx.anim.id, fx.anim.anim, fx.anim.ms);
+    fx.anims?.forEach((a) => play(a.id, a.anim, a.ms));
+    fx.bursts?.forEach((b) => burst(b.id, b.emoji));
     fx.events.forEach((name) => dispatch({ type: 'EVENT', name }));
     if (fx.later) {
       const later = fx.later;
@@ -203,6 +228,14 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
         const seat = byId.get(getState<string>(e, 'on') ?? '');
         patch([{ id: e.id, patch: { pose: 'stand', y: Math.min(695, (seat ? seat.y : e.y) + 18), state: withState(e, { on: undefined }) } }]);
         say(e.id, e.pose === 'sleep' ? 'Good morning! ☀️' : 'Up I go!'); sfx('pop'); return;
+      }
+      const now = Date.now();
+      const log = (tapLog.current[e.id] = [...(tapLog.current[e.id] ?? []), now].filter((t0) => now - t0 < 1300));
+      if (log.length >= 3) {
+        tapLog.current[e.id] = [];
+        play(e.id, 'tickle', 1300); say(e.id, ['Hehe! That tickles!', 'Stop it! Hahaha!', 'Giggle giggle!'][Math.floor(Math.random() * 3)]);
+        burst(e.id, '😆'); sfx('sparkle'); dispatch({ type: 'EVENT', name: 'tickle' });
+        return;
       }
       play(e.id, 'hop', 600); say(e.id, GREET[Math.floor(Math.random() * GREET.length)]); sfx('tap');
       return;
@@ -233,6 +266,19 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
         break;
       }
       case 'custom': onCustomTap?.(e); break;
+      case 'roll': {
+        const dir = e.x > 500 ? -1 : 1;
+        const nx = Math.max(40, Math.min(960, e.x + dir * (160 + Math.random() * 180)));
+        patch([{ id: e.id, patch: { x: nx, y: Math.max(e.y, def.horizon + 60), state: withState(e, { on: undefined }) } }]);
+        play(e.id, 'spin', 800); sfx(t.sfx ?? 'pop');
+        if (t.bubble) say(e.id, t.bubble[Math.floor(Math.random() * t.bubble.length)]);
+        break;
+      }
+      case 'pop':
+        sfx('bang'); burst(e.id, '💥');
+        if (e.heldBy) patch([{ id: e.heldBy, patch: { holding: undefined } }]);
+        dispatch({ type: 'REMOVE_ENTITIES', scene: sceneId, ids: [e.id] });
+        break;
       case 'anim': play(e.id, t.anim, 1000); if (t.sfx) sfx(t.sfx); if (t.bubble) say(e.id, t.bubble[Math.floor(Math.random() * t.bubble.length)]); break;
       case 'secret': {
         const taps = (getState<number>(e, 'taps') ?? 0) + 1;
@@ -282,7 +328,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     const anim = anims[e.id];
     if (e.kind === 'character') {
       const c = look.character(e.ref); if (!c) return null;
-      const mood: Mood = holderMood ?? (anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'check' || anim === 'hop' ? 'happy' : 'normal');
+      const holds = e.holding ? byId.get(e.holding)?.ref : undefined;
+      const mood: Mood = holderMood ?? (anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
       const art = <CharacterArt age={c.age} look={c.look} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
       if (e.pose === 'sleep') {
         const st = sizeOf({ ...e, pose: 'stand' }, look);
@@ -352,6 +399,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
                 );
               })()}
               {bubbles[e.id] && <Bubble key={bubbles[e.id].key} text={bubbles[e.id].text} />}
+              {bursts.filter((b) => b.id === e.id).map((b, i) => <span key={b.key} className="burst" style={{ ['--bx' as string]: `${(i % 3 - 1) * 26}px` }}>{b.emoji}</span>)}
             </div>
           );
         })}

@@ -173,3 +173,11 @@ button { touch-action: manipulation; }
   .scene-actions > button { min-height: 40px; padding: 4px 10px; font-size: 14px; }
   .scene-actions p { display: none; }
 }
+
+/* ── Play-feel pass ── */
+.entity.movable { transition: left .25s ease-out, top .38s cubic-bezier(.34,1.56,.64,1); cursor: grab; }
+.anim-happy { animation: hop .45s ease-in-out 2; }
+.anim-tickle { animation: dance .3s ease-in-out 4; }
+.anim-wave { animation: wiggle .4s ease-in-out 3; }
+.burst { position: absolute; left: 50%; top: 10%; font-size: clamp(16px, 3vw, 34px); pointer-events: none; z-index: 70; animation: burst 1.1s ease-out forwards; transform: translateX(-50%); }
+@keyframes burst { 0% { opacity: 0; transform: translate(-50%, 0) scale(.4); } 20% { opacity: 1; transform: translate(calc(-50% + var(--bx)), -30%) scale(1.15); } 100% { opacity: 0; transform: translate(calc(-50% + var(--bx) * 1.6), -160%) scale(.9); } }

@@ -59,6 +59,8 @@ export interface Effect {
   sfx?: SfxName;
   bubble?: { id: string; text: string };
   anim?: { id: string; anim: string; ms: number };
+  anims?: { id: string; anim: string; ms: number }[];
+  bursts?: { id: string; emoji: string }[];
   later?: { ms: number; patches: { id: string; patch: Partial<Entity> }[]; sfx?: SfxName; bubble?: { id: string; text: string }; events?: string[] };
   moveTo?: { scene: SceneId; entity: Entity };
 }
@@ -91,6 +93,29 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
     const td = t.kind === 'item' ? ITEMS[t.ref] : undefined;
     const ts = sizeOf(t, look);
     const top = t.y - ts.h + 8;
+
+    // ── Friends meeting ──
+    if ((d.kind === 'character' || d.kind === 'pet') && (t.kind === 'character' || t.kind === 'pet')) {
+      const side = x < t.x ? -1 : 1;
+      const nx = clamp(t.x + side * (d.kind === 'pet' || t.kind === 'pet' ? 85 : 95), 40, 960);
+      const pet = d.kind === 'pet' ? d : t.kind === 'pet' ? t : undefined;
+      const person = d.kind === 'character' ? d : t.kind === 'character' ? t : undefined;
+      P(d.id, { x: nx, y: clamp(t.y, horizon + 70, 695), pose: 'stand', state: withState(d, { on: undefined, ...(pet && person && pet.id === d.id ? { follow: person.ref } : {}) }) });
+      if (pet && person && pet.id === t.id) P(t.id, { state: withState(t, { follow: person.ref }) });
+      fx.anims = [{ id: d.id, anim: 'hop', ms: 900 }, { id: t.id, anim: 'hop', ms: 900 }];
+      fx.bursts = [{ id: t.id, emoji: '💕' }, { id: d.id, emoji: '💕' }];
+      if (pet && person) {
+        fx.bubble = { id: person.id, text: pick(['Aww! 🥰', 'Who’s a good buddy?', 'Snuggle time!']) };
+        fx.events.push('pet-play');
+      } else if (!pet) {
+        fx.bubble = { id: t.id, text: pick(['Hug! 🤗', 'Best friends!', 'Hi friend!', 'Yay, you’re here!']) };
+        fx.events.push('hug');
+      } else {
+        fx.bubble = { id: t.id, text: 'Hi buddy! 💕' };
+      }
+      fx.sfx = 'sparkle';
+      return true;
+    }
 
     // ── People ──
     if (d.kind === 'character' || d.kind === 'pet') {
@@ -133,7 +158,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
       if (has(dd, 'food')) {
         fx.remove.push(d.id); fx.anim = { id: t.id, anim: 'eat', ms: 1400 };
         fx.bubble = { id: t.id, text: pick(['Yum!', 'Delicious!', 'Mmm, tasty!', 'Crunch crunch!']) };
-        fx.sfx = 'munch'; fx.events.push('eat');
+        fx.sfx = 'munch'; fx.events.push('eat'); fx.bursts = [{ id: t.id, emoji: '😋' }];
         return true;
       }
       if (has(dd, 'brush')) {
@@ -222,7 +247,10 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
   if (!candidates.some(tryRule)) {
     const actor = d.kind !== 'item';
     const floorOnly = actor || has(dd, 'floor');
-    const ny = clamp(y, floorOnly ? horizon + 70 : 40, 695);
+    let ny = clamp(y, floorOnly ? horizon + 70 : 40, 695);
+    // Things fall to the floor (or float up, for balloons) like real toys.
+    if (!actor && has(dd, 'float')) ny = 110 + Math.random() * 90;
+    else if (!actor && !has(dd, 'wall') && ny < horizon + 55) { ny = horizon + 60 + Math.random() * 45; fx.bursts = [{ id: d.id, emoji: '💫' }]; }
     P(d.id, { x: clamp(x, 30, 970), y: ny, ...(actor ? { pose: 'stand' as const } : {}), state: withState(d, { on: undefined }) });
     fx.sfx = 'tap';
   }
