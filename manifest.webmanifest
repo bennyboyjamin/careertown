@@ -1,0 +1,16 @@
+{
+  "name": "CareerTown",
+  "short_name": "CareerTown",
+  "description": "Explore a cozy town, build a family and try out real jobs.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#7FD3F7",
+  "theme_color": "#7FD3F7",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
