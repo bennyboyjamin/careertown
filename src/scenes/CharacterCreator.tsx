@@ -5,6 +5,7 @@ import { BUILDS, ACCESSORIES, BOTTOMS, CLOTH_COLORS, EYES, FACES, GLASSES, HAIRS
 import { MISSIONS } from '../data/missions';
 import { CharacterArt } from '../components/art/Character';
 import { Btn, Face, HeadCrop } from '../ui/kit';
+import { Person } from '../components/Person';
 import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
 
@@ -118,16 +119,16 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
           </div>
           <div className="creator-stage relative w-full aspect-[3/4] rounded-[22px] border-[3px] border-ink bg-sky/30 mt-2 flex items-end justify-center overflow-hidden">
             <div className="absolute bottom-0 inset-x-0 h-[18%] bg-grass border-t-[3px] border-ink" />
-            <div className={`relative mb-[6%] ${draft.age === 'adult' ? 'w-[64%] h-[88%]' : 'w-[60%] h-[70%]'} idle-bob`}><CharacterArt age={draft.age} look={draft.look} mood="happy" /></div>
+            <div className={`relative mb-[6%] ${draft.sprite ? 'w-[64%] h-[88%]' : draft.age === 'adult' ? 'w-[64%] h-[88%]' : 'w-[60%] h-[70%]'} idle-bob`}><Person c={draft} mood="happy" /></div>
           </div>
           <input value={draft.name} maxLength={12} onChange={(e) => setDraft({ ...draft, name: e.target.value })} aria-label="Character name"
             className="mt-3 w-full rounded-2xl border-[3px] border-ink px-3 h-12 font-display text-xl text-ink text-center" />
-          <div className="mt-2 grid grid-cols-2 gap-2 w-full">
+          {!draft.sprite && <div className="mt-2 grid grid-cols-2 gap-2 w-full">
             {(['child', 'adult'] as const).map((a) => (
               <button key={a} onClick={() => { sfx('tap'); setDraft({ ...draft, age: a }); }}
                 className={`rounded-2xl border-[3px] border-ink h-12 font-display font-bold text-ink ${draft.age === a ? 'bg-sun' : 'bg-white'}`}>{a === 'child' ? '🧒 Kid' : '🧑 Grown-up'}</button>
             ))}
-          </div>
+          </div>}
           <div className="mt-3 flex gap-2 w-full">
             <Btn tone="mint" className="flex-1 text-lg" onClick={save}>{isNew ? 'Create' : 'Save'}</Btn>
             {!isNew && game.characters.length > 1 && (
@@ -137,7 +138,7 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
           <Btn tone="sky" className="mt-2 w-full" onClick={() => { if (!isNew) save(); onDone(); }}>Done</Btn>
         </div>
         <div className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4">
-          <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />
+          {draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
         </div>
       </div>
     </div>

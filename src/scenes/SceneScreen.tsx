@@ -6,8 +6,7 @@ import { Room, placeActor } from '../components/Room';
 import { BUILDINGS } from '../data/buildings';
 import { ITEMS } from '../data/items';
 import { Btn, Face, Modal } from '../ui/kit';
-import { PetArt } from '../components/art/Pet';
-import { CharacterArt } from '../components/art/Character';
+import { Person, PetPic } from '../components/Person';
 import { FurnitureArt } from '../components/art/Furniture';
 import { LookEditor } from './CharacterCreator';
 import { uid } from '../engine/ids';
@@ -73,7 +72,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
               return (
                 <button key={p.id} onClick={() => !inRoom && placeActor(dispatch, sceneId, 'pet', p.id)}
                   className={`shrink-0 flex flex-col items-center gap-1 rounded-2xl border-[3px] border-ink p-2 w-20 ${inRoom ? 'bg-sun' : 'bg-white'}`}>
-                  <div className="w-14 h-14"><PetArt species={p.species} accessory={p.accessory} /></div><span className="font-body text-xs text-ink">{inRoom ? `✓ ${p.name}` : p.name}</span>
+                  <div className="w-14 h-14"><PetPic p={p} /></div><span className="font-body text-xs text-ink">{inRoom ? `✓ ${p.name}` : p.name}</span>
                 </button>
               );
             })}
@@ -119,7 +118,7 @@ function WardrobeSheet({ characterId, onClose }: { characterId: string; onClose:
         <div className="hidden sm:grid place-items-center rounded-2xl border-[3px] border-ink bg-sky/30 h-64">
           <div className="w-[70%] h-[90%]"><CharacterPreview id={characterId} /></div>
         </div>
-        <LookEditor clothesOnly age={c.age} look={c.look} onChange={(look) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, look } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
+        {c.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{c.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor clothesOnly age={c.age} look={c.look} onChange={(look) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, look } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
       </div>
     </Modal>
   );
@@ -127,7 +126,7 @@ function WardrobeSheet({ characterId, onClose }: { characterId: string; onClose:
 function CharacterPreview({ id }: { id: string }) {
   const { game } = useGame();
   const c = game.characters.find((x) => x.id === id)!;
-  return <CharacterArt age={c.age} look={c.look} mood="happy" />;
+  return <Person c={c} mood="happy" />;
 }
 
 function Chalkboard({ entity, sceneId, onClose }: { entity: Entity; sceneId: SceneId; onClose: () => void }) {

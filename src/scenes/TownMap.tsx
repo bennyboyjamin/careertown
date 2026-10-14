@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { BUILDINGS, type BuildingDef } from '../data/buildings';
 import { useGame } from '../engine/store';
-import { INK, CharacterArt } from '../components/art/Character';
-import { PetArt } from '../components/art/Pet';
+import { INK } from '../components/art/Character';
+import { Person, PetPic } from '../components/Person';
 import { sfx } from '../engine/sfx';
 import type { BuildingId } from '../engine/types';
 
@@ -110,8 +110,8 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
         {/* walker + pet on the sidewalk */}
         {walker && (
           <div className="walker absolute z-10 top-[33.5%] w-[4.2%] h-[11%] pointer-events-none">
-            <CharacterArt age={walker.age} look={walker.look} mood="happy" />
-            {pet && <div className="absolute -right-[85%] bottom-0 w-[80%] h-[42%]"><PetArt species={pet.species} accessory={pet.accessory} /></div>}
+            <Person c={walker} mood="happy" />
+            {pet && <div className="absolute -right-[85%] bottom-0 w-[80%] h-[42%]"><PetPic p={pet} /></div>}
           </div>
         )}
 

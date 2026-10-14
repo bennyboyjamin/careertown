@@ -6,8 +6,8 @@ import { ITEMS } from '../data/items';
 import { SCENES } from '../data/scenes';
 import { SECRETS, VISITORS } from '../data/catalog';
 import { ROOM_H, ROOM_W, dependentsOf, depthOf, getState, resolveDrop, sizeOf, withState, type Effect, type Lookup } from '../engine/interactions';
-import { CharacterArt, type Mood } from './art/Character';
-import { PetArt } from './art/Pet';
+import { type Mood } from './art/Character';
+import { Person, PetPic } from './Person';
 import { FurnitureArt } from './art/Furniture';
 import { RoomBackdrop } from './RoomBackdrop';
 import { Bubble } from '../ui/kit';
@@ -330,7 +330,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       const c = look.character(e.ref); if (!c) return null;
       const holds = e.holding ? byId.get(e.holding)?.ref : undefined;
       const mood: Mood = holderMood ?? (anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
-      const art = <CharacterArt age={c.age} look={c.look} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
+      const art = <Person c={c} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
       if (e.pose === 'sleep') {
         const st = sizeOf({ ...e, pose: 'stand' }, look);
         const sl = sizeOf(e, look);
@@ -346,7 +346,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     if (e.kind === 'pet') {
       const p = look.pet(e.ref); if (!p) return null;
       const face = getState<number>(e, 'face') ?? 1;
-      return <div className="w-full h-full" style={{ transform: `scaleX(${-face})` }}><PetArt species={p.species} accessory={p.accessory} sleeping={e.pose === 'sleep'} bandage={!!getState(e, 'bandage')} /></div>;
+      return <div className="w-full h-full" style={{ transform: `scaleX(${-face})` }}><PetPic p={p} sleeping={e.pose === 'sleep'} bandage={!!getState(e, 'bandage')} /></div>;
     }
     const d = ITEMS[e.ref]; if (!d) return null;
     if (d.emoji) return (

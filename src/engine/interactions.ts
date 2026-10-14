@@ -1,5 +1,6 @@
 import type { CharacterData, Entity, PetData, SceneId } from './types';
 import { ITEMS, has, type ItemDef } from '../data/items';
+import { SPRITES } from '../data/sprites';
 import type { SfxName } from './sfx';
 
 // ── Geometry ───────────────────────────────────────────
@@ -13,7 +14,17 @@ export interface Lookup {
 
 export function sizeOf(e: Entity, look: Lookup): { w: number; h: number } {
   if (e.kind === 'item') { const d = ITEMS[e.ref]; return { w: d?.w ?? 60, h: d?.h ?? 60 }; }
-  if (e.kind === 'pet') return e.pose === 'sleep' ? { w: 150, h: 88 } : { w: 135, h: 123 };
+  if (e.kind === 'pet') {
+    const ps = look.pet(e.ref)?.sprite; const sp = ps ? SPRITES[ps] : undefined;
+    if (sp) return e.pose === 'sleep' ? { w: sp.w * 1.15, h: sp.h * 0.85 } : { w: sp.w, h: sp.h };
+    return e.pose === 'sleep' ? { w: 150, h: 88 } : { w: 135, h: 123 };
+  }
+  const cs = look.character(e.ref)?.sprite; const csp = cs ? SPRITES[cs] : undefined;
+  if (csp) {
+    if (e.pose === 'sit') return { w: csp.w, h: csp.h * 0.8 };
+    if (e.pose === 'sleep') return { w: csp.h, h: csp.w };
+    return { w: csp.w, h: csp.h };
+  }
   const adult = look.character(e.ref)?.age === 'adult';
   const w = adult ? 175 : 165, h = adult ? 257 : 212;
   if (e.pose === 'sit') return { w, h: h * (adult ? 0.85 : 0.92) };

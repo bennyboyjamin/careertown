@@ -9,28 +9,56 @@ import { uid } from './ids';
 import { setSoundEnabled, sfx } from './sfx';
 
 // ── Defaults ───────────────────────────────────────────
+const L = { skin: '#E8AE7E', face: 'round', eyes: 'dot', hair: 'long', hairColor: '#24160E', top: 'tee', topColor: '#FF5D5D', bottom: 'jeans', bottomColor: '#6E95DB', shoes: '#FFFFFF', glasses: 'none', hat: 'none', accessory: 'none' } as CharacterData['look'];
 export const DEFAULT_CHARACTERS: CharacterData[] = [
-  { id: 'kai', name: 'Kai', age: 'child', look: {
-    skin: '#C98B5B', face: 'round', eyes: 'happy', hair: 'curly', hairColor: '#2B1B12', top: 'star', topColor: '#FFC93C',
-    bottom: 'shorts', bottomColor: '#3D7BFF', shoes: '#FF5D8F', glasses: 'none', hat: 'none', accessory: 'none' } },
-  { id: 'rosa', name: 'Rosa', age: 'adult', look: {
-    skin: '#F6CBA5', face: 'oval', eyes: 'lashes', hair: 'long', hairColor: '#A8652F', top: 'sweater', topColor: '#5FE0B7',
-    bottom: 'jeans', bottomColor: '#3D7BFF', shoes: '#2B2350', glasses: 'round', hat: 'none', accessory: 'necklace' } },
+  { id: 'yuna', name: 'Yuna', age: 'child', sprite: 'yuna', look: { ...L, top: 'hoodie', topColor: '#E2483B' } },
+  { id: 'natalie', name: 'Natalie', age: 'child', sprite: 'natalie', look: { ...L, hair: 'ponytail', top: 'tee', topColor: '#222222', bottom: 'pants', bottomColor: '#222222' } },
+  { id: 'brother', name: 'Brother', age: 'child', sprite: 'brother', look: { ...L, hair: 'curly', top: 'hoodie', topColor: '#3D7BFF', bottom: 'shorts', bottomColor: '#222222' } },
+  { id: 'nene', name: 'Nene', age: 'child', sprite: 'nene', look: { ...L, hair: 'bob', bottom: 'dress', bottomColor: '#FF9FBF' } },
+  { id: 'mom', name: 'Mom', age: 'adult', sprite: 'mom', look: { ...L, hair: 'topknot', top: 'sweater', topColor: '#F2E6CF', bottom: 'widejeans', bottomColor: '#C8B08A' } },
+  { id: 'dad', name: 'Dad', age: 'adult', sprite: 'dad', look: { ...L, hair: 'short', top: 'sweatshirt', topColor: '#2B2B2B' } },
 ];
+export const DEFAULT_PETS: PetData[] = [
+  { id: 'snowy', species: 'puppy', name: 'Snowy', accessory: 'none', sprite: 'snowy' },
+  { id: 'coco', species: 'puppy', name: 'Coco', accessory: 'none', sprite: 'coco' },
+];
+
+/** Older saves: bring in the YunaVerse family and dogs without touching anything else. */
+export function addFamily(g: GameState): GameState {
+  if (g.characters.some((c) => c.sprite)) return g;
+  const living = g.scenes['home-living'] ?? initialScene('home-living');
+  return {
+    ...g,
+    characters: [...DEFAULT_CHARACTERS, ...g.characters],
+    pets: [...DEFAULT_PETS, ...g.pets],
+    activeCharacterId: 'yuna',
+    scenes: { ...g.scenes, 'home-living': [...living,
+      { id: 'char-natalie', kind: 'character', ref: 'natalie', x: 250, y: 670, pose: 'stand' },
+      { id: 'pet-snowy', kind: 'pet', ref: 'snowy', x: 640, y: 680, pose: 'stand' },
+      { id: 'pet-coco', kind: 'pet', ref: 'coco', x: 760, y: 690, pose: 'stand' },
+    ] },
+  };
+}
 
 export function freshGame(): GameState {
   const date = todayKey();
   const kitchen = initialScene('home-kitchen');
   kitchen.push(
-    { id: 'char-kai', kind: 'character', ref: 'kai', x: 420, y: 660, pose: 'stand' },
-    { id: 'char-rosa', kind: 'character', ref: 'rosa', x: 270, y: 670, pose: 'stand' },
+    { id: 'char-yuna', kind: 'character', ref: 'yuna', x: 430, y: 660, pose: 'stand' },
+    { id: 'char-mom', kind: 'character', ref: 'mom', x: 270, y: 670, pose: 'stand' },
+  );
+  const living = initialScene('home-living');
+  living.push(
+    { id: 'char-natalie', kind: 'character', ref: 'natalie', x: 250, y: 670, pose: 'stand' },
+    { id: 'pet-snowy', kind: 'pet', ref: 'snowy', x: 640, y: 680, pose: 'stand' },
+    { id: 'pet-coco', kind: 'pet', ref: 'coco', x: 760, y: 690, pose: 'stand' },
   );
   return {
     version: SAVE_VERSION, playerName: 'Player', coins: 20, xp: 0, careerXp: {}, badges: [],
-    completedMissions: {}, owned: [], characters: DEFAULT_CHARACTERS, pets: [],
-    scenes: { 'home-kitchen': kitchen }, secrets: [],
+    completedMissions: {}, owned: [], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
+    scenes: { 'home-kitchen': kitchen, 'home-living': living }, secrets: [],
     daily: { date, id: dailyFor(date).id, progress: 0, done: false },
-    stats: {}, settings: { sound: true }, activeCharacterId: 'kai', seenIntro: false,
+    stats: {}, settings: { sound: true }, activeCharacterId: 'yuna', seenIntro: false,
   };
 }
 
@@ -207,7 +235,7 @@ export function GameProvider({ children, adapter = localSave }: { children: Reac
 
   useEffect(() => {
     adapter.load(ACTIVE_PROFILE).then((saved) => {
-      if (saved && saved.version === SAVE_VERSION) dispatch({ type: 'LOAD', game: { ...freshGame(), ...saved } });
+      if (saved && saved.version === SAVE_VERSION) dispatch({ type: 'LOAD', game: addFamily({ ...freshGame(), ...saved }) });
       setLoaded(true);
     });
   }, [adapter]);

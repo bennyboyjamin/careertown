@@ -13,7 +13,7 @@ import { EngineerMission } from './missions/EngineerMission';
 import { DoctorMission } from './missions/DoctorMission';
 import { VetMission } from './missions/VetMission';
 import { RobotMission } from './missions/RobotMission';
-import { CharacterArt } from './components/art/Character';
+import { Person } from './components/Person';
 import { sfx } from './engine/sfx';
 
 // Mission registry: add a new career mission by adding one line here + data in data/missions.ts
@@ -101,7 +101,7 @@ function Intro({ onPlay }: { onPlay: () => void }) {
       <div className="text-center relative">
         <div className="flex justify-center items-end gap-2 h-40 sm:h-56 mb-2">
           {game.characters.slice(0, 2).map((c, i) => (
-            <div key={c.id} className={`${c.age === 'adult' ? 'w-24 sm:w-32 h-full' : 'w-20 sm:w-28 h-[80%]'} intro-wave`} style={{ animationDelay: `${i * 0.2}s` }}><CharacterArt age={c.age} look={c.look} mood="happy" /></div>
+            <div key={c.id} className={`${c.age === 'adult' ? 'w-24 sm:w-32 h-full' : 'w-20 sm:w-28 h-[80%]'} intro-wave`} style={{ animationDelay: `${i * 0.2}s` }}><Person c={c} mood="happy" /></div>
           ))}
         </div>
         <h1 className="logo-big font-display font-extrabold text-ink leading-none">CareerTown</h1>

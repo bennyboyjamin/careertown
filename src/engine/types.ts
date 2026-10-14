@@ -45,6 +45,8 @@ export interface CharacterData {
   name: string;
   age: 'child' | 'adult';
   look: Look;
+  /** Hand-drawn artwork id (data/sprites.ts). Sprite characters keep a fixed outfit. */
+  sprite?: string;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';
@@ -53,6 +55,7 @@ export interface PetData {
   species: PetSpecies;
   name: string;
   accessory: string; // pet-accessory catalog id, or 'none'
+  sprite?: string;
 }
 
 export type Pose = 'stand' | 'sit' | 'sleep' | 'walk' | 'wave';

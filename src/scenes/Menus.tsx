@@ -6,7 +6,7 @@ import { CAREERS, careerLevel, careerProgress } from '../data/careers';
 import { MISSIONS } from '../data/missions';
 import { BADGES, PET_ACCESSORIES, SECRETS, SHOP } from '../data/catalog';
 import { Btn, Coin, Face, Modal } from '../ui/kit';
-import { PetArt } from '../components/art/Pet';
+import { PetPic } from '../components/Person';
 import { sfx } from '../engine/sfx';
 
 export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onScene: (s: SceneId) => void; onMission: (m: string) => void }) {
@@ -131,7 +131,7 @@ export function Passport() {
           <div className="grid sm:grid-cols-2 gap-3">
             {game.pets.map((p) => (
               <div key={p.id} className="rounded-2xl border-[3px] border-ink p-3 flex gap-3 items-center">
-                <div className="w-24 h-24 shrink-0"><PetArt species={p.species} accessory={p.accessory} /></div>
+                <div className="w-24 h-24 shrink-0"><PetPic p={p} /></div>
                 <div className="flex-1">
                   <div className="font-display font-bold text-ink text-xl">{p.name}</div>
                   <div className="flex flex-wrap gap-1 mt-1">
