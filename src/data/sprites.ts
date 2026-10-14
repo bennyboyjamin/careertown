@@ -15,6 +15,6 @@ const S = (src: string, pw: number, ph: number, head = 0.42): Sprite => ({ src, 
 /** head = fraction of image height covered by the head, used for round face icons. */
 export const SPRITES: Record<string, Sprite> = {
   yuna: S(yuna, 179, 288, 0.42), natalie: S(natalie, 141, 313, 0.36), brother: S(brother, 126, 238, 0.45),
-  nene: S(nene, 135, 200, 0.5), mom: S(mom, 140, 319, 0.35), dad: S(dad, 137, 322, 0.36),
+  nene: S(nene, 147, 202, 0.5), mom: S(mom, 140, 319, 0.35), dad: S(dad, 137, 322, 0.36),
   snowy: S(snowy, 113, 136), coco: S(coco, 104, 140),
 };
