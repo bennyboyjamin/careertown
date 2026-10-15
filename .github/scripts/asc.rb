@@ -55,15 +55,17 @@ when 'setup'
   # 2. tidy up certificates and profiles left by builds more than a day old.
   #    (Never remove them at the end of a build: Apple checks the signature
   #    while processing the upload, and a revoked certificate fails that check.)
+  made_at = ->(c) { Time.parse(c['attributes']['expirationDate']) - 365 * 86_400 }
+  dist_certs = lambda do
+    lc, lj = api(:get, '/v1/certificates?limit=200')
+    lc == 200 ? lj['data'].select { |c| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(c['attributes']['certificateType']) } : []
+  end
   day_ago = Time.now - 86_400
-  code, j = api(:get, '/v1/certificates?filter[certificateType]=DISTRIBUTION&limit=50')
-  if code == 200
-    old = j['data'].select { |c| (Time.parse(c['attributes']['expirationDate']) - 365 * 86_400) < day_ago }
-    if j['data'].size >= 2
-      old.each do |c|
-        rc, = api(:delete, "/v1/certificates/#{c['id']}")
-        puts "Revoked an old build certificate from #{(Time.parse(c['attributes']['expirationDate']) - 365 * 86_400).strftime('%b %-d')} (#{rc})."
-      end
+  certs = dist_certs.call
+  if certs.size >= 2
+    certs.select { |c| made_at.(c) < day_ago }.each do |c|
+      rc, = api(:delete, "/v1/certificates/#{c['id']}")
+      puts "Revoked an old build certificate from #{made_at.(c).strftime('%b %-d')} (#{rc})."
     end
   end
   code, j = api(:get, '/v1/profiles?filter[profileType]=IOS_APP_STORE&limit=200')
@@ -82,11 +84,31 @@ when 'setup'
   csr.subject = OpenSSL::X509::Name.parse("/CN=#{APP_NAME} CI/O=Say Studios LLC")
   csr.public_key = key.public_key
   csr.sign(key, OpenSSL::Digest::SHA256.new)
-  code, j = api(:post, '/v1/certificates',
-                { data: { type: 'certificates', attributes: { certificateType: 'DISTRIBUTION', csrContent: csr.to_pem } } })
+  make_cert = lambda do
+    api(:post, '/v1/certificates',
+        { data: { type: 'certificates', attributes: { certificateType: 'DISTRIBUTION', csrContent: csr.to_pem } } })
+  end
+  code, j = make_cert.call
+  # Apple allows only a few distribution certificates per team, and every build
+  # (this app and your other apps) makes one. When the limit is reached, revoke
+  # the oldest certificates made more than 30 minutes ago (so a build that is
+  # still uploading is left alone) and try again. Apps already in TestFlight or
+  # on the App Store are not affected by this.
+  if code == 409
+    puts "Apple's certificate limit is full. Freeing up a spot..."
+    cutoff = Time.now - 30 * 60
+    certs = dist_certs.call.sort_by { |c| made_at.(c) }
+    certs.each do |c|
+      break if code == 201
+      next unless made_at.(c) < cutoff
+      rc, = api(:delete, "/v1/certificates/#{c['id']}")
+      puts "Revoked an older build certificate from #{made_at.(c).strftime('%b %-d %H:%M')} UTC (#{rc})."
+      code, j = make_cert.call
+    end
+  end
   unless code == 201
     fail!("Apple could not make a distribution certificate (#{code}). #{apple_error(j)} " \
-          "If it says you have too many certificates, wait a day before building again, or revoke old Apple Distribution certificates at developer.apple.com > Certificates.")
+          "Another app may have just been built. Wait 30 minutes and run the build again, or revoke old Apple Distribution certificates at developer.apple.com > Certificates.")
   end
   cert_id = j['data']['id']
   File.write("#{WORK}/cert_id", cert_id)
