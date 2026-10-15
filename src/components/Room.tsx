@@ -389,7 +389,6 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
           {(e.ref === 'lamp' || e.ref === 'lamp-pink') && on && <div className="lamp-glow absolute pointer-events-none" />}
           <img src={d.paint} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill' }} />
           {e.ref === 'tv' && on && <div className="tv-screen absolute" style={{ left: '12.5%', top: '1.5%', width: '75.5%', height: '56%' }} />}
-          {doorIcon && <span className="absolute left-1/2 -translate-x-1/2 grid place-items-center rounded-full bg-white border-ink shadow-chunkysm" style={{ top: '46%', width: '34%', aspectRatio: '1', fontSize: `${(d.w * 0.16 / ROOM_H) * 100}cqh`, borderWidth: 3, borderStyle: 'solid' }}>{doorIcon}</span>}
         </div>
       );
     }
