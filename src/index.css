@@ -236,3 +236,9 @@ button { touch-action: manipulation; }
   .reward-wrap .reward-in h2 { font-size: 22px; }
   .reward-wrap .star-spin { font-size: 40px; margin-top: -34px; }
 }
+/* painted town map (3:2) */
+.town-art { --tw: max(100vw, calc(100dvh * 1.5)); width: var(--tw); height: calc(var(--tw) / 1.5); min-height: 100%; }
+.art-building .art-crop { pointer-events: none; }
+.art-building.soon .art-crop { filter: saturate(.55) brightness(1.04); }
+.art-building:hover .art-crop, .art-building:focus-visible .art-crop { filter: brightness(1.08) drop-shadow(0 0 6px #fff); }
+.balloon-spot { border-radius: 50%; }
