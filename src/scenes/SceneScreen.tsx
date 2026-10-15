@@ -8,6 +8,7 @@ import { ITEMS } from '../data/items';
 import { Btn, Face, Modal } from '../ui/kit';
 import { Person, PetPic, LayeredArt } from '../components/Person';
 import { ItemIcon } from '../components/ItemIcon';
+import { WearPicker } from '../components/WearPicker';
 import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
 import { LookEditor } from './CharacterCreator';
@@ -25,7 +26,8 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   const isHome = b.id === 'home';
 
   const allPlaced = new Set(Object.values(game.scenes).flatMap((l) => (l ?? []).map((e) => e.ref)));
-  const stuff = game.owned.filter((id) => ITEMS[id] && !allPlaced.has(id));
+  const worn = new Set(game.characters.flatMap((c) => Object.values(c.wear ?? {})));
+  const stuff = game.owned.filter((id) => ITEMS[id] && !allPlaced.has(id) && !worn.has(id));
 
   return (
     <div className="scene-screen relative h-full flex flex-col">
@@ -189,7 +191,7 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
         {lay.outfits.map((o, i) => (
           <button key={o.id} onClick={() => { sfx('pop'); dispatch({ type: 'SAVE_CHARACTER', character: { ...c, outfit: i } }); dispatch({ type: 'EVENT', name: 'dress' }); }}
             className={`rounded-2xl border-[3px] border-ink p-2 bg-white shadow-chunkysm ${(c.outfit ?? 0) === i ? 'ring-4 ring-berry' : ''}`} style={{ width: 120 }}>
-            <div style={{ width: 100, height: 255 }}><LayeredArt lay={lay} outfit={i} face="happy" /></div>
+            <div style={{ width: 100, height: 255 }}><LayeredArt lay={lay} outfit={i} face="happy" wear={c.wear} /></div>
             <div className="font-display font-bold text-ink text-sm mt-1">{o.label}</div>
           </button>
         ))}
@@ -197,6 +199,7 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
           <div><div className="text-3xl">✨</div>More outfits coming soon</div>
         </div>
       </div>
+      <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />
     </div>
   );
 }

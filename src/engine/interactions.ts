@@ -1,6 +1,6 @@
 import type { CharacterData, Entity, PetData, SceneId } from './types';
 import { ITEMS, has, type ItemDef } from '../data/items';
-import { SPRITES } from '../data/sprites';
+import { SPRITES, LAYERED } from '../data/sprites';
 import type { SfxName } from './sfx';
 
 // ── Geometry ───────────────────────────────────────────
@@ -72,6 +72,7 @@ export interface Effect {
   anim?: { id: string; anim: string; ms: number };
   anims?: { id: string; anim: string; ms: number }[];
   bursts?: { id: string; emoji: string }[];
+  wear?: { character: string; slot: 'head' | 'eyes' | 'ears' | 'bag'; item: string };
   later?: { ms: number; patches: { id: string; patch: Partial<Entity> }[]; sfx?: SfxName; bubble?: { id: string; text: string }; events?: string[] };
   moveTo?: { scene: SceneId; entity: Entity };
 }
@@ -191,6 +192,15 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
           fx.bubble = { id: t.id, text: '💓 ba-dum, ba-dum!' }; fx.sfx = 'heartbeat';
         }
         fx.anim = { id: t.id, anim: 'check', ms: 900 };
+        return true;
+      }
+      if (dd.wear && look.character(t.ref)?.sprite && LAYERED[look.character(t.ref)!.sprite!]) {
+        fx.wear = { character: t.ref, slot: dd.wear, item: d.ref };
+        fx.remove.push(d.id);
+        fx.anim = { id: t.id, anim: 'hop', ms: 800 };
+        fx.bubble = { id: t.id, text: pick(['Looking good! ✨', 'I love it!', 'So stylish!', 'How do I look?']) };
+        fx.bursts = [{ id: t.id, emoji: '✨' }];
+        fx.sfx = 'sparkle'; fx.events.push('dress');
         return true;
       }
       if (has(dd, 'small')) {

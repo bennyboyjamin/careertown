@@ -49,6 +49,8 @@ export interface CharacterData {
   sprite?: string;
   /** Outfit index for layered artwork characters. */
   outfit?: number;
+  /** Worn accessories (item ids) by slot, for layered artwork characters. */
+  wear?: Partial<Record<'head' | 'eyes' | 'ears' | 'bag', string>>;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';

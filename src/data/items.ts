@@ -23,7 +23,8 @@ export interface ItemDef {
   w: number;            // room units
   h: number;
   emoji?: string;       // small props are drawn as emoji stickers
-  img?: string;         // hand-drawn sticker art (data URL)
+  img?: string;         // hand-drawn sticker art
+  wear?: import('./accessories').WearSlot; // characters with layered art can wear it
   art?: string;         // big furniture is drawn as SVG (components/art/Furniture.tsx)
   tags: ItemTag[];
   fixed?: boolean;      // can't be dragged, only tapped
@@ -187,7 +188,7 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     { id: 'blockbin', name: 'Block bin', art: 'blockbin', w: 170, h: 110, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: false, items: ['block-red', 'block-blue', 'block-yellow', 'block-roof'] } },
     // ── Hand-drawn accessories & toys ────────────────
-    ...ACCESSORIES.map((a): ItemDef => ({ id: a.id, name: a.name, img: a.img, w: a.w, h: a.h, tags: a.food ? ['food', 'small'] : a.toy ? ['small', 'toy'] : ['small'] })),
+    ...ACCESSORIES.map((a): ItemDef => ({ id: a.id, name: a.name, img: a.img, w: a.w, h: a.h, wear: a.wear, tags: a.food ? ['food', 'small'] : a.toy ? ['small', 'toy'] : ['small'] })),
   ] as ItemDef[]).map((d) => [d.id, d]),
 );
 

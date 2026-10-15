@@ -89,6 +89,7 @@ export type Action =
   | { type: 'EVENT'; name: string }
   | { type: 'FIND_SECRET'; id: string }
   | { type: 'SAVE_CHARACTER'; character: CharacterData }
+  | { type: 'WEAR'; character: string; slot: 'head' | 'eyes' | 'ears' | 'bag'; item: string | null }
   | { type: 'DELETE_CHARACTER'; id: string }
   | { type: 'SET_ACTIVE'; id: string }
   | { type: 'BUY'; id: string; price: number }
@@ -207,6 +208,21 @@ function reducer(root: Root, a: Action): Root {
       if (r.game.secrets.length >= 3 && !r.game.badges.includes('explorer'))
         r = withPopup(r, r.game, { badge: 'explorer', coins: 30, xp: 40 }, 'New badge: Explorer!');
       return reducer(r, { type: 'EVENT', name: 'secret' });
+    }
+    case 'WEAR': {
+      // One item can only be in one place: take it off anyone else and out of every room.
+      const characters = g.characters.map((c) => {
+        const wear = { ...(c.wear ?? {}) };
+        for (const k of Object.keys(wear) as (keyof typeof wear)[]) if (a.item && wear[k] === a.item) delete wear[k];
+        if (c.id === a.character) { if (a.item) wear[a.slot] = a.item; else delete wear[a.slot]; }
+        return { ...c, wear };
+      });
+      const scenes: GameState['scenes'] = {};
+      for (const [id, list] of Object.entries(g.scenes) as [SceneId, Entity[]][]) {
+        const gone = new Set(list.filter((e) => e.kind === 'item' && e.ref === a.item).map((e) => e.id));
+        scenes[id] = list.filter((e) => !gone.has(e.id)).map((e) => (e.holding && gone.has(e.holding) ? { ...e, holding: undefined } : e));
+      }
+      return { ...root, game: { ...g, characters, scenes } };
     }
     case 'SAVE_CHARACTER': {
       const exists = g.characters.some((c) => c.id === a.character.id);

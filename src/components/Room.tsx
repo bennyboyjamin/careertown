@@ -206,6 +206,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     if (fx.anim) play(fx.anim.id, fx.anim.anim, fx.anim.ms);
     fx.anims?.forEach((a) => play(a.id, a.anim, a.ms));
     fx.bursts?.forEach((b) => burst(b.id, b.emoji));
+    if (fx.wear) dispatch({ type: 'WEAR', character: fx.wear.character, slot: fx.wear.slot, item: fx.wear.item });
     fx.events.forEach((name) => dispatch({ type: 'EVENT', name }));
     if (fx.later) {
       const later = fx.later;
