@@ -7,6 +7,7 @@ import { MISSIONS } from '../data/missions';
 import { BADGES, PET_ACCESSORIES, SECRETS, SHOP } from '../data/catalog';
 import { Btn, Coin, Face, Modal } from '../ui/kit';
 import { PetPic } from '../components/Person';
+import { PET_LOOKS } from '../data/accessories';
 import { sfx } from '../engine/sfx';
 
 export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onScene: (s: SceneId) => void; onMission: (m: string) => void }) {
@@ -135,7 +136,13 @@ export function Passport() {
                 <div className="flex-1">
                   <div className="font-display font-bold text-ink text-xl">{p.name}</div>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {PET_ACCESSORIES.filter((a) => a.id === 'none' || game.owned.includes(`pet:${a.id}`)).map((a) => (
+                    {p.sprite && PET_LOOKS[p.sprite] ? PET_LOOKS[p.sprite].map((lk, i) => (
+                      <button key={lk.label} aria-label={lk.label} onClick={() => { sfx('pop'); dispatch({ type: 'SET_PET', pet: { ...p, look: i } }); }}
+                        className={`rounded-xl border-2 border-ink p-1 bg-white ${(p.look ?? 0) === i ? 'ring-4 ring-berry' : ''}`}>
+                        <img src={lk.src} alt="" style={{ width: 56, height: 56, objectFit: 'contain' }} />
+                        <div className="font-body text-xs text-ink">{lk.label}</div>
+                      </button>
+                    )) : PET_ACCESSORIES.filter((a) => a.id === 'none' || game.owned.includes(`pet:${a.id}`)).map((a) => (
                       <button key={a.id} onClick={() => { sfx('pop'); dispatch({ type: 'SET_PET', pet: { ...p, accessory: a.id } }); }}
                         className={`rounded-xl border-2 border-ink px-2 py-1 font-body text-xs text-ink ${p.accessory === a.id ? 'bg-sun' : 'bg-white'}`}>{a.label}</button>
                     ))}

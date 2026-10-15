@@ -7,6 +7,7 @@ import { BUILDINGS } from '../data/buildings';
 import { ITEMS } from '../data/items';
 import { Btn, Face, Modal } from '../ui/kit';
 import { Person, PetPic, LayeredArt } from '../components/Person';
+import { ItemIcon } from '../components/ItemIcon';
 import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
 import { LookEditor } from './CharacterCreator';
@@ -81,7 +82,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
             {tray === 'stuff' && stuff.map((id) => (
               <button key={id} onClick={() => { dispatch({ type: 'ADD_ENTITY', scene: sceneId, entity: { id: uid('it'), kind: 'item', ref: id, x: 300 + Math.random() * 400, y: 640 } }); sfx('pop'); }}
                 className="shrink-0 flex flex-col items-center gap-1 rounded-2xl border-[3px] border-ink p-2 w-24 bg-white">
-                <div className="w-16 h-14 grid place-items-center text-4xl">{ITEMS[id].emoji ?? <FurnitureArt art={ITEMS[id].art!} w={ITEMS[id].w} h={ITEMS[id].h} />}</div>
+                <div className="w-16 h-14 grid place-items-center"><ItemIcon id={id} size={52} /></div>
                 <span className="font-body text-xs text-ink truncate w-full text-center">{ITEMS[id].name}</span>
               </button>
             ))}

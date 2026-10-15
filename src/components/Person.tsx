@@ -1,6 +1,7 @@
 import type { CharacterData, PetData, Pose } from '../engine/types';
 import { CharacterArt, type Mood } from './art/Character';
 import { PetArt } from './art/Pet';
+import { PET_LOOKS } from '../data/accessories';
 import { SPRITES, LAYERED, type Face, type Layered } from '../data/sprites';
 
 /** Draws a character: hand-drawn artwork if it has a sprite, otherwise the vector style. */
@@ -20,7 +21,9 @@ export function Person({ c, pose = 'stand', mood = 'normal', bandage = false }: 
 export function PetPic({ p, sleeping = false, bandage = false }: { p: PetData; sleeping?: boolean; bandage?: boolean }) {
   const sp = p.sprite ? SPRITES[p.sprite] : undefined;
   if (!sp) return <PetArt species={p.species} accessory={p.accessory} sleeping={sleeping} bandage={bandage} />;
-  return <img src={sp.src} alt="" draggable={false} className="sprite-img" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transform: sleeping ? 'rotate(-12deg) translateY(6%)' : undefined }} />;
+  const looks = PET_LOOKS[p.sprite!];
+  const src = looks?.[p.look ?? 0]?.src ?? sp.src;
+  return <img src={src} alt="" draggable={false} className="sprite-img" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transform: sleeping ? 'rotate(-12deg) translateY(6%)' : undefined }} />;
 }
 
 /** Round face icon. */

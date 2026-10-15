@@ -8,6 +8,7 @@ import { SECRETS, VISITORS } from '../data/catalog';
 import { ROOM_H, ROOM_W, dependentsOf, depthOf, getState, resolveDrop, sizeOf, withState, type Effect, type Lookup } from '../engine/interactions';
 import { type Mood } from './art/Character';
 import { Person, PetPic } from './Person';
+import { ItemIcon } from './ItemIcon';
 import { FurnitureArt } from './art/Furniture';
 import { RoomBackdrop } from './RoomBackdrop';
 import { Bubble } from '../ui/kit';
@@ -351,6 +352,11 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       return <div className="w-full h-full" style={{ transform: `scaleX(${-face})` }}><PetPic p={p} sleeping={e.pose === 'sleep'} bandage={!!getState(e, 'bandage')} /></div>;
     }
     const d = ITEMS[e.ref]; if (!d) return null;
+    if (d.img) return (
+      <div className="w-full h-full relative">
+        <img src={d.img} alt="" draggable={false} className="sprite-img" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      </div>
+    );
     if (d.emoji) return (
       <div className="w-full h-full grid place-items-center sticker">
         <span style={{ fontSize: 'min(100%, 1em)' }} className="emoji leading-none select-none">{d.emoji}</span>
@@ -419,7 +425,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
               <div className="flex flex-wrap gap-2 justify-center">
                 {spawnDef.tap.items.map((ref) => (
                   <button key={ref} onClick={() => spawn(ref)} className="spawn-btn w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-[3px] border-ink bg-sky/30 grid place-items-center text-3xl sm:text-4xl shadow-chunkysm" aria-label={ITEMS[ref].name}>
-                    {ITEMS[ref].emoji ?? (ITEMS[ref].art ? <div className="w-12 h-10"><FurnitureArt art={ITEMS[ref].art!} w={ITEMS[ref].w} h={ITEMS[ref].h} variant={ref} /></div> : '?')}
+                    <ItemIcon id={ref} size={52} />
                   </button>
                 ))}
               </div>

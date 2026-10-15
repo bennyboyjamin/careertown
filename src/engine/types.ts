@@ -58,6 +58,8 @@ export interface PetData {
   name: string;
   accessory: string; // pet-accessory catalog id, or 'none'
   sprite?: string;
+  /** Outfit index for artwork pets (data/accessories.ts PET_LOOKS). */
+  look?: number;
 }
 
 export type Pose = 'stand' | 'sit' | 'sleep' | 'walk' | 'wave';

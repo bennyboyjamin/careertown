@@ -1,4 +1,5 @@
 import type { SfxName } from '../engine/sfx';
+import { ACCESSORIES, TOY_IDS } from './accessories';
 
 // Tags drive the interaction engine (engine/interactions.ts).
 export type ItemTag =
@@ -22,6 +23,7 @@ export interface ItemDef {
   w: number;            // room units
   h: number;
   emoji?: string;       // small props are drawn as emoji stickers
+  img?: string;         // hand-drawn sticker art (data URL)
   art?: string;         // big furniture is drawn as SVG (components/art/Furniture.tsx)
   tags: ItemTag[];
   fixed?: boolean;      // can't be dragged, only tapped
@@ -115,7 +117,7 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     { id: 'bed', name: 'Bed', art: 'bed', w: 330, h: 170, tags: ['bed'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So fluffy!', 'Boing boing!'] } },
     { id: 'closet', name: 'Closet', art: 'closet', w: 175, h: 305, fixed: true, tags: [], tap: { type: 'wardrobe' } },
     { id: 'toybox', name: 'Toy box', art: 'toybox', w: 160, h: 115, tags: [],
-      tap: { type: 'spawn', toggle: true, items: ['teddy', 'ball', 'train', 'balloon', 'drum', 'paints', 'book', 'yarn'] } },
+      tap: { type: 'spawn', toggle: true, items: ['teddy', 'train', 'balloon', 'drum', ...TOY_IDS, 'paints', 'book', 'yarn'] } },
     { id: 'lamp', name: 'Lamp', art: 'lamp', w: 85, h: 195, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'tv', name: 'TV', art: 'tv', w: 210, h: 185, tags: [], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'window', name: 'Window', art: 'window', w: 200, h: 165, fixed: true, tags: [], tap: { type: 'toggle', sfx: 'whoosh' } },
@@ -184,6 +186,8 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
       tap: { type: 'secret', secretId: 'robot', taps: 3, anim: 'dance', sfx: 'beep' } },
     { id: 'blockbin', name: 'Block bin', art: 'blockbin', w: 170, h: 110, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: false, items: ['block-red', 'block-blue', 'block-yellow', 'block-roof'] } },
+    // ── Hand-drawn accessories & toys ────────────────
+    ...ACCESSORIES.map((a): ItemDef => ({ id: a.id, name: a.name, img: a.img, w: a.w, h: a.h, tags: a.food ? ['food', 'small'] : a.toy ? ['small', 'toy'] : ['small'] })),
   ] as ItemDef[]).map((d) => [d.id, d]),
 );
 

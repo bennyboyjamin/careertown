@@ -4,6 +4,7 @@ import { initialScene } from '../data/scenes';
 import { BADGES, SECRETS } from '../data/catalog';
 import { MISSIONS } from '../data/missions';
 import { dailyFor, todayKey } from '../data/daily';
+import { STARTER_ACCESSORIES } from '../data/accessories';
 import { localSave, SAVE_VERSION, ACTIVE_PROFILE, type SaveAdapter } from './save';
 import { uid } from './ids';
 import { setSoundEnabled, sfx } from './sfx';
@@ -24,6 +25,12 @@ export const DEFAULT_PETS: PetData[] = [
 ];
 
 /** Older saves: bring in the YunaVerse family and dogs without touching anything else. */
+/** Everyone gets the accessory starter pack once (new and existing saves). */
+export function addStarterPack(g: GameState): GameState {
+  if (g.owned.includes('pack:accessories-1')) return g;
+  return { ...g, owned: [...g.owned, ...STARTER_ACCESSORIES.filter((id) => !g.owned.includes(id)), 'pack:accessories-1'] };
+}
+
 export function addFamily(g: GameState): GameState {
   if (g.characters.some((c) => c.sprite)) return g;
   const living = g.scenes['home-living'] ?? initialScene('home-living');
@@ -55,7 +62,7 @@ export function freshGame(): GameState {
   );
   return {
     version: SAVE_VERSION, playerName: 'Player', coins: 20, xp: 0, careerXp: {}, badges: [],
-    completedMissions: {}, owned: [], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
+    completedMissions: {}, owned: [...STARTER_ACCESSORIES, 'pack:accessories-1'], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
     scenes: { 'home-kitchen': kitchen, 'home-living': living }, secrets: [],
     daily: { date, id: dailyFor(date).id, progress: 0, done: false },
     stats: {}, settings: { sound: true }, activeCharacterId: 'yuna', seenIntro: false,
@@ -235,7 +242,7 @@ export function GameProvider({ children, adapter = localSave }: { children: Reac
 
   useEffect(() => {
     adapter.load(ACTIVE_PROFILE).then((saved) => {
-      if (saved && saved.version === SAVE_VERSION) dispatch({ type: 'LOAD', game: addFamily({ ...freshGame(), ...saved }) });
+      if (saved && saved.version === SAVE_VERSION) dispatch({ type: 'LOAD', game: addStarterPack(addFamily({ ...freshGame(), ...saved })) });
       setLoaded(true);
     });
   }, [adapter]);
