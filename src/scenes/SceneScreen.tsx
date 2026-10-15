@@ -6,7 +6,8 @@ import { Room, placeActor } from '../components/Room';
 import { BUILDINGS } from '../data/buildings';
 import { ITEMS } from '../data/items';
 import { Btn, Face, Modal } from '../ui/kit';
-import { Person, PetPic } from '../components/Person';
+import { Person, PetPic, LayeredArt } from '../components/Person';
+import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
 import { LookEditor } from './CharacterCreator';
 import { uid } from '../engine/ids';
@@ -118,7 +119,7 @@ function WardrobeSheet({ characterId, onClose }: { characterId: string; onClose:
         <div className="hidden sm:grid place-items-center rounded-2xl border-[3px] border-ink bg-sky/30 h-64">
           <div className="w-[70%] h-[90%]"><CharacterPreview id={characterId} /></div>
         </div>
-        {c.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{c.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor clothesOnly age={c.age} look={c.look} onChange={(look) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, look } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
+        {c.sprite && LAYERED[c.sprite] ? <OutfitPicker c={c} /> : c.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{c.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor clothesOnly age={c.age} look={c.look} onChange={(look) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, look } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
       </div>
     </Modal>
   );
@@ -174,5 +175,27 @@ function Chalkboard({ entity, sceneId, onClose }: { entity: Entity; sceneId: Sce
         <Btn tone="mint" onClick={save}>Put it on the board</Btn>
       </div>
     </Modal>
+  );
+}
+
+function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
+  const { dispatch } = useGame();
+  const lay = LAYERED[c.sprite!];
+  return (
+    <div>
+      <p className="font-body text-ink">Tap an outfit to put it on.</p>
+      <div className="mt-3 flex flex-wrap gap-3">
+        {lay.outfits.map((o, i) => (
+          <button key={o.id} onClick={() => { sfx('pop'); dispatch({ type: 'SAVE_CHARACTER', character: { ...c, outfit: i } }); dispatch({ type: 'EVENT', name: 'dress' }); }}
+            className={`rounded-2xl border-[3px] border-ink p-2 bg-white shadow-chunkysm ${(c.outfit ?? 0) === i ? 'ring-4 ring-berry' : ''}`} style={{ width: 120 }}>
+            <div style={{ width: 100, height: 255 }}><LayeredArt lay={lay} outfit={i} face="happy" /></div>
+            <div className="font-display font-bold text-ink text-sm mt-1">{o.label}</div>
+          </button>
+        ))}
+        <div className="rounded-2xl border-[3px] border-dashed border-ink p-3 grid place-items-center text-center font-body text-ink" style={{ width: 120 }}>
+          <div><div className="text-3xl">✨</div>More outfits coming soon</div>
+        </div>
+      </div>
+    </div>
   );
 }

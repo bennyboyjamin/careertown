@@ -5,7 +5,8 @@ import { BUILDS, ACCESSORIES, BOTTOMS, CLOTH_COLORS, EYES, FACES, GLASSES, HAIRS
 import { MISSIONS } from '../data/missions';
 import { CharacterArt } from '../components/art/Character';
 import { Btn, Face, HeadCrop } from '../ui/kit';
-import { Person } from '../components/Person';
+import { Person, LayeredArt } from '../components/Person';
+import { LAYERED } from '../data/sprites';
 import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
 
@@ -138,7 +139,7 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
           <Btn tone="sky" className="mt-2 w-full" onClick={() => { if (!isNew) save(); onDone(); }}>Done</Btn>
         </div>
         <div className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4">
-          {draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
+          {draft.sprite && LAYERED[draft.sprite] ? <div className="p-2"><h3 className="font-display text-2xl font-extrabold text-ink">Outfits</h3><div className="mt-3 flex flex-wrap gap-3">{LAYERED[draft.sprite].outfits.map((o, i) => <button key={o.id} onClick={() => { sfx('pop'); setDraft({ ...draft, outfit: i }); }} className={`rounded-2xl border-[3px] border-ink p-2 bg-white shadow-chunkysm ${(draft.outfit ?? 0) === i ? 'ring-4 ring-berry' : ''}`} style={{ width: 120 }}><div style={{ width: 100, height: 255 }}><LayeredArt lay={LAYERED[draft.sprite!]} outfit={i} face="happy" /></div><div className="font-display font-bold text-ink text-sm mt-1">{o.label}</div></button>)}</div></div> : draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
         </div>
       </div>
     </div>

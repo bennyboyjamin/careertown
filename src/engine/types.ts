@@ -47,6 +47,8 @@ export interface CharacterData {
   look: Look;
   /** Hand-drawn artwork id (data/sprites.ts). Sprite characters keep a fixed outfit. */
   sprite?: string;
+  /** Outfit index for layered artwork characters. */
+  outfit?: number;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';

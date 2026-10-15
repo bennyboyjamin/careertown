@@ -101,7 +101,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       const who = people[Math.floor(Math.random() * people.length)];
       const r = Math.random();
       if (r < 0.45) { play(who.id, 'hop', 600); burst(who.id, ['🎵', '✨', '💭', '⭐'][Math.floor(Math.random() * 4)]); }
-      else if (r < 0.75) { play(who.id, 'happy', 1400); say(who.id, ['La la la 🎵', 'What a nice day!', 'I’m hungry…', 'Let’s play!', 'Hmm…'][Math.floor(Math.random() * 5)]); }
+      else if (r < 0.62) { play(who.id, 'happy', 1400); say(who.id, ['La la la 🎵', 'What a nice day!', 'Let’s play!', 'Hmm…'][Math.floor(Math.random() * 4)]); }
+      else if (r < 0.75) { play(who.id, 'sad', 2200); say(who.id, ['I’m hungry…', 'I’m a little bored…', 'Can we play?'][Math.floor(Math.random() * 3)]); }
       else play(who.id, 'wave', 1200);
     }, 6500);
     return () => window.clearInterval(t);
@@ -329,7 +330,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     if (e.kind === 'character') {
       const c = look.character(e.ref); if (!c) return null;
       const holds = e.holding ? byId.get(e.holding)?.ref : undefined;
-      const mood: Mood = holderMood ?? (anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
+      const carried = drag?.id === e.id && drag.moved;
+      const mood: Mood = holderMood ?? (carried ? 'wow' : anim === 'sad' ? 'sad' : anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
       const art = <Person c={c} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
       if (e.pose === 'sleep') {
         const st = sizeOf({ ...e, pose: 'stand' }, look);
