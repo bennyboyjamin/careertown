@@ -9,6 +9,21 @@ original (SVG + synthesized WebAudio). No accounts, chat, ads or real purchases.
 One-time setup: in your GitHub repo open *Settings → Pages* and set **Source** to **GitHub Actions**.
 Your game will be at `https://YOUR-USERNAME.github.io/REPO-NAME/`.
 
+## Build the iPhone / iPad app (no Mac needed)
+`.github/workflows/ios-app.yml` turns the game into an iPhone and iPad app on GitHub's Mac computers
+and uploads it to App Store Connect, where it shows up in TestFlight. It works the same way as Say Math.
+
+One-time setup:
+1. At developer.apple.com → *Identifiers*, register an App ID, for example `com.saystudios.careertown`.
+2. In App Store Connect → *Apps*, make a new app named CareerTown with that bundle ID.
+3. In this repo open *Settings → Secrets and variables → Actions* and add the same five secrets
+   Say Math uses: `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, plus `BUNDLE_ID`
+   set to the new App ID.
+
+To build: *Actions → Build iPhone app → Run workflow*, type a version (1.0) and run it.
+After about 15–30 minutes the build appears in App Store Connect → TestFlight.
+The app uses `index.html`, `assets/`, `app-icon.png` and `app-splash.png` from this repo.
+
 ## Publish on GitLab
 The included `.gitlab-ci.yml` builds the game and deploys it to **GitLab Pages** whenever you push
 to the default branch. After the first pipeline finishes, find the link under
