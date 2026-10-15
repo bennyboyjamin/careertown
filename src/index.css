@@ -205,3 +205,7 @@ button { touch-action: manipulation; }
   .hud > button[class*="md:flex"] { display: none !important; }
   .hud > button[class*="md:hidden"] { display: block !important; }
 }
+/* keep buttons clear of the iPhone notch in landscape */
+.hud { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+.room-tabs { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+.scene-actions { left: max(8px, env(safe-area-inset-left, 0px)); bottom: max(8px, env(safe-area-inset-bottom, 0px)); }

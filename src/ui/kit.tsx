@@ -73,7 +73,9 @@ export function Coin({ className = '' }: { className?: string }) {
 
 const isStandalone = () =>
   (typeof window !== 'undefined' && (window.matchMedia?.('(display-mode: standalone)').matches || window.matchMedia?.('(display-mode: fullscreen)').matches)) ||
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+  // inside the iPhone/iPad app
+  !!(window as Window & { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
 
 /** Full screen: real Fullscreen API where it exists; on iPhone, explain Add to Home Screen. */
 export function FullscreenButton() {
