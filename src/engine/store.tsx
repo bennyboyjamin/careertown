@@ -32,6 +32,13 @@ export function addStarterPack(g: GameState): GameState {
   // New living-room furniture: existing saves find it in My stuff.
   if (!g.owned.includes('pack:living-1'))
     g = { ...g, owned: [...g.owned, ...['armchair', 'plant'].filter((id) => !g.owned.includes(id)), 'pack:living-1'] };
+  // Bedroom set: its own pink door and table lamp, and a study desk in My stuff.
+  if (!g.owned.includes('pack:bedroom-1')) {
+    const bed = g.scenes['home-bedroom'];
+    const swap: Record<string, string> = { door: 'door-pink', lamp: 'lamp-pink' };
+    g = { ...g, owned: [...g.owned, ...(g.owned.includes('studydesk') ? [] : ['studydesk']), 'pack:bedroom-1'],
+      scenes: bed ? { ...g.scenes, 'home-bedroom': bed.map((e) => (e.kind === 'item' && swap[e.ref] ? { ...e, ref: swap[e.ref] } : e)) } : g.scenes };
+  }
   return g;
 }
 

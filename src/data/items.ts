@@ -8,6 +8,12 @@ import pBookshelf from '../assets/furniture/bookshelf.webp';
 import pDoor from '../assets/furniture/door.webp';
 import pRug from '../assets/furniture/rug.webp';
 import pPlant from '../assets/furniture/plant.webp';
+import pBed from '../assets/furniture/bed.webp';
+import pCloset from '../assets/furniture/closet.webp';
+import pToybox from '../assets/furniture/toybox.webp';
+import pDoorPink from '../assets/furniture/door-pink.webp';
+import pStudyDesk from '../assets/furniture/studydesk.webp';
+import pLampPink from '../assets/furniture/lamp-pink.webp';
 
 // Tags drive the interaction engine (engine/interactions.ts).
 export type ItemTag =
@@ -124,9 +130,9 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
       tap: { type: 'spawn', toggle: true, items: ['plate', 'cup', 'cupcake'] } },
     { id: 'table', name: 'Table', art: 'table', w: 280, h: 125, tags: ['table'] },
     { id: 'chair', name: 'Chair', art: 'chair', w: 90, h: 150, tags: ['seat'], seatLift: 62, tap: { type: 'anim', anim: 'spin', sfx: 'whoosh' } },
-    { id: 'bed', name: 'Bed', art: 'bed', w: 330, h: 170, tags: ['bed'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So fluffy!', 'Boing boing!'] } },
-    { id: 'closet', name: 'Closet', art: 'closet', w: 175, h: 305, fixed: true, tags: [], tap: { type: 'wardrobe' } },
-    { id: 'toybox', name: 'Toy box', art: 'toybox', w: 160, h: 115, tags: [],
+    { id: 'bed', name: 'Bed', art: 'bed', paint: pBed, w: 300, h: 263, tags: ['bed'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So fluffy!', 'Boing boing!'] } },
+    { id: 'closet', name: 'Closet', art: 'closet', paint: pCloset, w: 262, h: 250, fixed: true, tags: [], tap: { type: 'wardrobe' } },
+    { id: 'toybox', name: 'Toy box', art: 'toybox', paint: pToybox, w: 170, h: 140, tags: [],
       tap: { type: 'spawn', toggle: true, items: ['teddy', 'train', 'balloon', 'drum', ...TOY_IDS, 'paints', 'book', 'yarn'] } },
     { id: 'lamp', name: 'Lamp', art: 'lamp', paint: pLamp, w: 92, h: 200, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'tv', name: 'TV', art: 'tv', paint: pTv, w: 240, h: 160, tags: [], tap: { type: 'toggle', sfx: 'click' } },
@@ -142,6 +148,9 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
       tap: { type: 'spawn', toggle: false, items: ['toothbrush', 'soap', 'duck'] } },
     { id: 'mirror', name: 'Mirror', art: 'mirror', w: 120, h: 150, fixed: true, tags: [], tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['Looking great!', 'Who is that? It\'s you!'] } },
     { id: 'door', name: 'Door', art: 'door', paint: pDoor, w: 150, h: 275, fixed: true, tags: ['door'] },
+    { id: 'door-pink', name: 'Door', art: 'door', paint: pDoorPink, w: 174, h: 275, fixed: true, tags: ['door'] },
+    { id: 'lamp-pink', name: 'Table lamp', art: 'lamp', paint: pLampPink, w: 96, h: 143, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
+    { id: 'studydesk', name: 'Study desk', art: 'desk', paint: pStudyDesk, w: 236, h: 217, tags: ['table', 'decor'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Homework time! ✏️', 'Let’s draw something!', 'So tidy!'] } },
     { id: 'secretspot', name: 'Sparkle', art: 'sparkle', w: 70, h: 50, fixed: true, tags: [],
       tap: { type: 'secret', secretId: 'underbed', taps: 1, sfx: 'sparkle' } },
 

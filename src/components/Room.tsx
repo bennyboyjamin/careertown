@@ -273,7 +273,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     const d = ITEMS[e.ref]; const t = d?.tap;
     if (!t) { play(e.id, 'hop', 500); say(e.id, d?.name ?? ''); sfx('tap'); return; }
     switch (t.type) {
-      case 'toggle': patch([{ id: e.id, patch: { state: withState(e, { on: !getState<boolean>(e, 'on') }) } }]); sfx(t.sfx ?? 'click'); break;
+      case 'toggle': patch([{ id: e.id, patch: { state: withState(e, { lit: !isOn(e), ...(getState(e, 'on') === true || getState(e, 'on') === false ? { on: undefined } : {}) }) } }]); sfx(t.sfx ?? 'click'); break;
       case 'spawn': if (t.toggle) patch([{ id: e.id, patch: { state: withState(e, { on: true }) } }]); setSpawnFor(e.id); sfx('pop'); break;
       case 'wardrobe': {
         patch([{ id: e.id, patch: { state: withState(e, { on: true }) } }]);
@@ -331,8 +331,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   };
 
   // ── Render helpers ──
-  const night = entities.some((e) => e.ref === 'window' && getState<boolean>(e, 'on'));
-  const lampOn = entities.some((e) => e.ref === 'lamp' && getState<boolean>(e, 'on'));
+  const night = entities.some((e) => e.ref === 'window' && isOn(e));
+  const lampOn = entities.some((e) => (e.ref === 'lamp' || e.ref === 'lamp-pink') && isOn(e));
   const isActive = (e: Entity) =>
     (e.ref === 'stove' && entities.some((v) => getState<string>(v, 'on') === e.id && getState<boolean>(v, 'cooking'))) ||
     (e.ref === 'shower' && entities.some((v) => v.kind === 'character' && getState<string>(v, 'on') === e.id && anims[v.id] === 'shower'));
@@ -383,17 +383,17 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     const to = getState<SceneId>(e, 'to');
     const doorIcon = to ? ({ 'home-kitchen': '🍳', 'home-bedroom': '🛏️', 'home-living': '🛋️', 'home-bathroom': '🛁' } as Record<string, string>)[to] : undefined;
     if (d.paint) {
-      const on = !!getState(e, 'on');
+      const on = isOn(e);
       return (
         <div className="w-full h-full relative">
-          {e.ref === 'lamp' && on && <div className="lamp-glow absolute pointer-events-none" />}
+          {(e.ref === 'lamp' || e.ref === 'lamp-pink') && on && <div className="lamp-glow absolute pointer-events-none" />}
           <img src={d.paint} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill' }} />
           {e.ref === 'tv' && on && <div className="tv-screen absolute" style={{ left: '12.5%', top: '1.5%', width: '75.5%', height: '56%' }} />}
           {doorIcon && <span className="absolute left-1/2 -translate-x-1/2 grid place-items-center rounded-full bg-white border-ink shadow-chunkysm" style={{ top: '46%', width: '34%', aspectRatio: '1', fontSize: `${(d.w * 0.16 / ROOM_H) * 100}cqh`, borderWidth: 3, borderStyle: 'solid' }}>{doorIcon}</span>}
         </div>
       );
     }
-    return <FurnitureArt art={d.art!} w={d.w} h={d.h} on={!!getState(e, 'on')} active={isActive(e)} variant={e.ref} label={doorIcon} img={getState<string>(e, 'img')} />;
+    return <FurnitureArt art={d.art!} w={d.w} h={d.h} on={isOn(e)} active={isActive(e)} variant={e.ref} label={doorIcon} img={getState<string>(e, 'img')} />;
   };
 
   const spawnSrc = spawnFor ? byId.get(spawnFor) : undefined;
@@ -440,7 +440,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
             >
               {active && e.pose !== 'sleep' && <div className="active-ring absolute left-1/2 -translate-x-1/2 -bottom-[3%] w-[90%] h-[8%] rounded-[50%]" />}
               <div className={`w-full h-full relative ${anims[e.id] ? `anim-${anims[e.id]}` : ''}`}>{anchor?.hide
-                ? (e.ref === 'window' && getState<boolean>(e, 'on') ? <div className="painted-night absolute inset-[4%] rounded-md" /> : null)
+                ? (e.ref === 'window' && isOn(e) ? <div className="painted-night absolute inset-[4%] rounded-md" /> : null)
                 : renderInner(e)}</div>
               {held && (() => {
                 const hs = sizeOf(held, look);
@@ -483,6 +483,12 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       {night && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? 'rgba(43,35,80,.18)' : 'rgba(43,35,80,.42)', zIndex: 900 }} />}
     </div>
   );
+}
+
+/** Switched on (lamp, TV, window = night). Older saves kept this in `on`, which now means "resting on". */
+function isOn(e: Entity): boolean {
+  const lit = getState<boolean>(e, 'lit');
+  return lit ?? getState(e, 'on') === true;
 }
 
 /** Used by the people tray: put a character/pet into this room. */

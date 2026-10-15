@@ -57,12 +57,14 @@ export function initialScene(id: SceneId): Entity[] {
         { ...it('apple', 670, 488), state: { on: table.id } }, { ...it('banana', 740, 488), state: { on: table.id } },
       ];
     }
-    case 'home-bedroom':
+    case 'home-bedroom': {
+      const desk = it('studydesk', 700, 560);
       return [
-        it('window', 520, 250), it('closet', 115, 480), it('rug', 560, 685), it('bed', 405, 600),
-        it('secretspot', 470, 628), it('lamp', 640, 560), it('tv', 790, 470), it('toybox', 800, 655),
-        it('backpack', 300, 670), it('clock', 640, 665), it('door', 925, 470, { to: 'home-bathroom' }),
+        it('window', 520, 250), it('closet', 130, 520), it('rug', 470, 685), it('bed', 410, 610),
+        it('secretspot', 470, 628), desk, { ...it('lamp-pink', 760, 438), state: { on: desk.id } }, it('toybox', 800, 670),
+        it('backpack', 300, 680), it('clock', 640, 680), it('door-pink', 925, 500, { to: 'home-bathroom' }),
       ];
+    }
     case 'home-living':
       return [
         it('window', 330, 250), it('bookshelf', 110, 500), it('rug', 470, 670), it('couch', 450, 585),

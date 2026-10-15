@@ -46,7 +46,7 @@ export const withState = (e: Entity, patch: Record<string, unknown>) => ({ ...(e
 export function depthOf(e: Entity, byId: Map<string, Entity>, guard = 0): number {
   if (e.heldBy && byId.has(e.heldBy) && guard < 8) return depthOf(byId.get(e.heldBy)!, byId, guard + 1) + 0.3;
   const on = getState<string>(e, 'on');
-  const t = on ? byId.get(on) : undefined;
+  const t = typeof on === 'string' ? byId.get(on) : undefined;
   if (t && guard < 8) {
     const base = depthOf(t, byId, guard + 1);
     return has(ITEMS[t.ref], 'behind') ? base - 0.5 : base + 0.5;
