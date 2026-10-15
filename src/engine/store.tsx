@@ -119,6 +119,7 @@ export type Action =
   | { type: 'SEEN_INTRO' }
   | { type: 'DISMISS_POPUP' }
   | { type: 'TOAST'; text: string }
+  | { type: 'OWN'; id: string }
   | { type: 'RESET' };
 
 export const sceneOf = (g: GameState, id: SceneId): Entity[] => g.scenes[id] ?? initialScene(id);
@@ -264,6 +265,7 @@ function reducer(root: Root, a: Action): Root {
     case 'SEEN_INTRO': return { ...root, game: { ...g, seenIntro: true } };
     case 'DISMISS_POPUP': return { ...root, queue: root.queue.slice(1) };
     case 'TOAST': return { ...root, toast: { id: uid('t'), text: a.text } };
+    case 'OWN': return g.owned.includes(a.id) ? root : { ...root, game: { ...g, owned: [...g.owned, a.id] } };
     case 'RESET': return { game: freshGame(), queue: [] };
   }
 }

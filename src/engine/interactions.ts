@@ -281,6 +281,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
     let ny = clamp(y, floorOnly ? horizon + 70 : 40, 695);
     // Things fall to the floor (or float up, for balloons) like real toys.
     if (!actor && has(dd, 'float')) ny = 110 + Math.random() * 90;
+    else if (!actor && !has(dd, 'wall') && !has(dd, 'small') && !dd?.emoji && !dd?.img) ny = Math.max(ny, horizon + 12); // big furniture stands where you put it, against the wall at the back
     else if (!actor && !has(dd, 'wall') && ny < horizon + 55) { ny = horizon + 60 + Math.random() * 45; fx.bursts = [{ id: d.id, emoji: '💫' }]; }
     P(d.id, { x: clamp(x, 30, 970), y: ny, ...(actor ? { pose: 'stand' as const } : {}), state: withState(d, { on: undefined }) });
     fx.sfx = 'tap';

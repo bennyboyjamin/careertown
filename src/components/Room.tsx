@@ -185,7 +185,9 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
         patch(pre);
         dispatch({ type: 'REMOVE_ENTITIES', scene: sceneId, ids: [e.id, ...deps.filter((id) => byId.get(id)?.kind === 'item')] });
         const name = ITEMS[e.ref]?.name ?? 'It';
-        dispatch({ type: 'TOAST', text: game.owned.includes(e.ref)
+        const furniture = !has(ITEMS[e.ref], 'small') && !ITEMS[e.ref]?.emoji;
+        if (furniture) dispatch({ type: 'OWN', id: e.ref });   // big furniture always goes to My stuff, never lost
+        dispatch({ type: 'TOAST', text: game.owned.includes(e.ref) || furniture
           ? `📦 ${name} is in My stuff. Tap My stuff to put it back.`
           : `👍 ${name} went back where it came from. Get another from the fridge, cupboard or toy box!` });
       } else {
