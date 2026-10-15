@@ -73,8 +73,10 @@ export function initialScene(id: SceneId): Entity[] {
       ];
     case 'home-bathroom':
       return [
-        it('shower', 140, 500), it('toilet', 380, 490), it('mirror', 590, 235), it('bathsink', 590, 490),
-        it('rug', 420, 650), it('toothbrush', 520, 650), it('duck', 160, 650), it('door', 925, 470, { to: 'home-kitchen' }),
+        it('shower', 160, 530), it('toilet', 380, 515), it('mirror', 600, 393), it('bathsink', 600, 505),
+        it('towel-rack', 760, 300), it('bath-shelf', 770, 520), it('laundry-basket', 460, 520),
+        it('bathmat', 430, 650), it('toothbrush', 560, 660), it('duck', 160, 660), it('step-stool', 610, 640),
+        it('door-white', 925, 500, { to: 'home-kitchen' }),
       ];
     case 'school-classroom': {
       const tdesk = it('teacherdesk', 830, 520);

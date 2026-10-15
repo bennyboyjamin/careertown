@@ -39,6 +39,16 @@ export function addStarterPack(g: GameState): GameState {
     g = { ...g, owned: [...g.owned, ...(g.owned.includes('studydesk') ? [] : ['studydesk']), 'pack:bedroom-1'],
       scenes: bed ? { ...g.scenes, 'home-bedroom': bed.map((e) => (e.kind === 'item' && swap[e.ref] ? { ...e, ref: swap[e.ref] } : e)) } : g.scenes };
   }
+  // Bathroom set: white door, bath mat, mirror lined up over the sink, extras in My stuff.
+  if (!g.owned.includes('pack:bathroom-1')) {
+    const bath = g.scenes['home-bathroom'];
+    const swap: Record<string, string> = { door: 'door-white', rug: 'bathmat' };
+    let scene = bath?.map((e) => (e.kind === 'item' && swap[e.ref] ? { ...e, ref: swap[e.ref] } : e));
+    const sink = scene?.find((e) => e.ref === 'bathsink');
+    if (scene && sink) scene = scene.map((e) => (e.ref === 'mirror' ? { ...e, x: sink.x, y: sink.y - 112 } : e));
+    const extra = ['towel-rack', 'laundry-basket', 'bath-shelf', 'bath-cart', 'trash-can', 'step-stool'].filter((id) => !g.owned.includes(id));
+    g = { ...g, owned: [...g.owned, ...extra, 'pack:bathroom-1'], scenes: scene ? { ...g.scenes, 'home-bathroom': scene } : g.scenes };
+  }
   return g;
 }
 

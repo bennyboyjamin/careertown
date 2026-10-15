@@ -14,6 +14,18 @@ import pToybox from '../assets/furniture/toybox.webp';
 import pDoorPink from '../assets/furniture/door-pink.webp';
 import pStudyDesk from '../assets/furniture/studydesk.webp';
 import pLampPink from '../assets/furniture/lamp-pink.webp';
+import pBathtub from '../assets/furniture/bathtub.webp';
+import pToiletW from '../assets/furniture/toilet-white.webp';
+import pBathSink from '../assets/furniture/bath-sink.webp';
+import pBathMirror from '../assets/furniture/bath-mirror.webp';
+import pDoorWhite from '../assets/furniture/door-white.webp';
+import pBathmat from '../assets/furniture/bathmat.webp';
+import pTowel from '../assets/furniture/towel-rack.webp';
+import pBasket from '../assets/furniture/laundry-basket.webp';
+import pBathShelf from '../assets/furniture/bath-shelf.webp';
+import pBathCart from '../assets/furniture/bath-cart.webp';
+import pTrash from '../assets/furniture/trash-can.webp';
+import pStool from '../assets/furniture/step-stool.webp';
 
 // Tags drive the interaction engine (engine/interactions.ts).
 export type ItemTag =
@@ -47,6 +59,7 @@ export interface ItemDef {
   cooksInto?: string;
   medical?: 'thermometer' | 'stethoscope' | 'bandage';
   seatLift?: number;    // how far above the item's base a sitter's feet go
+  front?: number;       // painted art: from this fraction down, the front is drawn over whoever is inside (bathtub)
 }
 
 const food = (id: string, name: string, emoji: string, extra: Partial<ItemDef> = {}): ItemDef => ({
@@ -142,11 +155,19 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     { id: 'armchair', name: 'Armchair', art: 'couch', paint: pArmchair, w: 170, h: 146, tags: ['seat'], seatLift: 64, tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So soft!', 'My reading chair!'] } },
     { id: 'bookshelf', name: 'Bookshelf', art: 'bookshelf', paint: pBookshelf, w: 150, h: 280, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: false, items: ['book', 'paints', 'clock'] } },
-    { id: 'shower', name: 'Shower', art: 'shower', w: 190, h: 340, fixed: true, tags: ['shower'] },
-    { id: 'toilet', name: 'Toilet', art: 'toilet', w: 115, h: 155, fixed: true, tags: ['seat'], seatLift: 58 },
-    { id: 'bathsink', name: 'Bathroom sink', art: 'bathsink', w: 135, h: 185, fixed: true, tags: ['sink'],
+    { id: 'shower', name: 'Bath & shower', art: 'shower', paint: pBathtub, w: 286, h: 243, front: 0.62, fixed: true, tags: ['shower'] },
+    { id: 'toilet', name: 'Toilet', art: 'toilet', paint: pToiletW, w: 94, h: 160, fixed: true, tags: ['seat'], seatLift: 76 },
+    { id: 'bathsink', name: 'Bathroom sink', art: 'bathsink', paint: pBathSink, w: 211, h: 112, fixed: true, tags: ['sink'],
       tap: { type: 'spawn', toggle: false, items: ['toothbrush', 'soap', 'duck'] } },
-    { id: 'mirror', name: 'Mirror', art: 'mirror', w: 120, h: 150, fixed: true, tags: [], tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['Looking great!', 'Who is that? It\'s you!'] } },
+    { id: 'mirror', name: 'Mirror', art: 'mirror', paint: pBathMirror, w: 211, h: 133, fixed: true, tags: [], tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['Looking great!', 'Who is that? It\'s you!'] } },
+    { id: 'door-white', name: 'Door', art: 'door', paint: pDoorWhite, w: 164, h: 275, fixed: true, tags: ['door'] },
+    { id: 'bathmat', name: 'Bath mat', art: 'rug', paint: pBathmat, w: 200, h: 102, tags: ['floor'] },
+    { id: 'towel-rack', name: 'Towel rack', art: 'mirror', paint: pTowel, w: 101, h: 68, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ['Fluffy towel!', 'All dry!'] } },
+    { id: 'laundry-basket', name: 'Laundry basket', art: 'toybox', paint: pBasket, w: 88, h: 82, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Laundry day!', 'Socks go here!'] } },
+    { id: 'bath-shelf', name: 'Bathroom shelf', art: 'bookshelf', paint: pBathShelf, w: 111, h: 154, tags: ['decor'], tap: { type: 'spawn', toggle: false, items: ['soap', 'duck', 'toothbrush'] } },
+    { id: 'bath-cart', name: 'Bath cart', art: 'toybox', paint: pBathCart, w: 102, h: 118, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Squeaky wheels!', 'Bubbles and lotion!'] } },
+    { id: 'trash-can', name: 'Trash can', art: 'toybox', paint: pTrash, w: 52, h: 78, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'click', bubble: ['Ding!'] } },
+    { id: 'step-stool', name: 'Step stool', art: 'toybox', paint: pStool, w: 95, h: 55, tags: ['seat', 'decor'], seatLift: 40 },
     { id: 'door', name: 'Door', art: 'door', paint: pDoor, w: 150, h: 275, fixed: true, tags: ['door'] },
     { id: 'door-pink', name: 'Door', art: 'door', paint: pDoorPink, w: 174, h: 275, fixed: true, tags: ['door'] },
     { id: 'lamp-pink', name: 'Table lamp', art: 'lamp', paint: pLampPink, w: 96, h: 143, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },

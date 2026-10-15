@@ -418,13 +418,17 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
           const isEmoji = e.kind === 'item' && !!ITEMS[e.ref]?.emoji;
           const active = e.kind === 'character' && e.ref === game.activeCharacterId;
           // Hand-drawn people sink into their seat: draw the seat's front again on top of them.
-          const seat = e.kind === 'character' && e.pose === 'sit' && !dragging && LAYERED[look.character(e.ref)?.sprite ?? ''] ? byId.get(getState<string>(e, 'on') ?? '') : undefined;
-          const seatDef = seat && seat.kind === 'item' ? ITEMS[seat.ref] : undefined;
-          const seatFront = seat && seatDef && !has(seatDef, 'behind') && seatDef.seatLift ? (() => {
+          const onIt = e.kind === 'character' && !dragging ? byId.get(getState<string>(e, 'on') ?? '') : undefined;
+          const onDef = onIt && onIt.kind === 'item' ? ITEMS[onIt.ref] : undefined;
+          const seat = onIt && ((e.pose === 'sit' && LAYERED[look.character(e.ref)?.sprite ?? '']) || onDef?.front) ? onIt : undefined;
+          const seatDef = seat ? onDef : undefined;
+          const frontFrac = seatDef?.front;
+          const seatFront = seat && seatDef && !has(seatDef, 'behind') && (seatDef.front || seatDef.seatLift) ? (() => {
             const ss = sizeOf(seat, look);
+            const top = frontFrac ?? (ss.h - seatDef.seatLift!) / ss.h;
             return (
               <div key={`${e.id}-seatfront`} className="absolute pointer-events-none"
-                style={{ left: pct(seat.x - ss.w / 2, ROOM_W), top: pct(seat.y - ss.h, ROOM_H), width: pct(ss.w, ROOM_W), height: pct(ss.h, ROOM_H), clipPath: `inset(${((ss.h - seatDef.seatLift!) / ss.h) * 100}% 0 0 0)` }}>
+                style={{ left: pct(seat.x - ss.w / 2, ROOM_W), top: pct(seat.y - ss.h, ROOM_H), width: pct(ss.w, ROOM_W), height: pct(ss.h, ROOM_H), clipPath: `inset(${top * 100}% 0 0 0)` }}>
                 <div className="w-full h-full relative">{renderInner(seat)}</div>
               </div>
             );

@@ -154,7 +154,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
         return true;
       }
       if (d.kind === 'character' && has(td, 'shower')) {
-        P(d.id, { pose: 'stand', x: t.x, y: t.y - 30, state: withState(d, { on: t.id }) });
+        P(d.id, { pose: 'stand', x: t.x + ts.w * 0.12, y: t.y - (td?.front ? ts.h * 0.08 : 30), state: withState(d, { on: t.id }) });
         fx.anim = { id: d.id, anim: 'shower', ms: 2600 }; fx.sfx = 'splash';
         fx.bubble = { id: d.id, text: pick(['La la la! 🫧', 'So bubbly!', 'Squeaky clean!']) }; fx.events.push('shower');
         return true;
