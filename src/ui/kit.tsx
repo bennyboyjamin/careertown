@@ -185,7 +185,7 @@ export function RewardPopup() {
   const p = queue[0];
   if (!p) return null;
   return (
-    <div className="fixed inset-0 z-[70] grid place-items-center bg-ink/55 p-4 modal-in">
+    <div className="reward-wrap fixed inset-0 z-[70] grid place-items-center bg-ink/55 p-4 modal-in overflow-y-auto">
       <Confetti />
       <div key={p.id} className="relative w-full max-w-sm rounded-[32px] border-[4px] border-ink bg-sun shadow-chunky p-6 text-center reward-in">
         <div className="text-6xl -mt-14 mb-1 star-spin">🌟</div>

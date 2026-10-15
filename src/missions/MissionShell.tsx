@@ -8,8 +8,8 @@ export function MissionShell({ id, step, steps, onExit, children, color = '#FFC9
   const m = MISSIONS[id];
   return (
     <div className="h-full flex flex-col">
-      <div className="px-3 pb-2 flex items-center gap-3">
-        <Btn tone="white" onClick={onExit} aria-label="Leave mission" className="!px-3">✕</Btn>
+      <div className="mission-head px-3 pb-2 flex items-center gap-3">
+        <Btn tone="white" onClick={onExit} aria-label="Leave mission" className="!px-3 shrink-0">✕ Leave</Btn>
         <div className="min-w-0">
           <div className="font-display font-extrabold text-ink text-lg sm:text-2xl truncate">{m.title}</div>
         </div>

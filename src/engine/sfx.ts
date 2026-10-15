@@ -13,8 +13,27 @@ function ac() {
     if (!C) return null;
     ctx = new C();
   }
-  if (ctx.state === 'suspended') void ctx.resume();
+  if (ctx.state !== 'running') void ctx.resume().catch(() => {});
   return ctx;
+}
+
+/* iPhone/iPad: sound only starts after a touch, and by default the ringer's
+   silent switch mutes web sound. Ask for "playback" audio (like a video app)
+   and wake the audio up on the first touch, and again after coming back. */
+function unlock() {
+  try {
+    const nav = navigator as Navigator & { audioSession?: { type: string } };
+    if (nav.audioSession && nav.audioSession.type !== 'playback') nav.audioSession.type = 'playback';
+  } catch { /* older iOS */ }
+  const a = ac(); if (!a) return;
+  try {
+    const b = a.createBuffer(1, 1, 22050); const s = a.createBufferSource();
+    s.buffer = b; s.connect(a.destination); s.start(0);
+  } catch { /* ignore */ }
+}
+if (typeof window !== 'undefined') {
+  for (const ev of ['pointerdown', 'touchend', 'keydown']) window.addEventListener(ev, unlock, { passive: true, capture: true });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ctx) void ctx.resume().catch(() => {}); });
 }
 
 function tone(freq: number, dur: number, type: OscillatorType = 'sine', when = 0, vol = 0.18, slideTo?: number) {

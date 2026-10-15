@@ -2,7 +2,8 @@ import type React from 'react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Entity, SceneId } from '../engine/types';
 import { useGame, sceneOf } from '../engine/store';
-import { ITEMS } from '../data/items';
+import { ITEMS, has } from '../data/items';
+import { LAYERED } from '../data/sprites';
 import { SCENES } from '../data/scenes';
 import { SECRETS, VISITORS } from '../data/catalog';
 import { ROOM_H, ROOM_W, dependentsOf, depthOf, getState, resolveDrop, sizeOf, withState, type Effect, type Lookup } from '../engine/interactions';
@@ -22,6 +23,8 @@ interface Drag {
   orig: { x: number; y: number };
   moved: boolean; deps: Set<string>;
   overTrash: boolean;
+  /** Pressed on something the character is wearing (tap = take it off). */
+  wearSlot?: 'head' | 'eyes' | 'ears' | 'bag';
 }
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
@@ -134,6 +137,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     setDrag({
       id: e.id, ox: pos.x - p.x, oy: pos.y - p.y, sx: ev.clientX, sy: ev.clientY,
       x: pos.x, y: pos.y, orig: pos, moved: false, deps: dependentsOf(e.id, entities), overTrash: false,
+      wearSlot: e.kind === 'character' ? ((ev.target as Element).closest?.('[data-wear]')?.getAttribute('data-wear') as Drag['wearSlot']) ?? undefined : undefined,
     });
   };
 
@@ -153,7 +157,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       if (!d) return;
       const e = byId.get(d.id); if (!e) return;
       const fixed = e.kind === 'item' && ITEMS[e.ref]?.fixed;
-      if (!d.moved) { onTap(e); return; }
+      if (!d.moved) { if (d.wearSlot && e.kind === 'character') takeOff(e, d.wearSlot); else onTap(e); return; }
       if (fixed) return;
       const hit = toRoom(ev.clientX, ev.clientY);
       onDrop(e, hit.x, hit.y, d.x, d.y, overTrash(ev.clientX, ev.clientY));
@@ -180,6 +184,10 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
         const deps = [...dependentsOf(e.id, entities)];
         patch(pre);
         dispatch({ type: 'REMOVE_ENTITIES', scene: sceneId, ids: [e.id, ...deps.filter((id) => byId.get(id)?.kind === 'item')] });
+        const name = ITEMS[e.ref]?.name ?? 'It';
+        dispatch({ type: 'TOAST', text: game.owned.includes(e.ref)
+          ? `📦 ${name} is in My stuff. Tap My stuff to put it back.`
+          : `👍 ${name} went back where it came from. Get another from the fridge, cupboard or toy box!` });
       } else {
         dispatch({ type: 'REMOVE_ACTOR', kind: e.kind, ref: e.ref });
       }
@@ -220,6 +228,14 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   };
 
   // ── Tap ──
+  /** Tap a worn hat / glasses / headphones / bag: it comes off and lands on the floor beside them. */
+  const takeOff = (e: Entity, slot: NonNullable<Drag['wearSlot']>) => {
+    const c = look.character(e.ref); const item = c?.wear?.[slot]; if (!item) return;
+    dispatch({ type: 'WEAR', character: e.ref, slot, item: null });
+    dispatch({ type: 'ADD_ENTITY', scene: sceneId, entity: { id: uid('it'), kind: 'item', ref: item, x: Math.min(960, e.x + 75), y: Math.min(695, Math.max(e.y, def.horizon + 60)) } });
+    say(e.id, ['Off it comes!', 'Taking it off!', 'There you go!'][Math.floor(Math.random() * 3)]); sfx('pop');
+  };
+
   const onTap = (e: Entity) => {
     if (e.kind === 'character') {
       dispatch({ type: 'SET_ACTIVE', id: e.ref });
@@ -236,7 +252,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       const log = (tapLog.current[e.id] = [...(tapLog.current[e.id] ?? []), now].filter((t0) => now - t0 < 1300));
       if (log.length >= 3) {
         tapLog.current[e.id] = [];
-        play(e.id, 'tickle', 1300); say(e.id, ['Hehe! That tickles!', 'Stop it! Hahaha!', 'Giggle giggle!'][Math.floor(Math.random() * 3)]);
+        play(e.id, 'tickle', 2000); say(e.id, ['Hehe! That tickles!', 'Stop it! Hahaha!', 'Giggle giggle!'][Math.floor(Math.random() * 3)]);
         burst(e.id, '😆'); sfx('sparkle'); dispatch({ type: 'EVENT', name: 'tickle' });
         return;
       }
@@ -251,7 +267,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       patch([{ id: e.id, patch: { pose: 'stand', state: withState(e, { follow, on: undefined }) } }]);
       play(e.id, 'play', 1000); sfx('pop');
       const friend = follow && look.character(follow)?.name;
-      say(e.id, friend ? `${pet?.species === 'kitten' ? 'Mew' : 'Woof'}! Following ${friend} 💕` : '💕 Exploring!');
+      say(e.id, friend ? `${pet?.species === 'kitten' ? 'Mew' : pet?.species === 'bunny' ? 'Hop hop' : 'Woof'}! Following ${friend} 💕` : '💕 Exploring!');
       return;
     }
     const d = ITEMS[e.ref]; const t = d?.tap;
@@ -333,7 +349,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       const c = look.character(e.ref); if (!c) return null;
       const holds = e.holding ? byId.get(e.holding)?.ref : undefined;
       const carried = drag?.id === e.id && drag.moved;
-      const mood: Mood = holderMood ?? (carried ? 'wow' : anim === 'sad' ? 'sad' : anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
+      const mood: Mood = holderMood ?? (carried ? 'wow' : anim === 'sad' ? 'sad' : anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' || anim === 'hugl' || anim === 'hugr' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
       const art = <Person c={c} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
       if (e.pose === 'sleep') {
         const st = sizeOf({ ...e, pose: 'stand' }, look);
@@ -388,7 +404,19 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
           const held = e.holding ? byId.get(e.holding) : undefined;
           const isEmoji = e.kind === 'item' && !!ITEMS[e.ref]?.emoji;
           const active = e.kind === 'character' && e.ref === game.activeCharacterId;
-          return (
+          // Hand-drawn people sink into their seat: draw the seat's front again on top of them.
+          const seat = e.kind === 'character' && e.pose === 'sit' && !dragging && LAYERED[look.character(e.ref)?.sprite ?? ''] ? byId.get(getState<string>(e, 'on') ?? '') : undefined;
+          const seatDef = seat && seat.kind === 'item' ? ITEMS[seat.ref] : undefined;
+          const seatFront = seat && seatDef && !has(seatDef, 'behind') && seatDef.seatLift ? (() => {
+            const ss = sizeOf(seat, look);
+            return (
+              <div key={`${e.id}-seatfront`} className="absolute pointer-events-none"
+                style={{ left: pct(seat.x - ss.w / 2, ROOM_W), top: pct(seat.y - ss.h, ROOM_H), width: pct(ss.w, ROOM_W), height: pct(ss.h, ROOM_H), clipPath: `inset(${((ss.h - seatDef.seatLift!) / ss.h) * 100}% 0 0 0)` }}>
+                <div className="w-full h-full relative">{renderInner(seat)}</div>
+              </div>
+            );
+          })() : null;
+          return [
             <div
               key={e.id}
               className={`entity absolute ${dragging ? 'dragging' : ''} ${e.kind === 'pet' && !dragging ? 'walking' : ''} ${fixed ? 'fixed-item' : 'movable'}`}
@@ -410,10 +438,11 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
               })()}
               {bubbles[e.id] && <Bubble key={bubbles[e.id].key} text={bubbles[e.id].text} />}
               {bursts.filter((b) => b.id === e.id).map((b, i) => <span key={b.key} className="burst" style={{ ['--bx' as string]: `${(i % 3 - 1) * 26}px` }}>{b.emoji}</span>)}
-            </div>
-          );
+            </div>,
+            seatFront,
+          ];
         })}
-        {(night) && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? 'rgba(43,35,80,.18)' : 'rgba(43,35,80,.42)', zIndex: 900 }} />}
+
         <div ref={trashRef} className={`trash absolute right-[1.5%] bottom-[2%] rounded-2xl border-[3px] border-ink px-3 py-2 font-display font-bold text-ink transition-all ${drag?.moved ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${drag?.overTrash ? 'bg-berry text-white scale-110' : 'bg-white'}`} style={{ zIndex: 950 }}>
           {drag && byId.get(drag.id)?.kind !== 'item' ? '👋 Leave room' : '📦 Put away'}
         </div>
@@ -435,6 +464,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
           </div>
         )}
       </div>
+      {night && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? 'rgba(43,35,80,.18)' : 'rgba(43,35,80,.42)', zIndex: 900 }} />}
     </div>
   );
 }

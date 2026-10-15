@@ -60,48 +60,57 @@ export interface Layered {
   eyes: [[number, number], [number, number]];
   /** Top of the skull (not hair puffs or ponytails), rig px: where a headband sits. */
   crown: number;
+  /** Hip line as a fraction of the full rig height: when sitting, the legs below it fold toward the viewer. */
+  hip: number;
 }
+/** Seated look: we draw the torso and the top of the thighs; the seat's front is drawn
+ *  over the rest (Room puts a copy of the seat front on top), so they sink into the seat. */
+export const SIT_EXTRA = 0.1;
+/** How far below the seat line the seated crop reaches, as a fraction of standing height. */
+export const sitDrop = (_l: Layered) => SIT_EXTRA * 0.7;
+/** Seated height as a fraction of standing height. */
+export const sitFrac = (l: Layered) => l.hip + SIT_EXTRA;
 export const LAYERED: Record<string, Layered> = {
   yuna: {
     W: 527, H: 1343, body: [0, 283, 527, 1060], head: [47, 0, 429, 416],
     outfits: [{ id: 'default', label: 'Red hoodie', src: yunaBody }],
     faces: { happy: yunaHappy, wink: yunaWink, sad: yunaSad, wow: yunaWow },
     eyes: [[215, 210], [318, 210]],
-    crown: 12,
+    crown: 12, hip: 0.645,
   },
   natalie: {
     W: 556, H: 1411, body: [0, 335, 556, 1076], head: [94, 0, 435, 421],
     outfits: [{ id: 'default', label: 'Track pants', src: natalieBody }],
     faces: { happy: natalieHappy, wink: natalieWink, sad: natalieSad, wow: natalieWow },
     eyes: [[225, 250], [330, 250]],
-    crown: 72,
+    crown: 72, hip: 0.655,
   },
   brother: {
     W: 563, H: 1357, body: [0, 302, 563, 1055], head: [71, 0, 392, 328],
     outfits: [{ id: 'default', label: 'Blue hoodie', src: brotherBody }],
     faces: { happy: brotherHappy, wink: brotherWink, sad: brotherSad, wow: brotherWow },
     eyes: [[227, 225], [330, 225]],
-    crown: 18,
+    crown: 18, hip: 0.66,
   },
   nene: {
     W: 560, H: 1188, body: [0, 298, 560, 890], head: [47, 0, 438, 334],
     outfits: [{ id: 'default', label: 'Bunny dress', src: neneBody }],
     faces: { happy: neneHappy, wink: neneWink, sad: neneSad, wow: neneWow },
     eyes: [[228, 215], [338, 215]],
-    crown: 8,
+    crown: 8, hip: 0.665,
   },
   mom: {
     W: 552, H: 1393, body: [0, 292, 552, 1101], head: [84, 0, 358, 367],
     outfits: [{ id: 'default', label: 'Cozy cardigan', src: momBody }],
     faces: { happy: momHappy, wink: momWink, sad: momSad, wow: momWow },
     eyes: [[222, 215], [330, 215]],
-    crown: 18,
+    crown: 18, hip: 0.628,
   },
   dad: {
     W: 567, H: 1468, body: [0, 321, 567, 1147], head: [115, 0, 323, 344],
     outfits: [{ id: 'default', label: 'Navy sweater', src: dadBody }],
     faces: { happy: dadHappy, wink: dadWink, sad: dadSad, wow: dadWow },
     eyes: [[225, 200], [328, 200]],
-    crown: 15,
+    crown: 15, hip: 0.618,
   },
 };

@@ -10,6 +10,7 @@ import { Person, PetPic } from '../components/Person';
 import { ItemIcon } from '../components/ItemIcon';
 import { ClothesPicker } from '../components/ClothesPicker';
 import { WearPicker } from '../components/WearPicker';
+import { PetCloset } from '../components/PetCloset';
 import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
 import { LookEditor } from './CharacterCreator';
@@ -23,6 +24,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   const [tray, setTray] = useState<'people' | 'stuff' | null>(null);
   const [wardrobe, setWardrobe] = useState<string | null>(null);
   const [drawOn, setDrawOn] = useState<Entity | null>(null);
+  const [petCloset, setPetCloset] = useState<string | null>(null);
   const here = sceneOf(game, sceneId);
   const isHome = b.id === 'home';
 
@@ -59,7 +61,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
       {tray && (
         <div className="tray-in fixed inset-x-2 bottom-20 z-[45] mx-auto max-w-2xl rounded-[24px] border-[4px] border-ink bg-white shadow-chunky p-3">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-display font-extrabold text-ink text-lg">{tray === 'people' ? 'Tap someone to bring them here' : 'Tap to place in this room'}</div>
+            <div className="font-display font-extrabold text-ink text-lg">{tray === 'people' ? 'Tap someone to bring them here (tap a pet again to dress it)' : 'Tap to place in this room'}</div>
             <button onClick={() => setTray(null)} className="w-10 h-10 rounded-full border-[3px] border-ink bg-berry text-white font-display" aria-label="Close tray">✕</button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-1">
@@ -75,9 +77,9 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
             {tray === 'people' && game.pets.map((p) => {
               const inRoom = here.some((e) => e.kind === 'pet' && e.ref === p.id);
               return (
-                <button key={p.id} onClick={() => !inRoom && placeActor(dispatch, sceneId, 'pet', p.id)}
+                <button key={p.id} onClick={() => { if (inRoom) { sfx('tap'); setPetCloset(p.id); setTray(null); } else placeActor(dispatch, sceneId, 'pet', p.id); }}
                   className={`shrink-0 flex flex-col items-center gap-1 rounded-2xl border-[3px] border-ink p-2 w-20 ${inRoom ? 'bg-sun' : 'bg-white'}`}>
-                  <div className="w-14 h-14"><PetPic p={p} /></div><span className="font-body text-xs text-ink">{inRoom ? `✓ ${p.name}` : p.name}</span>
+                  <div className="w-14 h-14"><PetPic p={p} /></div><span className="font-body text-xs text-ink">{inRoom ? `👗 ${p.name}` : p.name}</span>
                 </button>
               );
             })}
@@ -95,6 +97,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
       )}
 
       {wardrobe && <WardrobeSheet characterId={wardrobe} onClose={() => setWardrobe(null)} />}
+      {petCloset && <Modal title="Pet closet" onClose={() => setPetCloset(null)}><PetCloset only={petCloset} /></Modal>}
       {drawOn && <Chalkboard entity={drawOn} sceneId={sceneId} onClose={() => setDrawOn(null)} />}
     </div>
   );
@@ -189,6 +192,7 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
     <div>
       <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
       <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />
+      <PetCloset />
     </div>
   );
 }

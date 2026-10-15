@@ -1,6 +1,6 @@
 import type { CharacterData, Entity, PetData, SceneId } from './types';
 import { ITEMS, has, type ItemDef } from '../data/items';
-import { SPRITES, LAYERED } from '../data/sprites';
+import { SPRITES, LAYERED, sitFrac, sitDrop } from '../data/sprites';
 import type { SfxName } from './sfx';
 
 // ── Geometry ───────────────────────────────────────────
@@ -21,7 +21,7 @@ export function sizeOf(e: Entity, look: Lookup): { w: number; h: number } {
   }
   const cs = look.character(e.ref)?.sprite; const csp = cs ? SPRITES[cs] : undefined;
   if (csp) {
-    if (e.pose === 'sit') return { w: csp.w, h: csp.h * 0.8 };
+    if (e.pose === 'sit') return { w: csp.w, h: csp.h * (LAYERED[cs!] ? sitFrac(LAYERED[cs!]) : 0.8) };
     if (e.pose === 'sleep') return { w: csp.h, h: csp.w };
     return { w: csp.w, h: csp.h };
   }
@@ -30,6 +30,13 @@ export function sizeOf(e: Entity, look: Lookup): { w: number; h: number } {
   if (e.pose === 'sit') return { w, h: h * (adult ? 0.85 : 0.92) };
   if (e.pose === 'sleep') return { w: h, h: w * 0.75 };
   return { w, h };
+}
+
+/** Hand-drawn people sit with their shins hanging down, so their feet go below the seat. */
+function layeredDrop(e: Entity, look: Lookup) {
+  if (e.kind !== 'character') return 0;
+  const sp = look.character(e.ref)?.sprite; const l = sp ? LAYERED[sp] : undefined;
+  return l && SPRITES[sp!] ? sitDrop(l) * SPRITES[sp!].h : 0;
 }
 
 export const getState = <T,>(e: Entity, k: string) => e.state?.[k] as T | undefined;
@@ -109,12 +116,15 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
     // ── Friends meeting ──
     if ((d.kind === 'character' || d.kind === 'pet') && (t.kind === 'character' || t.kind === 'pet')) {
       const side = x < t.x ? -1 : 1;
-      const nx = clamp(t.x + side * (d.kind === 'pet' || t.kind === 'pet' ? 85 : 95), 40, 960);
+      const hugging = d.kind === 'character' && t.kind === 'character';
+      const nx = clamp(t.x + side * (d.kind === 'pet' || t.kind === 'pet' ? 85 : hugging ? 74 : 95), 40, 960);
       const pet = d.kind === 'pet' ? d : t.kind === 'pet' ? t : undefined;
       const person = d.kind === 'character' ? d : t.kind === 'character' ? t : undefined;
       P(d.id, { x: nx, y: clamp(t.y, horizon + 70, 695), pose: 'stand', state: withState(d, { on: undefined, ...(pet && person && pet.id === d.id ? { follow: person.ref } : {}) }) });
       if (pet && person && pet.id === t.id) P(t.id, { state: withState(t, { follow: person.ref }) });
-      fx.anims = [{ id: d.id, anim: 'hop', ms: 900 }, { id: t.id, anim: 'hop', ms: 900 }];
+      fx.anims = hugging
+        ? [{ id: d.id, anim: side < 0 ? 'hugr' : 'hugl', ms: 1800 }, { id: t.id, anim: side < 0 ? 'hugl' : 'hugr', ms: 1800 }]
+        : [{ id: d.id, anim: 'hop', ms: 900 }, { id: t.id, anim: 'hop', ms: 900 }];
       fx.bursts = [{ id: t.id, emoji: '💕' }, { id: d.id, emoji: '💕' }];
       if (pet && person) {
         fx.bubble = { id: person.id, text: pick(['Aww! 🥰', 'Who’s a good buddy?', 'Snuggle time!']) };
@@ -156,7 +166,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
         P(d.id, {
           pose: d.kind === 'pet' ? 'sleep' : 'sit',
           x: wide ? clamp(x, t.x - ts.w / 2 + 60, t.x + ts.w / 2 - 60) : t.x,
-          y: t.y - (td?.seatLift ?? 40), state: withState(d, { on: t.id }),
+          y: t.y - (td?.seatLift ?? 40) + layeredDrop(d, look), state: withState(d, { on: t.id }),
         });
         fx.sfx = 'pop'; fx.events.push('sit');
         return true;
@@ -232,7 +242,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
         P(d.id, { x: t.x + 70, y: t.y });
         const sp = look.pet(t.ref)?.species;
         fx.anim = { id: t.id, anim: 'play', ms: 1500 };
-        fx.bubble = { id: t.id, text: sp === 'kitten' ? 'Mew mew! 💕' : 'Woof woof! 💕' }; fx.sfx = 'pop'; fx.events.push('pet-play');
+        fx.bubble = { id: t.id, text: sp === 'kitten' ? 'Mew mew! 💕' : sp === 'bunny' ? 'Sniff sniff! Hop hop! 💕' : 'Woof woof! 💕' }; fx.sfx = 'pop'; fx.events.push('pet-play');
         return true;
       }
       return false;

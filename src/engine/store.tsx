@@ -116,7 +116,7 @@ function applyReward(g: GameState, r: Reward): GameState {
   for (const u of r.unlocks ?? []) {
     if (u === 'pet:puppy' || u === 'pet:kitten' || u === 'pet:bunny') {
       const species = u.slice(4) as PetData['species'];
-      if (next.pets.some((p) => p.species === species)) continue;
+      if (next.pets.some((p) => p.species === species && !p.sprite)) continue; // the family dogs don't count: you still get your own puppy
       const pet: PetData = { id: uid('pet'), species, name: PET_NAMES[species], accessory: 'none' };
       next.pets = [...next.pets, pet];
       const living = sceneOf(next, 'home-living');

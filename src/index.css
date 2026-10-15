@@ -218,3 +218,21 @@ button { touch-action: manipulation; }
   .intro-card p { font-size: 16px; margin-top: 6px; }
   .intro-card button { margin-top: 10px; font-size: 22px; padding: 8px 32px; }
 }
+.entity .worn { pointer-events: auto; }
+.mission-head { padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); padding-top: env(safe-area-inset-top, 0px); }
+/* hugs: lean in toward the friend, squeeze, let go */
+.anim-hugr, .anim-hugl { animation-duration: 1.8s; animation-timing-function: ease-in-out; transform-origin: 50% 100%; }
+.anim-hugr { animation-name: hugr; }
+.anim-hugl { animation-name: hugl; }
+@keyframes hugr { 0%, 100% { transform: none } 20%, 80% { transform: translateX(8%) rotate(6deg) } 40% { transform: translateX(10%) rotate(7deg) scale(1.03, .97) } 60% { transform: translateX(10%) rotate(7deg) scale(.98, 1.02) } }
+@keyframes hugl { 0%, 100% { transform: none } 20%, 80% { transform: translateX(-8%) rotate(-6deg) } 40% { transform: translateX(-10%) rotate(-7deg) scale(1.03, .97) } 60% { transform: translateX(-10%) rotate(-7deg) scale(.98, 1.02) } }
+.room-wrap { isolation: isolate; }
+/* reward popup must fit a sideways phone (Yay! button always reachable) */
+@media (max-height: 520px) {
+  .reward-wrap { padding-top: 28px; align-items: start; }
+  .reward-wrap .reward-in { padding: 14px 18px; }
+  .reward-wrap .reward-in li { padding-top: 4px; padding-bottom: 4px; }
+  .reward-wrap .reward-in ul { margin-top: 8px; }
+  .reward-wrap .reward-in h2 { font-size: 22px; }
+  .reward-wrap .star-spin { font-size: 40px; margin-top: -34px; }
+}

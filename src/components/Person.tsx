@@ -2,19 +2,47 @@ import type { CharacterData, PetData, Pose } from '../engine/types';
 import { CharacterArt, type Mood } from './art/Character';
 import { PetArt } from './art/Pet';
 import { PET_LOOKS, ACC_BY_ID, type WearSlot } from '../data/accessories';
-import { SPRITES, LAYERED, type Face, type Layered } from '../data/sprites';
+import { useEffect, useState } from 'react';
+import { SPRITES, LAYERED, sitFrac, type Face, type Layered } from '../data/sprites';
 import { CLOTHES } from '../data/clothes';
 
 /** Draws a character: hand-drawn artwork if it has a sprite, otherwise the vector style. */
 export function Person({ c, pose = 'stand', mood = 'normal', bandage = false }: { c: CharacterData; pose?: Pose; mood?: Mood; bandage?: boolean }) {
   const lay = c.sprite ? LAYERED[c.sprite] : undefined;
-  if (lay) return <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={faceFor(mood)} sit={pose === 'sit'} wear={c.wear} name={c.sprite} colors={c.colors} />;
+  if (lay) return <LayeredPerson c={c} lay={lay} pose={pose} mood={mood} />;
   const sp = c.sprite ? SPRITES[c.sprite] : undefined;
   if (!sp) return <CharacterArt age={c.age} look={c.look} pose={pose} mood={mood} bandage={bandage} />;
   // Sitting: show the top of the artwork so the legs tuck behind the seat.
   return (
     <div className="sprite-wrap w-full h-full overflow-hidden" style={{ position: 'relative' }}>
       <img src={sp.src} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: pose === 'sit' ? `${100 / 0.8}%` : '100%', objectFit: 'contain', objectPosition: 'top' }} />
+    </div>
+  );
+}
+
+/** Faces that move: giggling flips wink/happy, eating flips open/closed mouth. */
+function useFace(mood: Mood): Face {
+  const live = mood === 'silly' || mood === 'eat';
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    if (!live) return;
+    const id = window.setInterval(() => setT((v) => v + 1), 260);
+    return () => window.clearInterval(id);
+  }, [live]);
+  if (mood === 'silly') return t % 2 ? 'happy' : 'wink';
+  if (mood === 'eat') return t % 2 ? 'happy' : 'wow';
+  return faceFor(mood);
+}
+
+function LayeredPerson({ c, lay, pose, mood }: { c: CharacterData; lay: Layered; pose: Pose; mood: Mood }) {
+  const face = useFace(mood);
+  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} />;
+  if (pose !== 'sit') return art;
+  // Sitting: torso and the top of the thighs; the seat front (drawn over by Room) hides the rest.
+  const f = sitFrac(lay);
+  return (
+    <div className="w-full h-full" style={{ position: 'relative', clipPath: 'inset(-50% -50% 0 -50%)' }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: `${(1 / f) * 100}%` }}>{art}</div>
     </div>
   );
 }
@@ -60,7 +88,7 @@ function wearBox(lay: Layered, slot: WearSlot, aspect: number): [number, number,
   const [[lx, ly], [rx, ry]] = lay.eyes;
   const d = rx - lx, mx = (lx + rx) / 2, ey = (ly + ry) / 2;
   const [bx, by, bw, bh] = lay.body;
-  if (slot === 'eyes') { const w = d * 2.25; const h = w / aspect; return [mx - w / 2, ey - h / 2 + d * 0.04, w, h]; }
+  if (slot === 'eyes') { const w = d * 2.05; const h = w / aspect; return [mx - w / 2, ey - h / 2 + d * 0.1, w, h]; }
   if (slot === 'head') { const w = d * 3.05; const h = w / aspect; return [mx - w / 2, ey - d * 0.6 - h, w, h]; }
   if (slot === 'ears') { const w = d * 3.7; const h = w / aspect; return [mx - w / 2, ey + d * 0.3 - h * 0.74, w, h]; }
   const h = d * 1.9; const w = h * aspect; // bag: hangs at the hip
@@ -78,7 +106,7 @@ function Headphones({ lay, src }: { lay: Layered; src: string }) {
     const x = mx + side * earDx - cw / 2, y = earY - ch / 2;
     const iw = cw / 0.44, ih = ch / 0.6;
     return (
-      <div key={side} style={{ position: 'absolute', left: pct(x, lay.W), top: pct(y, lay.H), width: pct(cw, lay.W), height: pct(ch, lay.H), overflow: 'hidden' }}>
+      <div key={side} className="worn" data-wear="ears" style={{ position: 'absolute', left: pct(x, lay.W), top: pct(y, lay.H), width: pct(cw, lay.W), height: pct(ch, lay.H), overflow: 'hidden' }}>
         <img src={src} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', width: `${(iw / cw) * 100}%`, height: `${(ih / ch) * 100}%`, left: `${(-(side < 0 ? 0.02 : 0.54) * iw / cw) * 100}%`, top: `${(-0.4 * ih / ch) * 100}%`, maxWidth: 'none' }} />
       </div>
     );
@@ -110,7 +138,7 @@ export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors 
     if (!a) return null;
     if (slot === 'ears') return <Headphones key="ears" lay={lay} src={a.img} />;
     const [x, y, w, h] = wearBox(lay, slot, a.w / a.h);
-    return <img key={slot} src={a.img} alt="" draggable={false} className="sprite-img worn" style={{ position: 'absolute', left: pct(x, lay.W), top: pct(y, lay.H), width: pct(w, lay.W), height: pct(h, lay.H) }} />;
+    return <img key={slot} src={a.img} alt="" draggable={false} data-wear={slot} className="sprite-img worn" style={{ position: 'absolute', left: pct(x, lay.W), top: pct(y, lay.H), width: pct(w, lay.W), height: pct(h, lay.H) }} />;
   };
   return (
     <div className="w-full h-full" style={{ position: 'relative', overflow: 'visible' }}>
