@@ -96,7 +96,7 @@ function contains(e: Entity, x: number, y: number, look: Lookup, pad: number) {
  * Work out what happens when `d` is released. (hx, hy) is where the finger lifted
  * (used to find the target); (x, y) is where the entity's feet would land.
  */
-export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: number, all: Entity[], look: Lookup, horizon: number): Effect {
+export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: number, all: Entity[], look: Lookup, horizon: number, xMin = 30, xMax = 970): Effect {
   const fx: Effect = { patches: [], remove: [], events: [] };
   const byId = new Map(all.map((e) => [e.id, e]));
   const deps = dependentsOf(d.id, all);
@@ -117,7 +117,7 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
     if ((d.kind === 'character' || d.kind === 'pet') && (t.kind === 'character' || t.kind === 'pet')) {
       const side = x < t.x ? -1 : 1;
       const hugging = d.kind === 'character' && t.kind === 'character';
-      const nx = clamp(t.x + side * (d.kind === 'pet' || t.kind === 'pet' ? 85 : hugging ? 74 : 95), 40, 960);
+      const nx = clamp(t.x + side * (d.kind === 'pet' || t.kind === 'pet' ? 85 : hugging ? 74 : 95), xMin + 10, xMax - 10);
       const pet = d.kind === 'pet' ? d : t.kind === 'pet' ? t : undefined;
       const person = d.kind === 'character' ? d : t.kind === 'character' ? t : undefined;
       P(d.id, { x: nx, y: clamp(t.y, horizon + 70, 695), pose: 'stand', state: withState(d, { on: undefined, ...(pet && person && pet.id === d.id ? { follow: person.ref } : {}) }) });
@@ -283,7 +283,8 @@ export function resolveDrop(d: Entity, hx: number, hy: number, x: number, y: num
     if (!actor && has(dd, 'float')) ny = 110 + Math.random() * 90;
     else if (!actor && !has(dd, 'wall') && !has(dd, 'small') && !dd?.emoji && !dd?.img) ny = Math.max(ny, horizon + 12); // big furniture stands where you put it, against the wall at the back
     else if (!actor && !has(dd, 'wall') && ny < horizon + 55) { ny = horizon + 60 + Math.random() * 45; fx.bursts = [{ id: d.id, emoji: '💫' }]; }
-    P(d.id, { x: clamp(x, 30, 970), y: ny, ...(actor ? { pose: 'stand' as const } : {}), state: withState(d, { on: undefined }) });
+    const half = Math.min(sizeOf(d, look).w / 2, 200) - 30; // keep the whole thing on screen
+    P(d.id, { x: clamp(x, xMin + Math.max(0, half), xMax - Math.max(0, half)), y: ny, ...(actor ? { pose: 'stand' as const } : {}), state: withState(d, { on: undefined }) });
     fx.sfx = 'tap';
   }
 

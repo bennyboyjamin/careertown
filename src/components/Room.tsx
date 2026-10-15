@@ -46,6 +46,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
 
   const roomRef = useRef<HTMLDivElement>(null);
   const trashRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
   dragRef.current = drag;
@@ -129,6 +130,14 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     return { x: holder.x + s.w * 0.23, y: holder.y - s.h * (holder.pose === 'sit' ? 0.14 : adult ? 0.26 : 0.21) };
   };
 
+  /** The play area reaches the screen edges: on wide screens that is past the room's 0–1000 box. */
+  const playBounds = (): [number, number] => {
+    const r = roomRef.current?.getBoundingClientRect(); const w = wrapRef.current?.getBoundingClientRect();
+    if (!r || !w || !r.width) return [30, 970];
+    const extra = Math.max(0, ((w.width - r.width) / 2 / r.width) * ROOM_W);
+    return [30 - extra, 970 + extra];
+  };
+
   const onDown = (e: Entity, ev: React.PointerEvent) => {
     ev.stopPropagation();
     ev.preventDefault();
@@ -195,7 +204,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       }
       return;
     }
-    const fx = resolveDrop(d, hx, hy, x, y, entities.map((v) => (v.id === d.id ? d : v)), look, def.horizon);
+    const [xMin, xMax] = playBounds();
+    const fx = resolveDrop(d, hx, hy, x, y, entities.map((v) => (v.id === d.id ? d : v)), look, def.horizon, xMin, xMax);
     if (pre.length || fx.patches.length) {
       const merged = [...pre];
       for (const p of fx.patches) {
@@ -234,7 +244,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   const takeOff = (e: Entity, slot: NonNullable<Drag['wearSlot']>) => {
     const c = look.character(e.ref); const item = c?.wear?.[slot]; if (!item) return;
     dispatch({ type: 'WEAR', character: e.ref, slot, item: null });
-    dispatch({ type: 'ADD_ENTITY', scene: sceneId, entity: { id: uid('it'), kind: 'item', ref: item, x: Math.min(960, e.x + 75), y: Math.min(695, Math.max(e.y, def.horizon + 60)) } });
+    dispatch({ type: 'ADD_ENTITY', scene: sceneId, entity: { id: uid('it'), kind: 'item', ref: item, x: Math.min(playBounds()[1], e.x + 75), y: Math.min(695, Math.max(e.y, def.horizon + 60)) } });
     say(e.id, ['Off it comes!', 'Taking it off!', 'There you go!'][Math.floor(Math.random() * 3)]); sfx('pop');
   };
 
@@ -289,7 +299,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       case 'custom': onCustomTap?.(e); break;
       case 'roll': {
         const dir = e.x > 500 ? -1 : 1;
-        const nx = Math.max(40, Math.min(960, e.x + dir * (160 + Math.random() * 180)));
+        const [bl, br] = playBounds(); const nx = Math.max(bl + 10, Math.min(br - 10, e.x + dir * (160 + Math.random() * 180)));
         patch([{ id: e.id, patch: { x: nx, y: Math.max(e.y, def.horizon + 60), state: withState(e, { on: undefined }) } }]);
         play(e.id, 'spin', 800); sfx(t.sfx ?? 'pop');
         if (t.bubble) say(e.id, t.bubble[Math.floor(Math.random() * t.bubble.length)]);
@@ -401,9 +411,9 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   const spawnDef = spawnSrc && ITEMS[spawnSrc.ref];
 
   return (
-    <div className="room-wrap full relative w-full h-full grid place-items-center overflow-hidden">
+    <div ref={wrapRef} className="room-wrap full relative w-full h-full grid place-items-center overflow-hidden">
       <div className="room room-ext relative pointer-events-none" aria-hidden><RoomBackdrop def={def} extend /></div>
-      <div ref={roomRef} className="room relative overflow-hidden select-none" style={{ touchAction: 'none' }}>
+      <div ref={roomRef} className="room relative select-none" style={{ touchAction: 'none' }}>
         <RoomBackdrop def={def} />
         {sorted.map((e) => {
           if (e.heldBy && byId.get(e.heldBy) && drag?.id !== e.id) return null; // drawn in the holder's hand
@@ -464,9 +474,6 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
           ];
         })}
 
-        <div ref={trashRef} className={`trash absolute right-[1.5%] bottom-[2%] rounded-2xl border-[3px] border-ink px-3 py-2 font-display font-bold text-ink transition-all ${drag?.moved ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${drag?.overTrash ? 'bg-berry text-white scale-110' : 'bg-white'}`} style={{ zIndex: 950 }}>
-          {drag && byId.get(drag.id)?.kind !== 'item' ? '👋 Leave room' : '📦 Put away'}
-        </div>
         {spawnSrc && spawnDef?.tap?.type === 'spawn' && (
           <div className="absolute inset-0 z-[980] bg-ink/25 grid place-items-center" onPointerDown={(ev) => ev.target === ev.currentTarget && closeSpawn()}>
             <div className="pop-in rounded-[24px] border-[4px] border-ink bg-white shadow-chunky p-3 max-w-[92%]">
@@ -484,6 +491,9 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
             </div>
           </div>
         )}
+      </div>
+      <div ref={trashRef} className={`trash absolute rounded-2xl border-[3px] border-ink px-3 py-2 font-display font-bold text-ink transition-all ${drag?.moved ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${drag?.overTrash ? 'bg-berry text-white scale-110' : 'bg-white'}`} style={{ zIndex: 950, right: 'max(12px, env(safe-area-inset-right, 0px))', bottom: 12 }}>
+        {drag && byId.get(drag.id)?.kind !== 'item' ? '👋 Leave room' : '📦 Put away'}
       </div>
       {night && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? 'rgba(43,35,80,.18)' : 'rgba(43,35,80,.42)', zIndex: 900 }} />}
     </div>
