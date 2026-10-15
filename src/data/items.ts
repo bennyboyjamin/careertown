@@ -1,5 +1,13 @@
 import type { SfxName } from '../engine/sfx';
 import { ACCESSORIES, TOY_IDS } from './accessories';
+import pCouch from '../assets/furniture/couch.webp';
+import pArmchair from '../assets/furniture/armchair.webp';
+import pTv from '../assets/furniture/tv.webp';
+import pLamp from '../assets/furniture/lamp.webp';
+import pBookshelf from '../assets/furniture/bookshelf.webp';
+import pDoor from '../assets/furniture/door.webp';
+import pRug from '../assets/furniture/rug.webp';
+import pPlant from '../assets/furniture/plant.webp';
 
 // Tags drive the interaction engine (engine/interactions.ts).
 export type ItemTag =
@@ -26,6 +34,7 @@ export interface ItemDef {
   img?: string;         // hand-drawn sticker art
   wear?: import('./accessories').WearSlot; // characters with layered art can wear it
   art?: string;         // big furniture is drawn as SVG (components/art/Furniture.tsx)
+  paint?: string;       // painted furniture picture (used instead of the SVG art)
   tags: ItemTag[];
   fixed?: boolean;      // can't be dragged, only tapped
   tap?: TapAction;
@@ -119,24 +128,25 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     { id: 'closet', name: 'Closet', art: 'closet', w: 175, h: 305, fixed: true, tags: [], tap: { type: 'wardrobe' } },
     { id: 'toybox', name: 'Toy box', art: 'toybox', w: 160, h: 115, tags: [],
       tap: { type: 'spawn', toggle: true, items: ['teddy', 'train', 'balloon', 'drum', ...TOY_IDS, 'paints', 'book', 'yarn'] } },
-    { id: 'lamp', name: 'Lamp', art: 'lamp', w: 85, h: 195, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
-    { id: 'tv', name: 'TV', art: 'tv', w: 210, h: 185, tags: [], tap: { type: 'toggle', sfx: 'click' } },
+    { id: 'lamp', name: 'Lamp', art: 'lamp', paint: pLamp, w: 92, h: 200, tags: ['decor'], tap: { type: 'toggle', sfx: 'click' } },
+    { id: 'tv', name: 'TV', art: 'tv', paint: pTv, w: 240, h: 160, tags: [], tap: { type: 'toggle', sfx: 'click' } },
     { id: 'window', name: 'Window', art: 'window', w: 200, h: 165, fixed: true, tags: [], tap: { type: 'toggle', sfx: 'whoosh' } },
-    { id: 'rug', name: 'Rug', art: 'rug', w: 340, h: 70, tags: ['floor'] },
-    { id: 'couch', name: 'Couch', art: 'couch', w: 360, h: 170, tags: ['seat'], seatLift: 70, tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Comfy!', 'Pillow fort time?'] } },
-    { id: 'bookshelf', name: 'Bookshelf', art: 'bookshelf', w: 170, h: 265, fixed: true, tags: [],
+    { id: 'rug', name: 'Rug', art: 'rug', paint: pRug, w: 300, h: 108, tags: ['floor'] },
+    { id: 'couch', name: 'Couch', art: 'couch', paint: pCouch, w: 380, h: 144, tags: ['seat'], seatLift: 66, tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Comfy!', 'Pillow fort time?'] } },
+    { id: 'armchair', name: 'Armchair', art: 'couch', paint: pArmchair, w: 170, h: 146, tags: ['seat'], seatLift: 64, tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['So soft!', 'My reading chair!'] } },
+    { id: 'bookshelf', name: 'Bookshelf', art: 'bookshelf', paint: pBookshelf, w: 150, h: 280, fixed: true, tags: [],
       tap: { type: 'spawn', toggle: false, items: ['book', 'paints', 'clock'] } },
     { id: 'shower', name: 'Shower', art: 'shower', w: 190, h: 340, fixed: true, tags: ['shower'] },
     { id: 'toilet', name: 'Toilet', art: 'toilet', w: 115, h: 155, fixed: true, tags: ['seat'], seatLift: 58 },
     { id: 'bathsink', name: 'Bathroom sink', art: 'bathsink', w: 135, h: 185, fixed: true, tags: ['sink'],
       tap: { type: 'spawn', toggle: false, items: ['toothbrush', 'soap', 'duck'] } },
     { id: 'mirror', name: 'Mirror', art: 'mirror', w: 120, h: 150, fixed: true, tags: [], tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['Looking great!', 'Who is that? It\'s you!'] } },
-    { id: 'door', name: 'Door', art: 'door', w: 130, h: 270, fixed: true, tags: ['door'] },
+    { id: 'door', name: 'Door', art: 'door', paint: pDoor, w: 150, h: 275, fixed: true, tags: ['door'] },
     { id: 'secretspot', name: 'Sparkle', art: 'sparkle', w: 70, h: 50, fixed: true, tags: [],
       tap: { type: 'secret', secretId: 'underbed', taps: 1, sfx: 'sparkle' } },
 
     // ── Shop / reward decor ───────────────────────────
-    { id: 'plant', name: 'Leafy plant', art: 'plant', w: 95, h: 160, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ['Rustle rustle', 'Thanks for the water!'] } },
+    { id: 'plant', name: 'Leafy plant', art: 'plant', paint: pPlant, w: 125, h: 123, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ['Rustle rustle', 'Thanks for the water!'] } },
     { id: 'beanbag', name: 'Beanbag', art: 'beanbag', w: 140, h: 100, tags: ['seat', 'decor'], seatLift: 38 },
     { id: 'fishbowl', name: 'Fishbowl', art: 'fishbowl', w: 110, h: 110, tags: ['decor'], tap: { type: 'anim', anim: 'shake', sfx: 'splash', bubble: ['Blub blub!'] } },
     { id: 'starrug', name: 'Star rug', art: 'starrug', w: 300, h: 70, tags: ['floor', 'decor'] },

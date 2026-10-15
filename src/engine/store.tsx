@@ -27,8 +27,12 @@ export const DEFAULT_PETS: PetData[] = [
 /** Older saves: bring in the YunaVerse family and dogs without touching anything else. */
 /** Everyone gets the accessory starter pack once (new and existing saves). */
 export function addStarterPack(g: GameState): GameState {
-  if (g.owned.includes('pack:accessories-1')) return g;
-  return { ...g, owned: [...g.owned, ...STARTER_ACCESSORIES.filter((id) => !g.owned.includes(id)), 'pack:accessories-1'] };
+  if (!g.owned.includes('pack:accessories-1'))
+    g = { ...g, owned: [...g.owned, ...STARTER_ACCESSORIES.filter((id) => !g.owned.includes(id)), 'pack:accessories-1'] };
+  // New living-room furniture: existing saves find it in My stuff.
+  if (!g.owned.includes('pack:living-1'))
+    g = { ...g, owned: [...g.owned, ...['armchair', 'plant'].filter((id) => !g.owned.includes(id)), 'pack:living-1'] };
+  return g;
 }
 
 export function addFamily(g: GameState): GameState {

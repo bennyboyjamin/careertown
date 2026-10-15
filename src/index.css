@@ -242,3 +242,6 @@ button { touch-action: manipulation; }
 .art-building.soon .art-crop { filter: saturate(.55) brightness(1.04); }
 .art-building:hover .art-crop, .art-building:focus-visible .art-crop { filter: brightness(1.08) drop-shadow(0 0 6px #fff); }
 .balloon-spot { border-radius: 50%; }
+.painted-night { background: radial-gradient(circle at 70% 30%, #FFF6C8 0 4%, transparent 5%), radial-gradient(circle at 20% 25%, #fff 0 1.2%, transparent 1.6%), radial-gradient(circle at 45% 60%, #fff 0 1%, transparent 1.4%), radial-gradient(circle at 80% 70%, #fff 0 1%, transparent 1.4%), linear-gradient(#232059, #3B3A8C); opacity: .92; transition: opacity .7s; }
+.tv-screen { border-radius: 3px; background: linear-gradient(135deg, #7FD3F7, #FF7FB5 40%, #FFC93C 70%, #8BD46E); animation: tv 3s linear infinite; box-shadow: 0 0 18px rgba(127,211,247,.7); }
+.lamp-glow { left: -60%; right: -60%; top: -25%; height: 75%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,236,160,.85), rgba(255,236,160,0)); }

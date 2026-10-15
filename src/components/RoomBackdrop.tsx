@@ -1,4 +1,4 @@
-import type { SceneDef } from '../data/scenes';
+import { ART_WIDE, type SceneDef } from '../data/scenes';
 import { INK } from './art/Character';
 
 function shade(hex: string, amt: number) {
@@ -9,6 +9,19 @@ function shade(hex: string, amt: number) {
 
 /** `extend` draws the same wall and floor far past the stage edges, so the room can fill any screen shape. */
 export function RoomBackdrop({ def, extend = false }: { def: SceneDef; extend?: boolean }) {
+  if (def.art) {
+    // Painted room: the image is ART_WIDE times wider than the room, centred, so wide screens see more wall and floor.
+    return (
+      <>
+        {extend && <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden style={{ overflow: 'visible' }}>
+          <rect x={-5000} y={-5000} width={11000} height={5000 + def.horizon} fill={def.wall} />
+          <rect x={-5000} y={def.horizon} width={11000} height={5000} fill={def.floor} />
+        </svg>}
+        <img src={def.art} alt="" draggable={false} aria-hidden className="absolute pointer-events-none select-none"
+          style={{ left: `${-((ART_WIDE - 1) / 2) * 100}%`, top: 0, width: `${ART_WIDE * 100}%`, height: '100%', maxWidth: 'none' }} />
+      </>
+    );
+  }
   const H = def.horizon;
   const w2 = shade(def.wall, -14);
   const f2 = shade(def.floor, -18);

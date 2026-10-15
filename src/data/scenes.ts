@@ -1,4 +1,13 @@
 import type { Entity, SceneId } from '../engine/types';
+import artLiving from '../assets/rooms/home-living.webp';
+import artKitchen from '../assets/rooms/home-kitchen.webp';
+import artBedroom from '../assets/rooms/home-bedroom.webp';
+import artBathroom from '../assets/rooms/home-bathroom.webp';
+import artClassroom from '../assets/rooms/school-classroom.webp';
+import artHospital from '../assets/rooms/hospital-exam.webp';
+import artCourt from '../assets/rooms/courthouse-room.webp';
+import artEngineering from '../assets/rooms/engineering-lab.webp';
+import artVet from '../assets/rooms/vet-clinic.webp';
 
 export interface SceneDef {
   id: SceneId;
@@ -8,19 +17,26 @@ export interface SceneDef {
   floor: string;
   floorPattern: 'boards' | 'tiles' | 'carpet' | 'checker';
   horizon: number; // y where wall meets floor
+  /** Painted background (wide image: the room is the middle 1/1.6, the sides extend it for wide screens). */
+  art?: string;
+  /** Things painted into the art: [x, y, w, h] in room units. `hide` = don't draw our own picture of it. */
+  anchors?: Partial<Record<string, { box?: [number, number, number, number]; hide?: boolean }>>;
 }
 
+/** How much wider than the room the painted images are (centre = the room). */
+export const ART_WIDE = 1.6;
+
 export const SCENES: Record<SceneId, SceneDef> = {
-  'home-kitchen': { id: 'home-kitchen', label: 'Kitchen', wall: '#FFF1B8', wallPattern: 'tiles', floor: '#F7B98B', floorPattern: 'checker', horizon: 440 },
-  'home-bedroom': { id: 'home-bedroom', label: 'Bedroom', wall: '#D9CCFF', wallPattern: 'dots', floor: '#C98F63', floorPattern: 'boards', horizon: 440 },
-  'home-living': { id: 'home-living', label: 'Living room', wall: '#BFEBDD', wallPattern: 'stripes', floor: '#B98258', floorPattern: 'boards', horizon: 440 },
-  'home-bathroom': { id: 'home-bathroom', label: 'Bathroom', wall: '#CDEFFF', wallPattern: 'tiles', floor: '#9FD8E8', floorPattern: 'tiles', horizon: 440 },
-  'school-classroom': { id: 'school-classroom', label: 'Classroom', wall: '#FFE0C2', wallPattern: 'panels', floor: '#D7A46F', floorPattern: 'boards', horizon: 430 },
-  'hospital-exam': { id: 'hospital-exam', label: 'Exam room', wall: '#E3F6F1', wallPattern: 'plain', floor: '#BFE3EA', floorPattern: 'tiles', horizon: 440 },
-  'courthouse-room': { id: 'courthouse-room', label: 'Courtroom', wall: '#E6DDF8', wallPattern: 'panels', floor: '#8E5B3F', floorPattern: 'boards', horizon: 420 },
-  'vet-clinic': { id: 'vet-clinic', label: 'Pet clinic', wall: '#D4F7E8', wallPattern: 'dots', floor: '#FFE3B3', floorPattern: 'checker', horizon: 440 },
+  'home-kitchen': { id: 'home-kitchen', label: 'Kitchen', wall: '#FFF1B8', wallPattern: 'tiles', floor: '#F7B98B', floorPattern: 'checker', horizon: 470, art: artKitchen, anchors: { window: { box: [310, 80, 510, 290], hide: true } } },
+  'home-bedroom': { id: 'home-bedroom', label: 'Bedroom', wall: '#D9CCFF', wallPattern: 'dots', floor: '#C98F63', floorPattern: 'boards', horizon: 490, art: artBedroom, anchors: { window: { box: [400, 120, 320, 240], hide: true } } },
+  'home-living': { id: 'home-living', label: 'Living room', wall: '#BFEBDD', wallPattern: 'stripes', floor: '#B98258', floorPattern: 'boards', horizon: 480, art: artLiving, anchors: { window: { box: [400, 110, 420, 260], hide: true } } },
+  'home-bathroom': { id: 'home-bathroom', label: 'Bathroom', wall: '#CDEFFF', wallPattern: 'tiles', floor: '#9FD8E8', floorPattern: 'tiles', horizon: 500, art: artBathroom, anchors: { window: { box: [330, 80, 460, 310], hide: true } } },
+  'school-classroom': { id: 'school-classroom', label: 'Classroom', wall: '#FFE0C2', wallPattern: 'panels', floor: '#D7A46F', floorPattern: 'boards', horizon: 490, art: artClassroom, anchors: { window: { box: [0, 40, 90, 340], hide: true } } },
+  'hospital-exam': { id: 'hospital-exam', label: 'Exam room', wall: '#E3F6F1', wallPattern: 'plain', floor: '#BFE3EA', floorPattern: 'tiles', horizon: 500, art: artHospital, anchors: { window: { box: [220, 140, 360, 250], hide: true } } },
+  'courthouse-room': { id: 'courthouse-room', label: 'Courtroom', wall: '#E6DDF8', wallPattern: 'panels', floor: '#8E5B3F', floorPattern: 'boards', horizon: 450, art: artCourt, anchors: { window: { box: [10, 40, 140, 320], hide: true }, scales: { hide: true } } },
+  'vet-clinic': { id: 'vet-clinic', label: 'Pet clinic', wall: '#D4F7E8', wallPattern: 'dots', floor: '#FFE3B3', floorPattern: 'checker', horizon: 450, art: artVet, anchors: { window: { box: [250, 130, 370, 250], hide: true }, pawposter: { hide: true } } },
   'tech-lab': { id: 'tech-lab', label: 'Coding lab', wall: '#DCE6FF', wallPattern: 'grid', floor: '#B7C6D6', floorPattern: 'tiles', horizon: 440 },
-  'engineering-lab': { id: 'engineering-lab', label: 'Workshop', wall: '#D8EEFF', wallPattern: 'grid', floor: '#9AA6B8', floorPattern: 'checker', horizon: 440 },
+  'engineering-lab': { id: 'engineering-lab', label: 'Workshop', wall: '#D8EEFF', wallPattern: 'grid', floor: '#9AA6B8', floorPattern: 'checker', horizon: 450, art: artEngineering, anchors: { window: { box: [300, 130, 300, 240], hide: true } } },
 };
 
 let n = 0;
@@ -49,8 +65,9 @@ export function initialScene(id: SceneId): Entity[] {
       ];
     case 'home-living':
       return [
-        it('window', 330, 250), it('bookshelf', 110, 470), it('rug', 470, 665), it('couch', 450, 575),
-        it('tv', 800, 540), it('lamp', 660, 520), it('door', 925, 470, { to: 'home-bedroom' }),
+        it('window', 330, 250), it('bookshelf', 110, 500), it('rug', 470, 670), it('couch', 450, 585),
+        it('tv', 790, 545), it('lamp', 640, 520), it('door', 925, 500, { to: 'home-bedroom' }),
+        it('armchair', 235, 640), it('plant', 690, 690),
       ];
     case 'home-bathroom':
       return [

@@ -67,7 +67,7 @@ export interface Layered {
  *  over the rest (Room puts a copy of the seat front on top), so they sink into the seat. */
 export const SIT_EXTRA = 0.1;
 /** How far below the seat line the seated crop reaches, as a fraction of standing height. */
-export const sitDrop = (_l: Layered) => SIT_EXTRA * 0.7;
+export const sitDrop = (_l: Layered) => SIT_EXTRA + 0.05;
 /** Seated height as a fraction of standing height. */
 export const sitFrac = (l: Layered) => l.hip + SIT_EXTRA;
 export const LAYERED: Record<string, Layered> = {

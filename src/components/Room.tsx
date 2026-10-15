@@ -382,6 +382,17 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     );
     const to = getState<SceneId>(e, 'to');
     const doorIcon = to ? ({ 'home-kitchen': '🍳', 'home-bedroom': '🛏️', 'home-living': '🛋️', 'home-bathroom': '🛁' } as Record<string, string>)[to] : undefined;
+    if (d.paint) {
+      const on = !!getState(e, 'on');
+      return (
+        <div className="w-full h-full relative">
+          {e.ref === 'lamp' && on && <div className="lamp-glow absolute pointer-events-none" />}
+          <img src={d.paint} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill' }} />
+          {e.ref === 'tv' && on && <div className="tv-screen absolute" style={{ left: '12.5%', top: '1.5%', width: '75.5%', height: '56%' }} />}
+          {doorIcon && <span className="absolute left-1/2 -translate-x-1/2 grid place-items-center rounded-full bg-white border-ink shadow-chunkysm" style={{ top: '46%', width: '34%', aspectRatio: '1', fontSize: `${(d.w * 0.16 / ROOM_H) * 100}cqh`, borderWidth: 3, borderStyle: 'solid' }}>{doorIcon}</span>}
+        </div>
+      );
+    }
     return <FurnitureArt art={d.art!} w={d.w} h={d.h} on={!!getState(e, 'on')} active={isActive(e)} variant={e.ref} label={doorIcon} img={getState<string>(e, 'img')} />;
   };
 
@@ -395,12 +406,15 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
         <RoomBackdrop def={def} />
         {sorted.map((e) => {
           if (e.heldBy && byId.get(e.heldBy) && drag?.id !== e.id) return null; // drawn in the holder's hand
-          const s = sizeOf(e, look);
+          const anchor = e.kind === 'item' ? def.anchors?.[e.ref] : undefined;
+          if (anchor?.hide && !anchor.box) return null;     // painted into the background
+          const s0 = sizeOf(e, look);
+          const s = anchor?.box ? { w: anchor.box[2], h: anchor.box[3] } : s0;
           const dragging = drag?.id === e.id && drag.moved;
           const depOffset = drag?.moved && drag.deps.has(e.id) ? { x: drag.x - drag.orig.x, y: drag.y - drag.orig.y } : { x: 0, y: 0 };
           const fixed = e.kind === 'item' && ITEMS[e.ref]?.fixed;
-          const x = (dragging && !fixed ? drag.x : e.x) + depOffset.x;
-          const y = (dragging && !fixed ? drag.y : e.y) + depOffset.y;
+          const x = anchor?.box ? anchor.box[0] + anchor.box[2] / 2 : (dragging && !fixed ? drag.x : e.x) + depOffset.x;
+          const y = anchor?.box ? anchor.box[1] + anchor.box[3] : (dragging && !fixed ? drag.y : e.y) + depOffset.y;
           const held = e.holding ? byId.get(e.holding) : undefined;
           const isEmoji = e.kind === 'item' && !!ITEMS[e.ref]?.emoji;
           const active = e.kind === 'character' && e.ref === game.activeCharacterId;
@@ -425,7 +439,9 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
               aria-label={e.kind === 'item' ? ITEMS[e.ref]?.name : e.kind === 'pet' ? look.pet(e.ref)?.name : look.character(e.ref)?.name}
             >
               {active && e.pose !== 'sleep' && <div className="active-ring absolute left-1/2 -translate-x-1/2 -bottom-[3%] w-[90%] h-[8%] rounded-[50%]" />}
-              <div className={`w-full h-full relative ${anims[e.id] ? `anim-${anims[e.id]}` : ''}`}>{renderInner(e)}</div>
+              <div className={`w-full h-full relative ${anims[e.id] ? `anim-${anims[e.id]}` : ''}`}>{anchor?.hide
+                ? (e.ref === 'window' && getState<boolean>(e, 'on') ? <div className="painted-night absolute inset-[4%] rounded-md" /> : null)
+                : renderInner(e)}</div>
               {held && (() => {
                 const hs = sizeOf(held, look);
                 const hp = handPos(e);
