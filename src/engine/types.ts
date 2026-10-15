@@ -51,6 +51,8 @@ export interface CharacterData {
   outfit?: number;
   /** Worn accessories (item ids) by slot, for layered artwork characters. */
   wear?: Partial<Record<'head' | 'eyes' | 'ears' | 'bag', string>>;
+  /** Recolored top / bottom (swatch names from data/clothes.ts) for layered artwork characters. */
+  colors?: { top?: string; bottom?: string };
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';

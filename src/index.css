@@ -184,3 +184,24 @@ button { touch-action: manipulation; }
 
 .sprite-img { -webkit-user-drag: none; user-select: none; pointer-events: none; filter: drop-shadow(0 6px 6px rgba(91,58,94,.18)); }
 .anim-sad { animation: none; }
+
+/* ── Full-screen free play ── */
+.room-wrap.full > .room { grid-area: 1 / 1; --stage-w: min(100%, calc(100dvh * 10 / 7)); }
+.room-ext { overflow: visible; }
+.room-tabs { top: 64px; z-index: 30; scrollbar-width: none; }
+.room-tabs > .tabs-spacer { pointer-events: none !important; }
+.scene-actions { left: 8px; bottom: 8px; z-index: 30; }
+.scene-actions p { display: none; }
+.hud > button { white-space: nowrap; flex-shrink: 0; }
+.room-tabs::-webkit-scrollbar { display: none; }
+.scene-actions > button { box-shadow: 0 4px 0 #2B2350; }
+@media (max-height: 520px) {
+  .room-tabs { top: 52px; }
+  .scene-actions { left: 6px; bottom: 6px; }
+}
+.hud-float .hud { pointer-events: none; }
+.hud-float .hud > * { pointer-events: auto; }
+@media (max-height: 520px) {
+  .hud > button[class*="md:flex"] { display: none !important; }
+  .hud > button[class*="md:hidden"] { display: block !important; }
+}

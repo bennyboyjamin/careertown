@@ -3,11 +3,12 @@ import { CharacterArt, type Mood } from './art/Character';
 import { PetArt } from './art/Pet';
 import { PET_LOOKS, ACC_BY_ID, type WearSlot } from '../data/accessories';
 import { SPRITES, LAYERED, type Face, type Layered } from '../data/sprites';
+import { CLOTHES } from '../data/clothes';
 
 /** Draws a character: hand-drawn artwork if it has a sprite, otherwise the vector style. */
 export function Person({ c, pose = 'stand', mood = 'normal', bandage = false }: { c: CharacterData; pose?: Pose; mood?: Mood; bandage?: boolean }) {
   const lay = c.sprite ? LAYERED[c.sprite] : undefined;
-  if (lay) return <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={faceFor(mood)} sit={pose === 'sit'} wear={c.wear} />;
+  if (lay) return <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={faceFor(mood)} sit={pose === 'sit'} wear={c.wear} name={c.sprite} colors={c.colors} />;
   const sp = c.sprite ? SPRITES[c.sprite] : undefined;
   if (!sp) return <CharacterArt age={c.age} look={c.look} pose={pose} mood={mood} bandage={bandage} />;
   // Sitting: show the top of the artwork so the legs tuck behind the seat.
@@ -95,7 +96,12 @@ function Headphones({ lay, src }: { lay: Layered; src: string }) {
   );
 }
 
-export function LayeredArt({ lay, outfit, face, sit = false, wear }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear }) {
+export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear; name?: string; colors?: CharacterData['colors'] }) {
+  const cl = name ? CLOTHES[name] : undefined;
+  const layer = (part: 'top' | 'bottom') => {
+    const src = colors?.[part] ? cl?.[part][colors[part]!] : undefined;
+    return src ? <img key={part} src={src} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: pct(bx, lay.W), top: pct(by, lay.H), width: pct(bw, lay.W), height: pct(bh, lay.H) }} /> : null;
+  };
   const [bx, by, bw, bh] = lay.body;
   const [hx, hy, hw, hh] = lay.head;
   const body = lay.outfits[outfit] ?? lay.outfits[0];
@@ -111,6 +117,7 @@ export function LayeredArt({ lay, outfit, face, sit = false, wear }: { lay: Laye
       <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: sit ? `${100 / 0.8}%` : '100%' }}>
           <img src={body.src} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: pct(bx, lay.W), top: pct(by, lay.H), width: pct(bw, lay.W), height: pct(bh, lay.H) }} />
+          {layer('bottom')}{layer('top')}
           {piece('bag')}
         </div>
       </div>

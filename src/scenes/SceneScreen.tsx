@@ -6,8 +6,9 @@ import { Room, placeActor } from '../components/Room';
 import { BUILDINGS } from '../data/buildings';
 import { ITEMS } from '../data/items';
 import { Btn, Face, Modal } from '../ui/kit';
-import { Person, PetPic, LayeredArt } from '../components/Person';
+import { Person, PetPic } from '../components/Person';
 import { ItemIcon } from '../components/ItemIcon';
+import { ClothesPicker } from '../components/ClothesPicker';
 import { WearPicker } from '../components/WearPicker';
 import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
@@ -30,26 +31,26 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   const stuff = game.owned.filter((id) => ITEMS[id] && !allPlaced.has(id) && !worn.has(id));
 
   return (
-    <div className="scene-screen relative h-full flex flex-col">
-      <div className="room-tabs flex items-center gap-2 px-2 sm:px-3 pb-2 overflow-x-auto">
+    <div className="scene-screen relative h-full">
+      <div className="absolute inset-0">
+        <Room sceneId={sceneId} onWardrobe={setWardrobe} onCustomTap={(e) => e.ref === 'chalkboard' && setDrawOn(e)} />
+      </div>
+
+      <div className="room-tabs absolute inset-x-0 flex items-center gap-2 px-2 sm:px-3 pb-2 overflow-x-auto pointer-events-none [&>*]:pointer-events-auto">
         {b.rooms.length > 1 && b.rooms.map((r) => (
           <button key={r.sceneId} onClick={() => { sfx('tap'); onScene(r.sceneId); }}
             className={`shrink-0 rounded-2xl border-[3px] border-ink px-3 h-11 font-display font-bold text-ink shadow-chunkysm ${r.sceneId === sceneId ? 'bg-sun' : 'bg-white'}`}>
             <span className="mr-1">{r.icon}</span>{r.label}
           </button>
         ))}
-        {b.rooms.length === 1 && <div className="font-display font-extrabold text-ink text-lg px-1">{b.icon} {b.rooms[0].label}: free play</div>}
-        <div className="flex-1" />
+        {b.rooms.length === 1 && <div className="shrink-0 rounded-2xl border-[3px] border-ink bg-white px-3 py-1 shadow-chunkysm font-display font-extrabold text-ink text-lg">{b.icon} {b.rooms[0].label}: free play</div>}
+        <div className="flex-1 tabs-spacer" />
         {b.missions.map((m) => (
           <Btn key={m} tone="berry" className="shrink-0 !min-h-[44px]" onClick={() => onMission(m)}>⭐ {MISSIONS[m].title}</Btn>
         ))}
       </div>
 
-      <div className="flex-1 min-h-0 px-2 sm:px-3">
-        <Room sceneId={sceneId} onWardrobe={setWardrobe} onCustomTap={(e) => e.ref === 'chalkboard' && setDrawOn(e)} />
-      </div>
-
-      <div className="scene-actions flex items-center justify-center gap-2 p-2">
+      <div className="scene-actions absolute bottom-2 flex items-center gap-2">
         <Btn tone="sky" onClick={() => setTray(tray === 'people' ? null : 'people')}>🧑‍🤝‍🧑 People{game.pets.length ? ' & pets' : ''}</Btn>
         {isHome && <Btn tone="mint" onClick={() => setTray(tray === 'stuff' ? null : 'stuff')}>📦 My stuff{stuff.length ? ` (${stuff.length})` : ''}</Btn>}
         <Hint building={b.id} />
@@ -118,12 +119,12 @@ function WardrobeSheet({ characterId, onClose }: { characterId: string; onClose:
   if (!c) return null;
   return (
     <Modal title={`${c.name}’s closet`} onClose={onClose} wide>
-      <div className="grid sm:grid-cols-[160px_1fr] gap-4">
+      {c.sprite && LAYERED[c.sprite] ? <OutfitPicker c={c} /> : <div className="grid sm:grid-cols-[160px_1fr] gap-4">
         <div className="hidden sm:grid place-items-center rounded-2xl border-[3px] border-ink bg-sky/30 h-64">
           <div className="w-[70%] h-[90%]"><CharacterPreview id={characterId} /></div>
         </div>
         {c.sprite && LAYERED[c.sprite] ? <OutfitPicker c={c} /> : c.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{c.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor clothesOnly age={c.age} look={c.look} onChange={(look) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, look } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
-      </div>
+      </div>}
     </Modal>
   );
 }
@@ -186,19 +187,7 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
   const lay = LAYERED[c.sprite!];
   return (
     <div>
-      <p className="font-body text-ink">Tap an outfit to put it on.</p>
-      <div className="mt-3 flex flex-wrap gap-3">
-        {lay.outfits.map((o, i) => (
-          <button key={o.id} onClick={() => { sfx('pop'); dispatch({ type: 'SAVE_CHARACTER', character: { ...c, outfit: i } }); dispatch({ type: 'EVENT', name: 'dress' }); }}
-            className={`rounded-2xl border-[3px] border-ink p-2 bg-white shadow-chunkysm ${(c.outfit ?? 0) === i ? 'ring-4 ring-berry' : ''}`} style={{ width: 120 }}>
-            <div style={{ width: 100, height: 255 }}><LayeredArt lay={lay} outfit={i} face="happy" wear={c.wear} /></div>
-            <div className="font-display font-bold text-ink text-sm mt-1">{o.label}</div>
-          </button>
-        ))}
-        <div className="rounded-2xl border-[3px] border-dashed border-ink p-3 grid place-items-center text-center font-body text-ink" style={{ width: 120 }}>
-          <div><div className="text-3xl">✨</div>More outfits coming soon</div>
-        </div>
-      </div>
+      <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
       <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />
     </div>
   );

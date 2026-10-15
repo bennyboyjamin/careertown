@@ -373,8 +373,9 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   const spawnDef = spawnSrc && ITEMS[spawnSrc.ref];
 
   return (
-    <div className="room-wrap relative w-full h-full grid place-items-center">
-      <div ref={roomRef} className="room relative overflow-hidden rounded-[22px] sm:rounded-[30px] border-[4px] border-ink shadow-chunky select-none" style={{ touchAction: 'none' }}>
+    <div className="room-wrap full relative w-full h-full grid place-items-center overflow-hidden">
+      <div className="room room-ext relative pointer-events-none" aria-hidden><RoomBackdrop def={def} extend /></div>
+      <div ref={roomRef} className="room relative overflow-hidden select-none" style={{ touchAction: 'none' }}>
         <RoomBackdrop def={def} />
         {sorted.map((e) => {
           if (e.heldBy && byId.get(e.heldBy) && drag?.id !== e.id) return null; // drawn in the holder's hand
