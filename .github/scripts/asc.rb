@@ -57,8 +57,8 @@ when 'setup'
   #    while processing the upload, and a revoked certificate fails that check.)
   made_at = ->(c) { Time.parse(c['attributes']['expirationDate']) - 365 * 86_400 }
   dist_certs = lambda do
-    code, j = api(:get, '/v1/certificates?limit=200')
-    code == 200 ? j['data'].select { |c| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(c['attributes']['certificateType']) } : []
+    lc, lj = api(:get, '/v1/certificates?limit=200')
+    lc == 200 ? lj['data'].select { |c| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(c['attributes']['certificateType']) } : []
   end
   day_ago = Time.now - 86_400
   certs = dist_certs.call
