@@ -9,6 +9,7 @@ import { Btn, Face, Modal } from '../ui/kit';
 import { Person, PetPic } from '../components/Person';
 import { ItemIcon } from '../components/ItemIcon';
 import { ClothesPicker } from '../components/ClothesPicker';
+import { DollEditor } from '../components/DollEditor';
 import { WearPicker } from '../components/WearPicker';
 import { PetCloset } from '../components/PetCloset';
 import { LAYERED } from '../data/sprites';
@@ -190,6 +191,7 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
   const lay = LAYERED[c.sprite!];
   return (
     <div>
+      {c.doll && <DollEditor d={c.doll} onChange={(doll) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, doll } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
       <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
       <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />
       <PetCloset />

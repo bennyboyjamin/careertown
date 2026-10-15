@@ -51,8 +51,23 @@ export interface CharacterData {
   outfit?: number;
   /** Worn accessories (item ids) by slot, for layered artwork characters. */
   wear?: Partial<Record<'head' | 'eyes' | 'ears' | 'bag', string>>;
+  /** Dress-up character made in the character maker (drawn from data/doll.ts). */
+  doll?: DollLook;
   /** Recolored top / bottom (swatch names from data/clothes.ts) for layered artwork characters. */
   colors?: { top?: string; bottom?: string };
+}
+
+export interface DollLook {
+  tone: number;                 // 0 light … 3 deep brown
+  face: 'girl' | 'boy';
+  hair: string | null;
+  hairColor: string;
+  eyes: string;
+  top: string | null;
+  bottom: string | null;
+  shoes: string | null;
+  teeColor?: string;            // the plain tee underneath
+  shortsColor?: string;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';

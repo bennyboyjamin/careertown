@@ -8,6 +8,8 @@ import { Btn, Face, HeadCrop } from '../ui/kit';
 import { Person, LayeredArt } from '../components/Person';
 import { WearPicker } from '../components/WearPicker';
 import { ClothesPicker } from '../components/ClothesPicker';
+import { DollEditor } from '../components/DollEditor';
+import { DEFAULT_DOLL } from '../data/dollLooks';
 import { LAYERED } from '../data/sprites';
 import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
@@ -95,10 +97,14 @@ const NEW_LOOK: Look = {
   bottom: 'pants', bottomColor: '#A98BFF', shoes: '#FF5D8F', glasses: 'none', hat: 'none', accessory: 'none',
 };
 
+function newDoll(): CharacterData {
+  return { id: uid('c'), name: 'New friend', age: 'child', look: NEW_LOOK, sprite: 'doll', doll: { ...DEFAULT_DOLL, tone: Math.floor(Math.random() * 4) } };
+}
+
 export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: () => void }) {
   const { game, dispatch } = useGame();
   const start = game.characters.find((c) => c.id === (editId ?? game.activeCharacterId)) ?? game.characters[0];
-  const [draft, setDraft] = useState<CharacterData>(start ?? { id: uid('c'), name: 'New friend', age: 'child', look: NEW_LOOK });
+  const [draft, setDraft] = useState<CharacterData>(start ?? newDoll());
   const isNew = !game.characters.some((c) => c.id === draft.id);
 
   const save = () => {
@@ -116,7 +122,7 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
               <button key={c.id} onClick={() => { sfx('tap'); setDraft(c); }} aria-label={`Edit ${c.name}`} className={`rounded-full ${c.id === draft.id ? 'ring-4 ring-berry' : ''}`}><Face c={c} size={48} /></button>
             ))}
             {game.characters.length < 10 && (
-              <button onClick={() => { sfx('pop'); setDraft({ id: uid('c'), name: 'New friend', age: 'child', look: NEW_LOOK }); }}
+              <button onClick={() => { sfx('pop'); setDraft(newDoll()); }}
                 className="w-12 h-12 shrink-0 rounded-full border-[3px] border-dashed border-ink bg-mint font-display text-2xl text-ink" aria-label="New character">+</button>
             )}
           </div>
@@ -141,7 +147,7 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
           <Btn tone="sky" className="mt-2 w-full" onClick={() => { if (!isNew) save(); onDone(); }}>Done</Btn>
         </div>
         <div className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4">
-          {draft.sprite && LAYERED[draft.sprite] ? <div className="p-2"><ClothesPicker preview={false} c={draft} onChange={(colors) => setDraft({ ...draft, colors })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
+          {draft.doll ? <div className="p-2"><DollEditor d={draft.doll} onChange={(doll) => setDraft({ ...draft, doll })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite && LAYERED[draft.sprite] ? <div className="p-2"><ClothesPicker preview={false} c={draft} onChange={(colors) => setDraft({ ...draft, colors })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
         </div>
       </div>
     </div>

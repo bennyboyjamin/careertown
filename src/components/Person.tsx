@@ -5,6 +5,7 @@ import { PET_LOOKS, ACC_BY_ID, type WearSlot } from '../data/accessories';
 import { useEffect, useState } from 'react';
 import { SPRITES, LAYERED, sitFrac, type Face, type Layered } from '../data/sprites';
 import { CLOTHES } from '../data/clothes';
+import { DollBody, DollHead } from './Doll';
 
 /** Draws a character: hand-drawn artwork if it has a sprite, otherwise the vector style. */
 export function Person({ c, pose = 'stand', mood = 'normal', bandage = false }: { c: CharacterData; pose?: Pose; mood?: Mood; bandage?: boolean }) {
@@ -36,7 +37,7 @@ function useFace(mood: Mood): Face {
 
 function LayeredPerson({ c, lay, pose, mood }: { c: CharacterData; lay: Layered; pose: Pose; mood: Mood }) {
   const face = useFace(mood);
-  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} />;
+  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} doll={c.doll} />;
   if (pose !== 'sit') return art;
   // Sitting: torso and the top of the thighs; the seat front (drawn over by Room) hides the rest.
   const f = sitFrac(lay);
@@ -53,6 +54,18 @@ export function PetPic({ p, sleeping = false, bandage = false }: { p: PetData; s
   const looks = PET_LOOKS[p.sprite!];
   const src = looks?.[p.look ?? 0]?.src ?? sp.src;
   return <img src={src} alt="" draggable={false} className="sprite-img" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transform: sleeping ? 'rotate(-12deg) translateY(6%)' : undefined }} />;
+}
+
+/** Round face icon for a dress-up character: the head (with hair) cropped from their own art. */
+export function DollFace({ d, size }: { d: NonNullable<CharacterData['doll']>; size: number }) {
+  const lay = LAYERED.doll; const k = size / 390;
+  return (
+    <div style={{ width: size, height: size, overflow: 'hidden', position: 'relative' }}>
+      <div style={{ position: 'absolute', width: lay.W * k, height: lay.H * k, left: (size - lay.W * k) / 2, top: -(lay.crown - 40) * k }}>
+        <LayeredArt lay={lay} outfit={0} face="happy" doll={d} />
+      </div>
+    </div>
+  );
 }
 
 /** Round face icon. */
@@ -124,7 +137,7 @@ function Headphones({ lay, src }: { lay: Layered; src: string }) {
   );
 }
 
-export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear; name?: string; colors?: CharacterData['colors'] }) {
+export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors, doll }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear; name?: string; colors?: CharacterData['colors']; doll?: CharacterData['doll'] }) {
   const cl = name ? CLOTHES[name] : undefined;
   const layer = (part: 'top' | 'bottom') => {
     const src = colors?.[part] ? cl?.[part][colors[part]!] : undefined;
@@ -144,13 +157,14 @@ export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors 
     <div className="w-full h-full" style={{ position: 'relative', overflow: 'visible' }}>
       <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: sit ? `${100 / 0.8}%` : '100%' }}>
+          {doll ? <DollBody d={doll} /> : <>
           <img src={body.src} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: pct(bx, lay.W), top: pct(by, lay.H), width: pct(bw, lay.W), height: pct(bh, lay.H) }} />
-          {layer('bottom')}{layer('top')}
+          {layer('bottom')}{layer('top')}</>}
           {piece('bag')}
         </div>
       </div>
       <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: sit ? `${100 / 0.8}%` : '100%' }}>
-        <img src={lay.faces[face]} alt="" draggable={false} className="sprite-img layered-head" style={{ position: 'absolute', left: pct(hx, lay.W), top: pct(hy, lay.H), width: pct(hw, lay.W), height: pct(hh, lay.H) }} />
+        {doll ? <DollHead d={doll} face={face} /> : <img src={lay.faces[face]} alt="" draggable={false} className="sprite-img layered-head" style={{ position: 'absolute', left: pct(hx, lay.W), top: pct(hy, lay.H), width: pct(hw, lay.W), height: pct(hh, lay.H) }} />}
         {piece('ears')}{piece('eyes')}{piece('head')}
       </div>
     </div>
