@@ -97,8 +97,8 @@ function RotateHint() {
 function Intro({ onPlay }: { onPlay: () => void }) {
   const { game } = useGame();
   return (
-    <div className="fixed inset-0 z-[90] intro grid place-items-center p-4 overflow-hidden">
-      <div className="text-center relative">
+    <div className="fixed inset-0 z-[90] intro grid place-items-center p-4 overflow-y-auto">
+      <div className="intro-card text-center relative">
         <div className="flex justify-center items-end gap-2 h-40 sm:h-56 mb-2">
           {game.characters.slice(0, 2).map((c, i) => (
             <div key={c.id} className={`${c.age === 'adult' ? 'w-24 sm:w-32 h-full' : 'w-20 sm:w-28 h-[80%]'} intro-wave`} style={{ animationDelay: `${i * 0.2}s` }}><Person c={c} mood="happy" /></div>

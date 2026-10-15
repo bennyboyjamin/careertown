@@ -209,3 +209,12 @@ button { touch-action: manipulation; }
 .hud { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .room-tabs { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .scene-actions { left: max(8px, env(safe-area-inset-left, 0px)); bottom: max(8px, env(safe-area-inset-bottom, 0px)); }
+/* intro fits a sideways phone: everything, including the Play button, stays on screen */
+.logo-big { font-size: clamp(44px, min(13vw, 17dvh), 150px); }
+.intro { padding-top: max(16px, env(safe-area-inset-top, 0px)); padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
+@media (max-height: 520px) {
+  .intro-card > div:first-child { height: 34dvh; margin-bottom: 0; }
+  .intro-card > div:first-child > div { height: 100% !important; width: calc(34dvh * 0.42) !important; }
+  .intro-card p { font-size: 16px; margin-top: 6px; }
+  .intro-card button { margin-top: 10px; font-size: 22px; padding: 8px 32px; }
+}
