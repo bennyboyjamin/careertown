@@ -1,7 +1,7 @@
 import type { DollLook } from '../engine/types';
 
 export const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
-export const SKIN_SWATCH = ['#F6CFB4', '#EDB48C', '#D79A6E', '#9E6544'];
+export const SKIN_SWATCH = ['#FDC39F', '#F9AE7F', '#EB9663', '#C3693F'];
 /** Hair colours: `null` = the original painted dark brown. */
 export const HAIR_TINTS: Record<string, { label: string; hex: string | null; swatch: string }> = {
   darkbrown: { label: 'Dark brown', hex: null, swatch: '#5A3424' },
@@ -28,5 +28,5 @@ export const BASIC_TINTS: Record<string, string | null> = {
 
 export const DEFAULT_DOLL: DollLook = {
   tone: 1, face: 'girl', hair: 'long', hairColor: 'darkbrown', eyes: 'brown',
-  top: 'stripes', bottom: 'jeans', shoes: 'pink-sneakers',
+  top: 'pink-hoodie', bottom: 'jeans', shoes: 'white-sneakers',
 };

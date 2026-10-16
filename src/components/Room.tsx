@@ -184,6 +184,8 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
     let d = e;
     if (e.heldBy) {                 // pulled out of someone's hand
       pre.push({ id: e.heldBy, patch: { holding: undefined } });
+      const holder = byId.get(e.heldBy);
+      if (holder?.kind === 'character') { play(holder.id, 'grumpy', 1500); say(holder.id, ['Hey, I was holding that!', 'Hmph!', 'That’s mine!'][Math.floor(Math.random() * 3)]); }
       d = { ...e, heldBy: undefined, x, y };
     }
     if (trash && e.kind === 'pet' && VISITORS[e.ref]) { say(e.id, 'I’m a patient here!'); sfx('tap'); return; }
@@ -361,7 +363,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       const c = look.character(e.ref); if (!c) return null;
       const holds = e.holding ? byId.get(e.holding)?.ref : undefined;
       const carried = drag?.id === e.id && drag.moved;
-      const mood: Mood = holderMood ?? (carried ? 'wow' : anim === 'sad' ? 'sad' : anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' || anim === 'hugl' || anim === 'hugr' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
+      const mood: Mood = holderMood ?? (carried ? 'wow' : anim === 'sad' ? 'sad' : anim === 'grumpy' ? 'grumpy' : anim === 'eat' ? 'eat' : anim === 'brush' ? 'brush' : anim === 'tickle' ? 'silly' : anim === 'wave' || anim === 'hugl' || anim === 'hugr' ? 'wink' : anim === 'check' || anim === 'hop' || anim === 'happy' ? 'happy' : holds && ['teddy', 'balloon', 'cupcake', 'ball'].includes(holds) ? 'happy' : 'normal');
       const art = <Person c={c} pose={e.pose === 'sleep' ? 'stand' : e.pose} mood={e.pose === 'sleep' ? 'sleep' : mood} bandage={!!getState(e, 'bandage')} />;
       if (e.pose === 'sleep') {
         const st = sizeOf({ ...e, pose: 'stand' }, look);

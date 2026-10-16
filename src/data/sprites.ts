@@ -81,7 +81,7 @@ export const LAYERED: Record<string, Layered> = {
     outfits: [{ id: 'doll', label: 'Outfit', src: DOLL_BODY[1] }],
     faces: { happy: DOLL_HEADS['girl-happy-1'].src, wink: DOLL_HEADS['girl-wink-1'].src, sad: DOLL_HEADS['girl-sad-1'].src, wow: DOLL_HEADS['girl-wow-1'].src },
     eyes: [[DOLL_EYES[0][0] + DOLL_OX[1], DOLL_EYES[0][1] + DOLL_PAD], [DOLL_EYES[1][0] + DOLL_OX[1], DOLL_EYES[1][1] + DOLL_PAD]],
-    crown: DOLL_PAD + 6, hip: (DOLL_PAD + 548) / DOLL_H,
+    crown: DOLL_PAD + 6, hip: (DOLL_PAD + 508) / DOLL_H,
   },
   yuna: {
     W: 527, H: 1343, body: [0, 283, 527, 1060], head: [47, 0, 429, 416],

@@ -14,7 +14,7 @@ import type { Look, Pose } from '../../engine/types';
  */
 
 export const INK = '#2B2350';
-export type Mood = 'normal' | 'eat' | 'sleep' | 'brush' | 'happy' | 'wow' | 'sad' | 'proud' | 'wink' | 'silly';
+export type Mood = 'normal' | 'eat' | 'sleep' | 'brush' | 'happy' | 'wow' | 'sad' | 'proud' | 'wink' | 'silly' | 'grumpy';
 export type Build = 'slim' | 'average' | 'round';
 
 export function shade(hex: string, amt: number) {

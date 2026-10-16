@@ -37,7 +37,7 @@ function useFace(mood: Mood): Face {
 
 function LayeredPerson({ c, lay, pose, mood }: { c: CharacterData; lay: Layered; pose: Pose; mood: Mood }) {
   const face = useFace(mood);
-  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} doll={c.doll} />;
+  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} doll={c.doll} mood={mood} />;
   if (pose !== 'sit') return art;
   // Sitting: torso and the top of the thighs; the seat front (drawn over by Room) hides the rest.
   const f = sitFrac(lay);
@@ -89,7 +89,7 @@ export function SpriteFace({ sprite, size }: { sprite: string; size: number }) {
 export function faceFor(mood: Mood): Face {
   if (mood === 'wink' || mood === 'silly') return 'wink';
   if (mood === 'wow') return 'wow';
-  if (mood === 'sad') return 'sad';
+  if (mood === 'sad' || mood === 'grumpy') return 'sad';
   return 'happy';
 }
 
@@ -137,7 +137,7 @@ function Headphones({ lay, src }: { lay: Layered; src: string }) {
   );
 }
 
-export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors, doll }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear; name?: string; colors?: CharacterData['colors']; doll?: CharacterData['doll'] }) {
+export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors, doll, mood }: { lay: Layered; outfit: number; face: Face; sit?: boolean; wear?: Wear; name?: string; colors?: CharacterData['colors']; doll?: CharacterData['doll']; mood?: Mood }) {
   const cl = name ? CLOTHES[name] : undefined;
   const layer = (part: 'top' | 'bottom') => {
     const src = colors?.[part] ? cl?.[part][colors[part]!] : undefined;
@@ -164,7 +164,7 @@ export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors,
         </div>
       </div>
       <div style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: sit ? `${100 / 0.8}%` : '100%' }}>
-        {doll ? <DollHead d={doll} face={face} /> : <img src={lay.faces[face]} alt="" draggable={false} className="sprite-img layered-head" style={{ position: 'absolute', left: pct(hx, lay.W), top: pct(hy, lay.H), width: pct(hw, lay.W), height: pct(hh, lay.H) }} />}
+        {doll ? <DollHead d={doll} face={face} mood={mood} /> : <img src={lay.faces[face]} alt="" draggable={false} className="sprite-img layered-head" style={{ position: 'absolute', left: pct(hx, lay.W), top: pct(hy, lay.H), width: pct(hw, lay.W), height: pct(hh, lay.H) }} />}
         {piece('ears')}{piece('eyes')}{piece('head')}
       </div>
     </div>

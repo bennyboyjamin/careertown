@@ -30,10 +30,19 @@ export function DollBody({ d }: { d: DollLook }) {
 }
 
 /** Head with the chosen face and mood, eye colour and hair. */
-export function DollHead({ d, face }: { d: DollLook; face: Face }) {
+/** The 8 drawn expressions: the 4 shared faces plus laugh, cry, grumpy and silly for dress-up characters. */
+function exprFor(face: Face, mood?: string) {
+  if (mood === 'silly') return face === 'wink' ? 'silly' : 'laugh';   // tickled: giggle and stick tongue out
+  if (mood === 'grumpy') return 'angry';
+  if (mood === 'sad') return 'cry';
+  return face;
+}
+
+export function DollHead({ d, face, mood }: { d: DollLook; face: Face; mood?: string }) {
   const t = tone(d);
-  const head = DOLL_HEADS[`${d.face}-${face}-${t}`] ?? DOLL_HEADS[`${d.face}-happy-${t}`];
-  const iris = DOLL_IRIS[`${d.face}-${face}`];
+  const expr = exprFor(face, mood);
+  const head = DOLL_HEADS[`${d.face}-${expr}-${t}`] ?? DOLL_HEADS[`${d.face}-${face}-${t}`] ?? DOLL_HEADS[`${d.face}-happy-${t}`];
+  const iris = DOLL_IRIS[`${d.face}-${expr}`];
   const eye = EYE_TINTS[d.eyes]?.hex;
   const hair = d.hair ? DOLL_HAIR[d.hair] : undefined;
   return (
