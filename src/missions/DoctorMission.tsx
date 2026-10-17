@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../engine/store';
 import { INK } from '../components/art/Character';
 import { Person } from '../components/Person';
-import { npc } from '../data/dollLooks';
+import { npc, npcAspect } from '../data/dollLooks';
 import { DragChip } from '../ui/DragChip';
 import { Btn } from '../ui/kit';
 import { MissionShell, Panel, Feedback, Stars } from './MissionShell';
@@ -74,12 +74,12 @@ export function DoctorMission({ onExit }: { onExit: () => void }) {
   const stars = mistakes <= 1 ? 3 : mistakes <= 4 ? 2 : 1;
 
   const patient = (
-    <div className="relative mx-auto" style={{ width: 'min(52vw, 28vh, 250px)', aspectRatio: '384 / 780' }}>
+    <div className="relative mx-auto" style={{ height: 'min(46vh, 380px)', aspectRatio: String(npcAspect(PIP)) }}>
       <div className={`absolute inset-0 ${beats === 'playing' ? '' : 'idle-bob'}`}><Person c={PIP} mood={mood} /></div>
-      {knee !== 'bandaged' && <div className="absolute rounded-full" style={{ left: '38%', top: '81%', width: '11%', height: '2.6%', background: knee === 'scraped' ? '#E2475D' : '#FFB0C8', border: `2px solid ${INK}` }} />}
-      {knee === 'bandaged' && <div className="absolute rounded" style={{ left: '37%', top: '80.4%', width: '13%', height: '3.6%', background: '#FFD6A5', border: `3px solid ${INK}` }} />}
-      {beats === 'playing' && <div className="absolute text-5xl heartbeat-big" style={{ left: '36%', top: '52%' }}>❤️</div>}
-      {[['mouth', 30, 30, 40, 18], ['chest', 28, 51, 44, 13], ['knee', 30, 74, 26, 13]].map(([z, l, t, w, h]) => (
+      {knee !== 'bandaged' && <div className="absolute rounded-full" style={{ left: '38%', top: '86.5%', width: '8%', height: '2%', background: knee === 'scraped' ? '#E2475D' : '#FFB0C8', border: `2px solid ${INK}` }} />}
+      {knee === 'bandaged' && <div className="absolute rounded" style={{ left: '37%', top: '86%', width: '10%', height: '3%', background: '#FFD6A5', border: `3px solid ${INK}` }} />}
+      {beats === 'playing' && <div className="absolute text-5xl heartbeat-big" style={{ left: '42%', top: '55%' }}>❤️</div>}
+      {[['mouth', 36, 32, 28, 12], ['chest', 34, 52, 32, 13], ['knee', 33, 81, 20, 12]].map(([z, l, t, w, h]) => (
         <div key={z as string} data-drop={z} onClick={() => zoneClick(z as string)}
           className={`absolute rounded-3xl ${armed ? 'drop-zone-armed' : ''}`} style={{ left: `${l}%`, top: `${t}%`, width: `${w}%`, height: `${h}%` }} />
       ))}
