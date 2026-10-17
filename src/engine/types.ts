@@ -10,7 +10,7 @@ export type CareerId =
 export type BuildingId =
   | 'home' | 'school' | 'hospital' | 'courthouse' | 'engineering'
   | 'animal-hospital' | 'tech-lab' | 'restaurant' | 'shopping' | 'bank'
-  | 'park' | 'beach' | 'cafe' | 'fishing' | 'playground' | 'nature-trail';
+  | 'park' | 'beach' | 'cafe' | 'fishing' | 'playground' | 'nature-trail' | 'kpop';
 
 export type FaceShape = 'round' | 'oval' | 'square';
 export type EyeStyle = 'dot' | 'happy' | 'big' | 'lashes' | 'sleepy';
@@ -76,7 +76,7 @@ export interface DollLook {
 }
 
 export interface PaperLook {
-  base: 'kid' | 'preschool';
+  base: 'kid' | 'preschool' | 'adult';
   tone: number;                  // skin tone index (data/paperArt.ts PAPER_SKIN_TONES)
   hair: string | null;           // PAPER_HAIR id
   hairColor: string;             // PAPER_HAIR_COLOURS key
@@ -161,4 +161,5 @@ export type Screen =
   | { name: 'mission'; id: string }
   | { name: 'creator'; editId?: string }
   | { name: 'passport' }
+  | { name: 'visit'; id: BuildingId }
   | { name: 'shop' };

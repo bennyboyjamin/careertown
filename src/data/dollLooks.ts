@@ -1,6 +1,6 @@
 import type { CharacterData, DollLook, Look, PaperLook } from '../engine/types';
 import { PAPER_BASES } from './paperArt';
-const PAPER_ASPECT = { kid: PAPER_BASES.kid.canvas[2] / PAPER_BASES.kid.canvas[3], preschool: PAPER_BASES.preschool.canvas[2] / PAPER_BASES.preschool.canvas[3] };
+const PAPER_ASPECT = Object.fromEntries(Object.entries(PAPER_BASES).map(([b, B]) => [b, B.canvas[2] / B.canvas[3]])) as Record<keyof typeof PAPER_BASES, number>;
 
 export const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 export const SKIN_SWATCH = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F'];
@@ -71,12 +71,14 @@ export const NPC_PAPER: Record<string, PaperLook> = {
   ava:   { base: 'kid', tone: 3, hair: 'ponytail', hairColor: 'black', top: 'pink-cardigan', bottom: 'lavender-skirt', shoes: 'loafers', acc: {} },
   ben:   { base: 'kid', tone: 0, hair: 'sideswept', hairColor: 'blonde', top: 'jersey-23', bottom: 'black-shorts', shoes: 'navy-sneakers', acc: {} },
   chloe: { base: 'kid', tone: 2, hair: 'braids', hairColor: 'brown', top: 'ghost-hoodie', bottom: 'baggy-jeans', shoes: 'black-boots', acc: { eyes: 'heart-glasses' } },
+  judge: { base: 'adult', tone: 2, hair: 'lowbun', hairColor: 'black', top: 'judge-suit', bottom: 'gray-trousers', shoes: 'black-shoes', acc: {} },
+  sunny: { base: 'adult', tone: 1, hair: 'sleekbob', hairColor: 'darkbrown', top: 'chef-coat', bottom: 'blue-jeans', shoes: 'white-clogs', acc: {} },
 };
 export const npc = (id: string, name: string): CharacterData => NPC_PAPER[id]
-  ? { id: `npc-${id}`, name, age: 'child', look: {} as Look, sprite: `paper-${NPC_PAPER[id].base}`, doll: NPC_DOLLS[id], paper: NPC_PAPER[id] }
+  ? { id: `npc-${id}`, name, age: NPC_PAPER[id].base === 'adult' ? 'adult' : 'child', look: {} as Look, sprite: `paper-${NPC_PAPER[id].base}`, doll: NPC_DOLLS[id], paper: NPC_PAPER[id] }
   : { id: `npc-${id}`, name, age: NPC_DOLLS[id].adult ? 'adult' : 'child', look: {} as Look, sprite: NPC_DOLLS[id].adult ? 'doll-adult' : 'doll', doll: NPC_DOLLS[id] };
 /** Width / height of how a character is drawn (for sizing boxes). */
-export const npcAspect = (c: CharacterData) => (c.paper ? (c.paper.base === 'kid' ? PAPER_ASPECT.kid : PAPER_ASPECT.preschool) : c.age === 'adult' ? 384 / 881 : 384 / 780);
+export const npcAspect = (c: CharacterData) => (c.paper ? PAPER_ASPECT[c.paper.base] ?? PAPER_ASPECT.kid : c.age === 'adult' ? 384 / 881 : 384 / 780);
 
 /* ── Older characters (made before the dress-up maker) → dress-up look ── */
 const rgbOf = (h: string) => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
@@ -105,4 +107,8 @@ export function lookToDoll(look: Look, adult: boolean): DollLook {
 export const FAMILY_PAPER: Record<string, PaperLook> = {
   yuna: { base: 'kid', tone: 2, hair: 'wavy', hairColor: 'black', top: 'red-hoodie', bottom: 'wide-jeans', shoes: 'red-sneakers', acc: {} },
   nene: { base: 'preschool', tone: 2, hair: 'bob', hairColor: 'black', top: 'bunny-dress', bottom: null, shoes: 'bow-shoes', acc: {} },
+  natalie: { base: 'kid', tone: 2, hair: 'scrunchieponytail', hairColor: 'darkbrown', top: 'cream-bow-sweater', bottom: 'cream-cargos', shoes: 'gray-sneakers', acc: {} },
+  brother: { base: 'kid', tone: 2, hair: 'boyshort', hairColor: 'black', top: 'dino-tee', bottom: 'khaki-cargo-shorts', shoes: 'gray-low-sneakers', acc: {} },
+  mom: { base: 'adult', tone: 2, hair: 'momwaves', hairColor: 'black', top: 'mom-cream-cardigan', bottom: 'mom-blue-jeans', shoes: 'mom-white-sneakers', acc: {} },
+  dad: { base: 'adult', tone: 2, hair: 'dadshort', hairColor: 'black', top: 'dad-navy-hoodie', bottom: 'dad-blue-jeans', shoes: 'dad-brown-loafers', acc: {} },
 };

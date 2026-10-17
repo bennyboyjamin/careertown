@@ -4,6 +4,8 @@ import { PAPER_HAIR, PAPER_CLOTHES, PAPER_ACCESSORIES, PAPER_HAIR_COLOURS, PAPER
 import { CAREER_OUTFITS } from '../data/dollLooks';
 import { paperClothesFor, PaperFaceIcon } from './Paper';
 import { useGame } from '../engine/store';
+import { useOwned } from '../engine/iap';
+import { STYLE_PACK, STYLE_PACK_CLOTHES } from '../data/stylePack';
 import { sfx } from '../engine/sfx';
 
 type Tab = 'look' | 'hair' | 'top' | 'bottom' | 'shoes' | 'extras';
@@ -13,19 +15,21 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 ];
 const HAIR_LABELS: Record<string, string> = {
   wavy: 'Long wavy', bob: 'Bob with clip', bobbangs: 'Bob with bangs', bowwaves: 'Waves with bow', braids: 'Two braids', locs: 'Locs',
-  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns', ponytail: 'High ponytail',
+  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns', ponytail: 'High ponytail', momwaves: 'Long layers', dadshort: 'Short and swept', boyshort: 'Short and messy', sleekbob: 'Sleek bob', lowbun: 'Low side bun', scrunchieponytail: 'Ponytail with scrunchie',
 };
 const COLOUR_LABELS: Record<string, string> = { black: 'Black', darkbrown: 'Dark brown', brown: 'Brown', blonde: 'Blonde', ginger: 'Ginger', pink: 'Pink' };
 const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 const SLOT_LABELS: Record<string, string> = { head: 'Hats', eyes: 'Glasses', ears: 'Headphones', hair: 'Hair bows', bag: 'Bags' };
-const nice = (id: string) => id.replace(/-/g, ' ').replace(/^\w/, (m) => m.toUpperCase());
+const nice = (id: string) => id.replace(/^mom-/, '').replace(/-/g, ' ').replace(/^\w/, (m) => m.toUpperCase());
 
 /** Character maker for YunaVerse characters: body, skin, hair, clothes and extras. */
 export function PaperEditor({ p, onChange, lockBase = false }: { p: PaperLook; onChange: (p: PaperLook) => void; lockBase?: boolean }) {
   const [tab, setTab] = useState<Tab>('look');
   const { game, dispatch } = useGame();
   const set = (patch: Partial<PaperLook>) => onChange({ ...p, ...patch });
-  const locked = (id: string) => !!CAREER_OUTFITS[id] && !game.owned.includes(CAREER_OUTFITS[id].unlock);
+  const hasPack = useOwned(STYLE_PACK.productId);
+  const inPack = (id: string) => STYLE_PACK_CLOTHES.has(id) && !hasPack;
+  const locked = (id: string) => inPack(id) || (!!CAREER_OUTFITS[id] && !game.owned.includes(CAREER_OUTFITS[id].unlock));
   const tile = (key: string, selected: boolean, label: string, onClick: () => void, child: ReactNode) => (
     <button key={key} aria-label={label} aria-pressed={selected} onClick={() => { sfx('pop'); onClick(); }}
       className={`relative rounded-2xl border-[3px] border-ink overflow-hidden h-20 sm:h-24 ${selected ? 'bg-sun ring-4 ring-berry' : 'bg-sky/25'}`}>
@@ -49,7 +53,7 @@ export function PaperEditor({ p, onChange, lockBase = false }: { p: PaperLook; o
   const clothes = (kind: 'top' | 'bottom' | 'shoes', none: string, noneIcon: string) => grid(<>
     {tile('none', !p[kind], none, () => set({ [kind]: null } as Partial<PaperLook>), <span style={{ fontSize: 30 }}>{noneIcon}</span>)}
     {paperClothesFor(p.base, kind).map((id) => locked(id)
-      ? tile(id, false, `${nice(id)} (locked)`, () => dispatch({ type: 'TOAST', text: `Finish “${CAREER_OUTFITS[id].mission}” to unlock this outfit!` }),
+      ? tile(id, false, `${nice(id)} (locked)`, () => dispatch({ type: 'TOAST', text: inPack(id) ? 'Part of the Style Pack. Ask a grown-up to look in the Shop 🛍️' : `Finish “${CAREER_OUTFITS[id].mission}” to unlock this outfit!` }),
           <div className="relative w-full h-full grid place-items-center"><div className="w-full h-full opacity-25 grayscale">{pic(PAPER_CLOTHES[id].src)}</div><span className="absolute text-2xl">🔒</span></div>)
       : tile(id, p[kind] === id, nice(id), () => set({ [kind]: id } as Partial<PaperLook>), pic(PAPER_CLOTHES[id].src)))}
   </>);
@@ -68,7 +72,7 @@ export function PaperEditor({ p, onChange, lockBase = false }: { p: PaperLook; o
           <div className="font-display font-bold text-ink mt-1">Age</div>
           {grid((['kid', 'preschool'] as const).map((b) => tile(b, p.base === b, b === 'kid' ? 'Kid' : 'Little kid', () => {
             // keep only clothes the new body can wear
-            const ok = (id: string | null) => (id && (PAPER_CLOTHES[id]?.base === 'any' || PAPER_CLOTHES[id]?.base === b) ? id : null);
+            const ok = (id: string | null) => (id && paperClothesFor(b, PAPER_CLOTHES[id]?.kind ?? 'top').includes(id) ? id : null);
             set({ base: b, top: ok(p.top), bottom: ok(p.bottom), shoes: ok(p.shoes) });
           }, <PaperFaceIcon p={{ ...p, base: b }} size={62} />)))}
         </>}

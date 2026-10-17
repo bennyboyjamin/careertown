@@ -78,8 +78,6 @@ export const SHOP: ShopEntry[] = [
   { id: 'starrug', label: 'Star rug', price: 35, kind: 'decor', icon: '⭐' },
   { id: 'rocketposter', label: 'Rocket poster', price: 30, kind: 'decor', icon: '🚀' },
   { id: 'petbed', label: 'Pet bed', price: 30, kind: 'decor', icon: '🛏️' },
-  { id: wardrobeKey('glasses', 'star'), label: 'Star shades', price: 40, kind: 'wear', icon: '🕶️' },
-  { id: wardrobeKey('accessory', 'headphones'), label: 'Headphones', price: 50, kind: 'wear', icon: '🎧' },
   { id: 'pet:collar-red', label: 'Red pet collar', price: 20, kind: 'pet', icon: '❤️' },
   { id: 'pet:collar-blue', label: 'Blue pet collar', price: 20, kind: 'pet', icon: '💙' },
   { id: 'pet:bow-pink', label: 'Pink pet bow', price: 30, kind: 'pet', icon: '🎀' },
