@@ -29,6 +29,7 @@ export function VisitScreen({ id, onBack }: { id: BuildingId; onBack: () => void
 
   // the place's own piece of the town picture, zoomed out a little so there's room to search
   const bg = useMemo(() => {
+    if (t.inside) return { backgroundImage: `url(${t.inside})`, backgroundSize: 'cover', backgroundPosition: 'center' };
     const [x, y, w, h] = SPOTS[id]; const cx = x + w / 2, cy = y + h / 2;
     const W = Math.min(IMG_W, w * 2.1), H = Math.min(IMG_H, W * 0.62);
     const x0 = Math.max(0, Math.min(IMG_W - W, cx - W / 2)), y0 = Math.max(0, Math.min(IMG_H - H, cy - H / 2));
