@@ -403,3 +403,18 @@ body.photo-mode .hud-float, body.photo-mode .room-tabs, body.photo-mode .scene-a
 .trail-animal { position: absolute; font-size: 22px; line-height: 1; opacity: .55; filter: saturate(.4); z-index: 2; padding: 6px; }
 .trail-animal.found { opacity: 1; filter: none; font-size: 40px; z-index: 3; animation: sticker-in .4s cubic-bezier(.3,1.6,.6,1); }
 @media (prefers-reduced-motion: reduce) { .fish-swim { animation-duration: 30s; } .fish-float { animation: none; } }
+/* Grown-ups corner (components/GrownUps.tsx). */
+.gu-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.gu-stats > div { border: 3px solid #2B2350; border-radius: 16px; background: #F3EAFF; padding: 8px 10px; display: flex; flex-direction: column; }
+.gu-stats b { font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-size: 28px; color: #2B2350; line-height: 1.1; }
+.gu-stats span { font-family: Lexend, ui-rounded, system-ui, sans-serif; font-size: 13px; color: rgba(43,35,80,.8); }
+.gu-bar { display: flex; align-items: center; gap: 8px; }
+.gu-bar-name { width: 170px; flex-shrink: 0; font-family: Lexend, ui-rounded, system-ui, sans-serif; font-size: 14px; color: #2B2350; }
+.gu-bar-track { flex: 1; height: 16px; border: 2px solid #2B2350; border-radius: 999px; background: #fff; overflow: hidden; }
+.gu-bar-track > span { display: block; height: 100%; }
+.gu-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 2px solid rgba(43,35,80,.1); flex-wrap: wrap; }
+.gu-switch { width: 58px; height: 34px; border-radius: 999px; border: 3px solid #2B2350; background: #E4E0EE; position: relative; flex-shrink: 0; }
+.gu-switch > span { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid #2B2350; transition: left .2s; }
+.gu-switch.on { background: #5FE0B7; } .gu-switch.on > span { left: 27px; }
+.gu-chip { height: 36px; padding: 0 12px; border-radius: 999px; border: 3px solid #2B2350; background: #fff; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; color: #2B2350; }
+.gu-chip.on { background: #FFC93C; }

@@ -9,7 +9,8 @@ import { Btn, Coin, Face, Modal } from '../ui/kit';
 import { PetPic } from '../components/Person';
 import { PET_LOOKS } from '../data/accessories';
 import { sfx } from '../engine/sfx';
-import { StylePackCard } from '../components/StylePack';
+import { StylePackCard, GrownUpGate } from '../components/StylePack';
+import { GrownUpsCorner } from '../components/GrownUps';
 import { StickerBook } from '../components/StickerBook';
 
 export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onScene: (s: SceneId) => void; onMission: (m: string) => void }) {
@@ -67,6 +68,7 @@ export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onS
 export function Passport() {
   const { game, dispatch } = useGame();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [grown, setGrown] = useState<'gate' | 'open' | null>(null);
   const ranked = (Object.keys(CAREERS) as CareerId[]).map((id) => ({ id, xp: game.careerXp[id] ?? 0 })).sort((a, b) => b.xp - a.xp);
   const strengths = ranked.filter((r) => r.xp >= 40).slice(0, 2);
   const tryNext = ranked.filter((r) => CAREERS[r.id].available && r.xp < 40).slice(0, 2);
@@ -159,10 +161,12 @@ export function Passport() {
 
         <section className="rounded-[28px] border-[4px] border-dashed border-ink/50 p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold text-ink">For grown-ups</h2>
-          <p className="font-body text-ink/80 mt-1">CareerTown saves progress only on this device. There are no chats, ads or sharing. In the iPhone and iPad app, a grown-up can buy the optional Style Pack after a grown-ups check; everything else is free. Career suggestions describe what a child enjoyed, never what they should become.</p>
-          <Btn tone="white" className="mt-3" onClick={() => setConfirmReset(true)}>Start over</Btn>
+          <p className="font-body text-ink/80 mt-1">See what your child has explored, change sounds and music, set a break reminder, or start over.</p>
+          <Btn tone="sky" className="mt-3" onClick={() => setGrown('gate')}>🔒 Grown-ups corner</Btn>
         </section>
       </div>
+      {grown === 'gate' && <GrownUpGate onClose={() => setGrown(null)} onPass={() => setGrown('open')} />}
+      {grown === 'open' && <GrownUpsCorner onClose={() => setGrown(null)} onReset={() => { setGrown(null); setConfirmReset(true); }} />}
       {confirmReset && (
         <Modal title="Start over?" onClose={() => setConfirmReset(false)}>
           <p className="font-body text-ink">This clears coins, badges, characters and rooms on this device.</p>
