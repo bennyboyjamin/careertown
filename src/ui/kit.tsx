@@ -3,6 +3,8 @@ import { useGame, playerLevel, levelProgress } from '../engine/store';
 import { BADGES, TOPS, HATS, GLASSES, ACCESSORIES } from '../data/catalog';
 import { ITEMS } from '../data/items';
 import { CharacterArt, charViewBox } from '../components/art/Character';
+import { garmentForUnlock } from '../data/dollLooks';
+import { DOLL_GARMENTS } from '../data/doll';
 import { SpriteFace, DollFace } from '../components/Person';
 import type { CharacterData, Reward } from '../engine/types';
 import { sfx } from '../engine/sfx';
@@ -174,6 +176,7 @@ function rewardLines(r: Reward) {
     else if (u === 'pet:bunny') lines.push({ icon: '🐰', text: 'A bunny moved into your living room!' });
     else if (u === 'pet:kitten') lines.push({ icon: '🐱', text: 'A kitten moved into your living room!' });
     else if (u.startsWith('pet:')) lines.push({ icon: '🎀', text: 'New pet accessory' });
+    else if (garmentForUnlock(u)) lines.push({ icon: '👕', text: `New in the closet: ${DOLL_GARMENTS[garmentForUnlock(u)!]?.label}` });
     else if (u.startsWith('wear:')) { const [, slot, id] = u.split(':'); const list = { top: TOPS, hat: HATS, glasses: GLASSES, accessory: ACCESSORIES }[slot] ?? []; lines.push({ icon: slot === 'hat' ? '🎩' : '👕', text: `New in the closet: ${list.find((o) => o.id === id)?.label ?? id}` }); }
     else lines.push({ icon: '🎁', text: `New item: ${ITEMS[u]?.name ?? u}` });
   }

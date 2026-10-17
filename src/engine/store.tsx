@@ -5,8 +5,8 @@ import { BADGES, SECRETS } from '../data/catalog';
 import { MISSIONS } from '../data/missions';
 import { dailyFor, todayKey } from '../data/daily';
 import { STARTER_ACCESSORIES } from '../data/accessories';
-import { FAMILY_DOLLS } from '../data/dollLooks';
-import { localSave, SAVE_VERSION, ACTIVE_PROFILE, type SaveAdapter } from './save';
+import { FAMILY_DOLLS, lookToDoll } from '../data/dollLooks';
+import { localSave, SAVE_VERSION, ACTIVE_PROFILE, migrate, type SaveAdapter } from './save';
 import { uid } from './ids';
 import { setSoundEnabled, sfx } from './sfx';
 
@@ -52,6 +52,11 @@ export function addStarterPack(g: GameState): GameState {
   }
   // The family is now drawn as vector dress-up characters: give each one their look
   // (worn hats, glasses and bags stay on; the old hand-drawn recolours no longer apply).
+  // Characters made with the older character maker: same idea, drawn in the vector style.
+  if (!g.owned.includes('pack:vector-all-1')) {
+    g = { ...g, owned: [...g.owned, 'pack:vector-all-1'],
+      characters: g.characters.map((c) => (!c.sprite && !c.doll && c.look ? { ...c, sprite: c.age === 'adult' ? 'doll-adult' : 'doll', doll: lookToDoll(c.look, c.age === 'adult') } : c)) };
+  }
   if (!g.owned.includes('pack:vector-family-1')) {
     g = { ...g, owned: [...g.owned, 'pack:vector-family-1'],
       characters: g.characters.map((c) => (c.sprite && FAMILY_DOLLS[c.sprite] && !c.doll ? { ...c, doll: { ...FAMILY_DOLLS[c.sprite] }, colors: undefined, outfit: undefined } : c)) };
@@ -287,8 +292,13 @@ export function GameProvider({ children, adapter = localSave }: { children: Reac
   const timer = useRef<number>();
 
   useEffect(() => {
-    adapter.load(ACTIVE_PROFILE).then((saved) => {
-      if (saved && saved.version === SAVE_VERSION) dispatch({ type: 'LOAD', game: addStarterPack(addFamily({ ...freshGame(), ...saved })) });
+    adapter.load(ACTIVE_PROFILE).then(async (saved) => {
+      if (saved && (saved.version ?? 1) <= SAVE_VERSION) {
+        dispatch({ type: 'LOAD', game: addStarterPack(addFamily({ ...freshGame(), ...migrate(saved) })) });
+      } else if (saved) {
+        // A save from a newer version of the game: keep a copy rather than overwrite it.
+        await adapter.backup?.(ACTIVE_PROFILE, saved);
+      }
       setLoaded(true);
     });
   }, [adapter]);

@@ -77,7 +77,7 @@ export function DollHead({ d, face, mood }: { d: DollLook; face: Face; mood?: st
 }
 
 /** Tops that reach past the hips (dresses) get a taller picker tile. */
-const LONG_TOPS = new Set(['bunny-dress']);
+const LONG_TOPS = new Set(['bunny-dress', 'lab-coat']);
 
 /** A single garment drawn on its own, for the character maker's picker tiles. */
 export function GarmentPic({ id }: { id: string }) {

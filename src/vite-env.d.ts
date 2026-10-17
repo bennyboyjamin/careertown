@@ -1,1 +1,2 @@
 declare module '*.webp' { const src: string; export default src; }
+declare module '*.woff' { const src: string; export default src; }

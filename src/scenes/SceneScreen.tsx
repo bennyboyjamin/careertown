@@ -112,6 +112,7 @@ const HINTS: Partial<Record<BuildingId, string>> = {
   engineering: 'Try: stack blocks into a tower 4 high.',
   'animal-hospital': 'Try: drag the pet brush or stethoscope onto Clover.',
   'tech-lab': 'Try: tap a computer to turn it on, then sit someone nearby.',
+  restaurant: 'Try: drag the pizza dough onto the stove to bake a pizza.',
 };
 function Hint({ building }: { building: BuildingId }) {
   return <p className="hidden lg:block font-body text-ink/80 text-sm max-w-xs">{HINTS[building]}</p>;

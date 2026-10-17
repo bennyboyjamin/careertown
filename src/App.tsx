@@ -13,6 +13,7 @@ import { EngineerMission } from './missions/EngineerMission';
 import { DoctorMission } from './missions/DoctorMission';
 import { VetMission } from './missions/VetMission';
 import { RobotMission } from './missions/RobotMission';
+import { ChefMission } from './missions/ChefMission';
 import { Person } from './components/Person';
 import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
@@ -24,6 +25,7 @@ const MISSION_VIEWS: Record<string, (p: { onExit: () => void }) => ReactElement>
   'doctor-checkup': DoctorMission,
   'vet-checkup': VetMission,
   'software-robot': RobotMission,
+  'chef-pizza': ChefMission,
 };
 
 function Game() {

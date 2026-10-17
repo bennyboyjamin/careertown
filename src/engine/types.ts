@@ -5,7 +5,7 @@
 
 export type CareerId =
   | 'lawyer' | 'engineer' | 'doctor' | 'teacher'
-  | 'vet' | 'software' | 'entrepreneur';
+  | 'vet' | 'software' | 'entrepreneur' | 'chef';
 
 export type BuildingId =
   | 'home' | 'school' | 'hospital' | 'courthouse' | 'engineering'
@@ -101,7 +101,7 @@ export interface Entity {
 export type SceneId =
   | 'home-kitchen' | 'home-bedroom' | 'home-living' | 'home-bathroom'
   | 'school-classroom' | 'hospital-exam' | 'courthouse-room' | 'engineering-lab'
-  | 'vet-clinic' | 'tech-lab';
+  | 'vet-clinic' | 'tech-lab' | 'restaurant-kitchen';
 
 export interface Reward {
   coins?: number;

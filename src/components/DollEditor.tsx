@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import type { DollLook } from '../engine/types';
 import { DOLL_GARMENTS, DOLL_HAIR, type GarmentKind } from '../data/doll';
-import { SKIN_LABELS, SKIN_SWATCH, HAIR_TINTS, EYE_TINTS, BASIC_TINTS } from '../data/dollLooks';
+import { SKIN_LABELS, SKIN_SWATCH, HAIR_TINTS, EYE_TINTS, BASIC_TINTS, CAREER_OUTFITS } from '../data/dollLooks';
+import { useGame } from '../engine/store';
 import { DollFace } from './Person';
 import { GarmentPic } from './Doll';
 import { sfx } from '../engine/sfx';
@@ -29,7 +30,10 @@ function Swatches({ items, value, onPick, label }: { items: [string, string, str
 /** Character maker for dress-up characters: skin, face, eyes, hair, outfit and shoes. */
 export function DollEditor({ d, onChange }: { d: DollLook; onChange: (d: DollLook) => void }) {
   const [tab, setTab] = useState<Tab>('look');
+  const { game, dispatch } = useGame();
   const set = (patch: Partial<DollLook>) => onChange({ ...d, ...patch });
+  /** Career outfits stay locked until their mission is done. */
+  const locked = (id: string) => !!CAREER_OUTFITS[id] && !game.owned.includes(CAREER_OUTFITS[id].unlock);
   const tile = (key: string, selected: boolean, label: string, onClick: () => void, child: ReactNode) => (
     <button key={key} aria-label={label} aria-pressed={selected} onClick={() => { sfx('pop'); onClick(); }}
       className={`relative rounded-2xl border-[3px] border-ink overflow-hidden h-20 sm:h-24 ${selected ? 'bg-sun ring-4 ring-berry' : 'bg-sky/25'}`}>
@@ -40,8 +44,10 @@ export function DollEditor({ d, onChange }: { d: DollLook; onChange: (d: DollLoo
   const garments = (kind: GarmentKind, none: string, field: 'top' | 'bottom' | 'shoes') => (
     <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-2">
       {tile('none', !d[field], none, () => set({ [field]: null } as Partial<DollLook>), <span style={{ fontSize: 30 }}>{field === 'shoes' ? '🦶' : field === 'top' ? '👕' : '🩳'}</span>)}
-      {Object.entries(DOLL_GARMENTS).filter(([, g]) => g.kind === kind).map(([id, g]) =>
-        tile(id, d[field] === id, g.label, () => set({ [field]: id } as Partial<DollLook>),
+      {Object.entries(DOLL_GARMENTS).filter(([, g]) => g.kind === kind).map(([id, g]) => locked(id)
+        ? tile(id, false, `${g.label} (locked)`, () => dispatch({ type: 'TOAST', text: `Finish “${CAREER_OUTFITS[id].mission}” to unlock the ${g.label.toLowerCase()}!` }),
+            <div className="relative w-full h-full grid place-items-center"><div className="w-full h-full opacity-25 grayscale"><GarmentPic id={id} /></div><span className="absolute text-2xl">🔒</span></div>)
+        : tile(id, d[field] === id, g.label, () => set({ [field]: id } as Partial<DollLook>),
           <GarmentPic id={id} />))}
     </div>
   );

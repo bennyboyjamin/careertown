@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useGame } from '../engine/store';
-import type { Look } from '../engine/types';
-import { CharacterArt, INK } from '../components/art/Character';
+import { INK } from '../components/art/Character';
+import { Person } from '../components/Person';
+import { npc } from '../data/dollLooks';
 import { DragChip } from '../ui/DragChip';
 import { Btn } from '../ui/kit';
 import { MissionShell, Panel, Feedback, Stars } from './MissionShell';
 import { sfx } from '../engine/sfx';
 
-const PIP: Look = { skin: '#F6CBA5', face: 'round', eyes: 'big', hair: 'buns', hairColor: '#C9473A', top: 'stripes', topColor: '#7FD3F7', bottom: 'shorts', bottomColor: '#A98BFF', shoes: '#FFC93C', glasses: 'none', hat: 'none', accessory: 'none' };
+const PIP = npc('pip', 'Pip');
 const STEPS = ['Hello', 'Temperature', 'Heartbeat', 'Knee', 'Body', 'Habits', 'Done'];
 type Tool = 'thermometer' | 'stethoscope' | 'soap' | 'bandage';
 const TOOLS: { id: Tool; icon: string; label: string; zone: string }[] = [
@@ -73,12 +74,12 @@ export function DoctorMission({ onExit }: { onExit: () => void }) {
   const stars = mistakes <= 1 ? 3 : mistakes <= 4 ? 2 : 1;
 
   const patient = (
-    <div className="relative mx-auto w-[min(62vw,240px)] aspect-[120/154]">
-      <div className={`absolute inset-0 ${beats === 'playing' ? '' : 'idle-bob'}`}><CharacterArt look={PIP} mood={mood} /></div>
-      {knee !== 'bandaged' && <div className="absolute rounded-full" style={{ left: '35%', top: '80%', width: '14%', height: '5%', background: knee === 'scraped' ? '#E2475D' : '#FFB0C8', border: `2px solid ${INK}` }} />}
-      {knee === 'bandaged' && <div className="absolute rounded" style={{ left: '34%', top: '79.5%', width: '16%', height: '6%', background: '#FFD6A5', border: `3px solid ${INK}` }} />}
-      {beats === 'playing' && <div className="absolute left-[38%] top-[56%] text-5xl heartbeat-big">❤️</div>}
-      {[['mouth', 24, 24, 52, 32], ['chest', 26, 57, 48, 18], ['knee', 26, 76, 30, 14]].map(([z, l, t, w, h]) => (
+    <div className="relative mx-auto" style={{ width: 'min(52vw, 28vh, 250px)', aspectRatio: '384 / 780' }}>
+      <div className={`absolute inset-0 ${beats === 'playing' ? '' : 'idle-bob'}`}><Person c={PIP} mood={mood} /></div>
+      {knee !== 'bandaged' && <div className="absolute rounded-full" style={{ left: '38%', top: '81%', width: '11%', height: '2.6%', background: knee === 'scraped' ? '#E2475D' : '#FFB0C8', border: `2px solid ${INK}` }} />}
+      {knee === 'bandaged' && <div className="absolute rounded" style={{ left: '37%', top: '80.4%', width: '13%', height: '3.6%', background: '#FFD6A5', border: `3px solid ${INK}` }} />}
+      {beats === 'playing' && <div className="absolute text-5xl heartbeat-big" style={{ left: '36%', top: '52%' }}>❤️</div>}
+      {[['mouth', 30, 30, 40, 18], ['chest', 28, 51, 44, 13], ['knee', 30, 74, 26, 13]].map(([z, l, t, w, h]) => (
         <div key={z as string} data-drop={z} onClick={() => zoneClick(z as string)}
           className={`absolute rounded-3xl ${armed ? 'drop-zone-armed' : ''}`} style={{ left: `${l}%`, top: `${t}%`, width: `${w}%`, height: `${h}%` }} />
       ))}

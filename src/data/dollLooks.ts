@@ -1,4 +1,4 @@
-import type { DollLook } from '../engine/types';
+import type { CharacterData, DollLook, Look } from '../engine/types';
 
 export const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 export const SKIN_SWATCH = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F'];
@@ -12,6 +12,7 @@ export const HAIR_TINTS: Record<string, { label: string; hex: string; swatch: st
   pink: { label: 'Pink', hex: '#F496BE', swatch: '#F496BE' },
   lavender: { label: 'Lavender', hex: '#AC8EE6', swatch: '#AC8EE6' },
   blue: { label: 'Blue', hex: '#6092E0', swatch: '#6092E0' },
+  silver: { label: 'Silver', hex: '#A9ABB6', swatch: '#A9ABB6' },
 };
 export const EYE_TINTS: Record<string, { label: string; hex: string; swatch: string }> = {
   brown: { label: 'Brown', hex: '#7A4424', swatch: '#7A4424' },
@@ -41,3 +42,49 @@ export const FAMILY_DOLLS: Record<string, DollLook> = {
   mom:     { ...FAM, face: 'girl', hair: 'lowbun', top: 'cardigan', bottom: 'khaki-wide', shoes: 'cream-sneakers', adult: true },
   dad:     { ...FAM, face: 'boy', hair: 'sidepart', top: 'navy-sweater', bottom: 'wide-jeans', shoes: 'gray-sneakers', adult: true },
 };
+
+/** Career outfits: worn by anyone, but only after the mission that unlocks them (game.owned). */
+export const CAREER_OUTFITS: Record<string, { unlock: string; mission: string }> = {
+  'lab-coat':    { unlock: 'wear:top:labcoat', mission: 'Check-up for Pip' },
+  'suit-jacket': { unlock: 'wear:top:suit', mission: 'The Missing Science Trophy' },
+  'safety-vest': { unlock: 'wear:top:vest', mission: 'The River Bridge' },
+  'chef-coat':   { unlock: 'wear:top:chef', mission: 'Pizza Party at Café Sunny' },
+};
+/** Doll garment for a 'wear:top:…' unlock, if there is one. */
+export const garmentForUnlock = (u: string) => Object.entries(CAREER_OUTFITS).find(([, o]) => o.unlock === u)?.[0];
+
+/** Mission characters, drawn like everyone else. */
+export const NPC_DOLLS: Record<string, DollLook> = {
+  pip:   { tone: 1, face: 'girl', hair: 'buns', hairColor: 'ginger', eyes: 'brown', top: null, bottom: null, shoes: 'boots', teeColor: 'sky', shortsColor: 'lavender' },
+  ava:   { tone: 3, face: 'girl', hair: 'ponytail', hairColor: 'black', eyes: 'brown', top: 'puff-top', bottom: 'pleat-skirt', shoes: 'white-sneakers' },
+  ben:   { tone: 0, face: 'boy', hair: 'spiky', hairColor: 'blonde', eyes: 'blue', top: 'green-tee', bottom: null, shoes: 'green-sneakers', shortsColor: 'sky' },
+  chloe: { tone: 2, face: 'girl', hair: 'wavyboy', hairColor: 'brown', eyes: 'hazel', top: 'pink-hoodie', bottom: 'jeans', shoes: 'boots' },
+  judge: { tone: 2, face: 'girl', hair: 'bangs', hairColor: 'silver', eyes: 'brown', top: 'suit-jacket', bottom: 'khaki-wide', shoes: 'cream-sneakers', adult: true },
+  sunny: { tone: 1, face: 'girl', hair: 'topbun', hairColor: 'darkbrown', eyes: 'green', top: 'chef-coat', bottom: 'jeans', shoes: 'clogs', adult: true },
+};
+/** A stand-in character record for drawing an NPC with <Person>. */
+export const npc = (id: string, name: string): CharacterData =>
+  ({ id: `npc-${id}`, name, age: NPC_DOLLS[id].adult ? 'adult' : 'child', look: {} as Look, sprite: NPC_DOLLS[id].adult ? 'doll-adult' : 'doll', doll: NPC_DOLLS[id] });
+
+/* ── Older characters (made before the dress-up maker) → dress-up look ── */
+const rgbOf = (h: string) => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const dist = (a: string, b: string) => { const [r, g, bl] = rgbOf(a), [r2, g2, b2] = rgbOf(b); return (r - r2) ** 2 + (g - g2) ** 2 + (bl - b2) ** 2; };
+const nearest = <T extends string>(hex: string, opts: Record<T, string>) => (Object.keys(opts) as T[]).reduce((best, k) => (dist(hex, opts[k]) < dist(hex, opts[best]) ? k : best));
+const HAIR_MAP: Record<string, string | null> = { short: 'sidepart', bob: 'bangs', long: 'long', ponytail: 'ponytail', buns: 'buns', curly: 'wavyboy', spiky: 'spiky',
+  buzz: 'swoop', wavy: 'wavy', locs: 'long', braids: 'braids', afropuff: 'topbun', topknot: 'topbun', headscarf: 'bangs' };
+const TOP_MAP: Record<string, string> = { tee: 'pocket-tee', stripes: 'green-tee', sweater: 'navy-sweater', star: 'sport-tee', polo: 'pocket-tee',
+  labcoat: 'lab-coat', suit: 'suit-jacket', vest: 'safety-vest', sweatshirt: 'navy-sweater' };
+const HOODIES: Record<string, string> = { 'red-hoodie': '#E8573F', 'pink-hoodie': '#FF8FB8', 'blue-hoodie': '#7FB2F0', 'royal-hoodie': '#2F6BD9' };
+export function lookToDoll(look: Look, adult: boolean): DollLook {
+  const tints = Object.fromEntries(Object.entries(HAIR_TINTS).map(([k, v]) => [k, v.hex])) as Record<string, string>;
+  const skins = Object.fromEntries(SKIN_SWATCH.map((c, i) => [String(i), c])) as Record<string, string>;
+  const shorts = look.bottom === 'shorts' ? nearest(look.bottomColor ?? '#FFFFFF', BASIC_TINTS) : undefined;
+  return {
+    tone: Number(nearest(look.skin ?? SKIN_SWATCH[1], skins)),
+    face: ['short', 'spiky', 'buzz'].includes(look.hair) ? 'boy' : 'girl',
+    hair: HAIR_MAP[look.hair] ?? 'long', hairColor: nearest(look.hairColor ?? '#6B3D26', tints), eyes: 'brown',
+    top: look.bottom === 'dress' ? 'bunny-dress' : look.top === 'hoodie' ? nearest(look.topColor ?? '#FF8FB8', HOODIES) : TOP_MAP[look.top] ?? 'pocket-tee',
+    bottom: ({ pants: 'jeans', jeans: 'jeans', widejeans: 'wide-jeans', skirt: 'pleat-skirt' } as Record<string, string>)[look.bottom] ?? null,
+    shoes: 'white-sneakers', ...(shorts && shorts !== 'white' ? { shortsColor: shorts } : {}), ...(adult ? { adult: true } : {}),
+  };
+}
