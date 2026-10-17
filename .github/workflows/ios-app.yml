@@ -91,6 +91,9 @@ jobs:
           P=app/ios/App/App/Info.plist
           /usr/libexec/PlistBuddy -c "Delete :ITSAppUsesNonExemptEncryption" "$P" 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$P"
+          # Photo mode saves pictures to the Photos app
+          /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryAddUsageDescription" "$P" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'CareerTown saves the photos you take in photo mode to your Photos.'" "$P"
           /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName CareerTown" "$P" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string CareerTown" "$P"
           # iPhone plays sideways; iPad can turn any way
           /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$P" 2>/dev/null || true
@@ -129,7 +132,7 @@ jobs:
           ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
           ruby /tmp/settings.rb
 
-      - name: Add in-app purchases (Style Pack)
+      - name: Add in-app purchases (Style Pack) and photo saving
         run: |
           # The game asks the app through a "store" message handler; StoreKit 2 does the rest.
           D=app/ios/App/App
@@ -138,12 +141,36 @@ jobs:
           // MARK: - In-app purchases (Style Pack), used by src/engine/iap.ts
           import StoreKit
           import WebKit
+          import Photos
 
           class StoreBridgeViewController: CAPBridgeViewController {
               private let store = StoreBridge()
+              private let photo = PhotoBridge()
               override func capacitorDidLoad() {
                   super.capacitorDidLoad()
                   webView?.configuration.userContentController.addScriptMessageHandler(store, contentWorld: .page, name: "store")
+                  photo.webView = webView
+                  webView?.configuration.userContentController.addScriptMessageHandler(photo, contentWorld: .page, name: "photo")
+              }
+          }
+
+          // Photo mode (src/components/PhotoMode.tsx): snapshot the game and save it to Photos.
+          final class PhotoBridge: NSObject, WKScriptMessageHandlerWithReply {
+              weak var webView: WKWebView?
+              func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
+                                         replyHandler: @escaping (Any?, String?) -> Void) {
+                  guard let web = webView else { replyHandler(["error": "No view"], nil); return }
+                  web.takeSnapshot(with: nil) { image, error in
+                      guard let image = image else { replyHandler(["error": error?.localizedDescription ?? "No picture"], nil); return }
+                      PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+                          guard status == .authorized || status == .limited else {
+                              DispatchQueue.main.async { replyHandler(["denied": true], nil) }; return
+                          }
+                          PHPhotoLibrary.shared().performChanges({ PHAssetChangeRequest.creationRequestForAsset(from: image) }) { ok, err in
+                              DispatchQueue.main.async { ok ? replyHandler(["ok": true], nil) : replyHandler(["error": err?.localizedDescription ?? "Could not save"], nil) }
+                          }
+                      }
+                  }
               }
           }
 
