@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../engine/store';
 import { Person } from '../components/Person';
-import { npc } from '../data/dollLooks';
+import { npc, npcAspect } from '../data/dollLooks';
 import { Btn } from '../ui/kit';
 import { MissionShell, Panel, Feedback, Stars } from './MissionShell';
 import { sfx } from '../engine/sfx';
@@ -84,7 +84,7 @@ export function ChefMission({ onExit }: { onExit: () => void }) {
               <Person c={SUNNY} mood={mood} />
             </div>
             {step === 3 && served < ORDERS.length && (
-              <div className="relative" style={{ width: 'min(22vw, 14vh, 120px)', aspectRatio: '384 / 780' }}>
+              <div className="relative" style={{ height: 'min(26vh, 220px)', aspectRatio: String(npcAspect(npc(ORDERS[served].who, ORDERS[served].name))) }}>
                 <Person c={npc(ORDERS[served].who, ORDERS[served].name)} mood="happy" />
               </div>
             )}

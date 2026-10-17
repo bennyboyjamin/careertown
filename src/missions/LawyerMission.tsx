@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useGame } from '../engine/store';
 import { Person } from '../components/Person';
-import { npc } from '../data/dollLooks';
+import { npc, npcAspect } from '../data/dollLooks';
 import { DragChip } from '../ui/DragChip';
 import { Btn, Modal } from '../ui/kit';
 import { MissionShell, Panel, Feedback, Stars } from './MissionShell';
@@ -50,7 +50,7 @@ const ARG = {
 const STEPS = ['Case', 'Witnesses', 'Evidence', 'Fact or opinion', 'Contradiction', 'Questions', 'Best evidence', 'Argument', 'Verdict'];
 
 function Portrait({ who, size = 'w-20 h-28' }: { who: string; size?: string }) {
-  return <div className={`${size} shrink-0 rounded-2xl border-[3px] border-ink bg-[#E6DDF8] overflow-hidden`}><div className="w-full" style={{ aspectRatio: who === 'judge' ? '384 / 881' : '384 / 780', marginTop: '-6%' }}><Person c={npc(who, PEOPLE[who].name)} mood="happy" /></div></div>;
+  return <div className={`${size} shrink-0 rounded-2xl border-[3px] border-ink bg-[#E6DDF8] overflow-hidden`}><div className="w-full" style={{ aspectRatio: String(npcAspect(npc(who, PEOPLE[who].name))), marginTop: '-6%' }}><Person c={npc(who, PEOPLE[who].name)} mood="happy" /></div></div>;
 }
 
 export function LawyerMission({ onExit }: { onExit: () => void }) {

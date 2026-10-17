@@ -1,4 +1,6 @@
 import type { CharacterData, DollLook, Look, PaperLook } from '../engine/types';
+import { PAPER_BASES } from './paperArt';
+const PAPER_ASPECT = { kid: PAPER_BASES.kid.canvas[2] / PAPER_BASES.kid.canvas[3], preschool: PAPER_BASES.preschool.canvas[2] / PAPER_BASES.preschool.canvas[3] };
 
 export const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 export const SKIN_SWATCH = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F'];
@@ -63,8 +65,18 @@ export const NPC_DOLLS: Record<string, DollLook> = {
   sunny: { tone: 1, face: 'girl', hair: 'topbun', hairColor: 'darkbrown', eyes: 'green', top: 'chef-coat', bottom: 'jeans', shoes: 'clogs', adult: true },
 };
 /** A stand-in character record for drawing an NPC with <Person>. */
-export const npc = (id: string, name: string): CharacterData =>
-  ({ id: `npc-${id}`, name, age: NPC_DOLLS[id].adult ? 'adult' : 'child', look: {} as Look, sprite: NPC_DOLLS[id].adult ? 'doll-adult' : 'doll', doll: NPC_DOLLS[id] });
+/** Mission kids drawn in the painted YunaVerse style (grown-ups keep the vector look until their body is added). */
+export const NPC_PAPER: Record<string, PaperLook> = {
+  pip:   { base: 'kid', tone: 1, hair: 'spacebuns', hairColor: 'ginger', top: 'heart-crop-tee', bottom: 'overalls', shoes: 'pink-sneakers', acc: {} },
+  ava:   { base: 'kid', tone: 3, hair: 'ponytail', hairColor: 'black', top: 'pink-cardigan', bottom: 'lavender-skirt', shoes: 'loafers', acc: {} },
+  ben:   { base: 'kid', tone: 0, hair: 'sideswept', hairColor: 'blonde', top: 'jersey-23', bottom: 'black-shorts', shoes: 'navy-sneakers', acc: {} },
+  chloe: { base: 'kid', tone: 2, hair: 'braids', hairColor: 'brown', top: 'ghost-hoodie', bottom: 'baggy-jeans', shoes: 'black-boots', acc: { eyes: 'heart-glasses' } },
+};
+export const npc = (id: string, name: string): CharacterData => NPC_PAPER[id]
+  ? { id: `npc-${id}`, name, age: 'child', look: {} as Look, sprite: `paper-${NPC_PAPER[id].base}`, doll: NPC_DOLLS[id], paper: NPC_PAPER[id] }
+  : { id: `npc-${id}`, name, age: NPC_DOLLS[id].adult ? 'adult' : 'child', look: {} as Look, sprite: NPC_DOLLS[id].adult ? 'doll-adult' : 'doll', doll: NPC_DOLLS[id] };
+/** Width / height of how a character is drawn (for sizing boxes). */
+export const npcAspect = (c: CharacterData) => (c.paper ? (c.paper.base === 'kid' ? PAPER_ASPECT.kid : PAPER_ASPECT.preschool) : c.age === 'adult' ? 384 / 881 : 384 / 780);
 
 /* ── Older characters (made before the dress-up maker) → dress-up look ── */
 const rgbOf = (h: string) => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
