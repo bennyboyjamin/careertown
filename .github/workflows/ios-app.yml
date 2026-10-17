@@ -91,6 +91,13 @@ jobs:
           P=app/ios/App/App/Info.plist
           /usr/libexec/PlistBuddy -c "Delete :ITSAppUsesNonExemptEncryption" "$P" 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$P"
+          # Nearby playdates find friends on the same Wi-Fi/Bluetooth (MultipeerConnectivity)
+          /usr/libexec/PlistBuddy -c "Delete :NSLocalNetworkUsageDescription" "$P" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string 'CareerTown looks for friends nearby so you can have a playdate together.'" "$P"
+          /usr/libexec/PlistBuddy -c "Delete :NSBonjourServices" "$P" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSBonjourServices array" "$P"
+          /usr/libexec/PlistBuddy -c "Add :NSBonjourServices:0 string _careertown._tcp" "$P"
+          /usr/libexec/PlistBuddy -c "Add :NSBonjourServices:1 string _careertown._udp" "$P"
           # Photo mode saves pictures to the Photos app
           /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryAddUsageDescription" "$P" 2>/dev/null || true
           /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'CareerTown saves the photos you take in photo mode to your Photos.'" "$P"
@@ -132,7 +139,7 @@ jobs:
           ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
           ruby /tmp/settings.rb
 
-      - name: Add in-app purchases (Style Pack) and photo saving
+      - name: Add in-app purchases (Style Pack), photo saving and nearby playdates
         run: |
           # The game asks the app through a "store" message handler; StoreKit 2 does the rest.
           D=app/ios/App/App
@@ -142,16 +149,102 @@ jobs:
           import StoreKit
           import WebKit
           import Photos
+          import MultipeerConnectivity
 
           class StoreBridgeViewController: CAPBridgeViewController {
               private let store = StoreBridge()
               private let photo = PhotoBridge()
+              private let nearby = NearbyBridge()
               override func capacitorDidLoad() {
                   super.capacitorDidLoad()
                   webView?.configuration.userContentController.addScriptMessageHandler(store, contentWorld: .page, name: "store")
                   photo.webView = webView
                   webView?.configuration.userContentController.addScriptMessageHandler(photo, contentWorld: .page, name: "photo")
+                  nearby.webView = webView
+                  webView?.configuration.userContentController.addScriptMessageHandler(nearby, contentWorld: .page, name: "nearby")
               }
+          }
+
+          // Nearby playdates (src/engine/nearby.ts): find friends on devices in the same room and send small
+          // messages between them with MultipeerConnectivity. Only the character's name is shown to others.
+          final class NearbyBridge: NSObject, WKScriptMessageHandlerWithReply, MCSessionDelegate, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate {
+              weak var webView: WKWebView?
+              private let serviceType = "careertown"
+              private var session: MCSession?
+              private var advertiser: MCNearbyServiceAdvertiser?
+              private var browser: MCNearbyServiceBrowser?
+              private var found: [String: MCPeerID] = [:]
+              private var pending: [String: (Bool, MCSession?) -> Void] = [:]
+
+              private func key(_ p: MCPeerID) -> String { "\(p.displayName)#\(p.hash)" }
+              private func emit(_ obj: [String: Any]) {
+                  guard let data = try? JSONSerialization.data(withJSONObject: obj), let json = String(data: data, encoding: .utf8) else { return }
+                  DispatchQueue.main.async { self.webView?.evaluateJavaScript("window.__nearby && window.__nearby(\(json))", completionHandler: nil) }
+              }
+              private func stopAll() {
+                  advertiser?.stopAdvertisingPeer(); browser?.stopBrowsingForPeers(); session?.disconnect()
+                  advertiser = nil; browser = nil; session = nil; found = [:]; pending = [:]
+              }
+
+              func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
+                                         replyHandler: @escaping (Any?, String?) -> Void) {
+                  let body = message.body as? [String: Any] ?? [:]
+                  let action = body["action"] as? String ?? ""
+                  switch action {
+                  case "start":
+                      stopAll()
+                      var name = String((body["name"] as? String ?? "Friend").prefix(20))
+                      if name.isEmpty { name = "Friend" }
+                      let me = MCPeerID(displayName: name)
+                      let s = MCSession(peer: me, securityIdentity: nil, encryptionPreference: .required)
+                      s.delegate = self; session = s
+                      let a = MCNearbyServiceAdvertiser(peer: me, discoveryInfo: nil, serviceType: serviceType)
+                      a.delegate = self; a.startAdvertisingPeer(); advertiser = a
+                      let b = MCNearbyServiceBrowser(peer: me, serviceType: serviceType)
+                      b.delegate = self; b.startBrowsingForPeers(); browser = b
+                      replyHandler(["ok": true], nil)
+                  case "stop":
+                      stopAll(); replyHandler(["ok": true], nil)
+                  case "invite":
+                      if let id = body["id"] as? String, let p = found[id], let s = session {
+                          browser?.invitePeer(p, to: s, withContext: nil, timeout: 30); replyHandler(["ok": true], nil)
+                      } else { replyHandler(["error": "Friend not found"], nil) }
+                  case "answer":
+                      let id = body["id"] as? String ?? ""
+                      let yes = body["accept"] as? Bool ?? false
+                      if let h = pending.removeValue(forKey: id) { h(yes, yes ? session : nil) }
+                      replyHandler(["ok": true], nil)
+                  case "send":
+                      if let s = session, !s.connectedPeers.isEmpty, let text = body["data"] as? String, text.count < 20000, let data = text.data(using: .utf8) {
+                          try? s.send(data, toPeers: s.connectedPeers, with: .reliable)
+                      }
+                      replyHandler(["ok": true], nil)
+                  default:
+                      replyHandler(["error": "Unknown nearby action"], nil)
+                  }
+              }
+
+              func browser(_ b: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
+                  DispatchQueue.main.async { let k = self.key(peerID); self.found[k] = peerID; self.emit(["type": "found", "id": k, "name": peerID.displayName]) }
+              }
+              func browser(_ b: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+                  DispatchQueue.main.async { let k = self.key(peerID); self.found.removeValue(forKey: k); self.emit(["type": "lost", "id": k]) }
+              }
+              func advertiser(_ a: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?,
+                              invitationHandler: @escaping (Bool, MCSession?) -> Void) {
+                  DispatchQueue.main.async { let k = self.key(peerID); self.pending[k] = invitationHandler; self.emit(["type": "invite", "id": k, "name": peerID.displayName]) }
+              }
+              func session(_ s: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+                  let st: String
+                  switch state { case .connected: st = "connected"; case .connecting: st = "connecting"; default: st = "disconnected" }
+                  emit(["type": "state", "id": key(peerID), "name": peerID.displayName, "state": st])
+              }
+              func session(_ s: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+                  if let text = String(data: data, encoding: .utf8) { emit(["type": "data", "id": key(peerID), "data": text]) }
+              }
+              func session(_ s: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {}
+              func session(_ s: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {}
+              func session(_ s: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {}
           }
 
           // Photo mode (src/components/PhotoMode.tsx): snapshot the game and save it to Photos.
