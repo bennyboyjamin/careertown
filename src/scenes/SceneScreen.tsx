@@ -19,6 +19,7 @@ import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
 import { MISSIONS } from '../data/missions';
 import { Worker } from '../components/Worker';
+import { useDayPhase } from '../engine/dayPhase';
 
 export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId; onScene: (s: SceneId) => void; onMission: (id: string) => void }) {
   const { game, dispatch } = useGame();
@@ -29,6 +30,11 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   const [petCloset, setPetCloset] = useState<string | null>(null);
   const here = sceneOf(game, sceneId);
   const isHome = b.id === 'home';
+  const phase = useDayPhase();
+  const night = phase === 'night' && isHome;
+  useEffect(() => {
+    if (night && sceneId === 'home-bedroom') dispatch({ type: 'TOAST', text: 'It’s nighttime! 🌙 Drag everyone onto the bed to sleep, or tap the lamp for a night light.' });
+  }, [night, sceneId, dispatch]);
 
   const allPlaced = new Set(Object.values(game.scenes).flatMap((l) => (l ?? []).map((e) => e.ref)));
   const worn = new Set(game.characters.flatMap((c) => Object.values(c.wear ?? {})));
@@ -37,7 +43,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   return (
     <div className="scene-screen relative h-full">
       <div className="absolute inset-0">
-        <Room sceneId={sceneId} onWardrobe={setWardrobe} onCustomTap={(e) => e.ref === 'chalkboard' && setDrawOn(e)} />
+        <Room sceneId={sceneId} townNight={night} onWardrobe={setWardrobe} onCustomTap={(e) => e.ref === 'chalkboard' && setDrawOn(e)} />
       </div>
 
       <div className="room-tabs absolute inset-x-0 flex items-center gap-2 px-2 sm:px-3 pb-2 overflow-x-auto pointer-events-none [&>*]:pointer-events-auto">
