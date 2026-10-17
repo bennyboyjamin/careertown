@@ -162,6 +162,7 @@ export type Action =
   | { type: 'SET_PET'; pet: PetData }
   | { type: 'TOGGLE_SOUND' }
   | { type: 'TOGGLE_MUSIC' }
+  | { type: 'SET_BREAK'; mins: number }
   | { type: 'TOGGLE_PET_FOLLOW' }
   | { type: 'NEW_DAY'; date: string }
   | { type: 'STICKER'; id: string }
@@ -311,13 +312,14 @@ function reducer(root: Root, a: Action): Root {
       return { ...root, game: { ...g, coins: g.coins - a.price, owned: [...g.owned, a.id] }, toast: { id: uid('t'), text: 'Bought! Find it in your stuff.' } };
     }
     case 'SET_PET': return { ...root, game: { ...g, pets: g.pets.map((p) => (p.id === a.pet.id ? a.pet : p)) } };
+    case 'SET_BREAK': return { ...root, game: { ...g, settings: { ...g.settings, breakMins: a.mins } } };
     case 'TOGGLE_MUSIC': return { ...root, game: { ...g, settings: { ...g.settings, music: g.settings.music === false } } };
     case 'TOGGLE_PET_FOLLOW': return { ...root, game: { ...g, settings: { ...g.settings, petFollow: g.settings.petFollow === false } } };
     case 'NEW_DAY': {
       if (g.lastPlayed === a.date) return root;
       const have = g.stickers ?? [];
       const s = nextDailySticker(have);
-      const game = { ...g, lastPlayed: a.date, stickers: s ? [...have, s.id] : have };
+      const game = { ...g, lastPlayed: a.date, stickers: s ? [...have, s.id] : have, stats: { ...g.stats, days: (g.stats.days ?? 0) + 1 } };
       return withPopup(root, game, { coins: 5 }, s ? `Daily sticker: ${s.icon} ${s.name}!` : 'Welcome back! Here are 5 coins.');
     }
     case 'STICKER': {

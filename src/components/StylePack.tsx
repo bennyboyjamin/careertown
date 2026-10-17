@@ -9,7 +9,7 @@ import { PaperArt } from './Paper';
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 /** Grown-ups check before anything that costs real money (required for apps made for kids). */
-function GrownUpGate({ onPass, onClose }: { onPass: () => void; onClose: () => void }) {
+export function GrownUpGate({ onPass, onClose }: { onPass: () => void; onClose: () => void }) {
   const [q] = useState(() => { const a = 3 + Math.floor(Math.random() * 7), b = 3 + Math.floor(Math.random() * 7); return { a, b }; });
   const [typed, setTyped] = useState('');
   const [wrong, setWrong] = useState(false);

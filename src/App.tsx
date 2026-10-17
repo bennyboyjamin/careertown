@@ -4,6 +4,7 @@ import { playTune, type Tune } from './engine/music';
 import { useDayPhase } from './engine/dayPhase';
 import { todayKey } from './data/daily';
 import { SPECIAL_STICKERS } from './data/stickers';
+import { BreakReminder } from './components/GrownUps';
 import { STYLE_PACK, STYLE_PACK_FRIENDS } from './data/stylePack';
 import type { BuildingId, Screen } from './engine/types';
 import { GameProvider, useGame } from './engine/store';
@@ -122,6 +123,7 @@ function Game() {
       {screen.name === 'mission' && <div className="h-3" />}
       <main className="flex-1 min-h-0">{body}</main>
       {shop && <Shop onClose={() => setShop(false)} />}
+      <BreakReminder />
       {!game.seenIntro && <Intro onPlay={() => { sfx('success'); dispatch({ type: 'SEEN_INTRO' }); }} />}
       <RotateHint />
       <RewardPopup />
