@@ -4,7 +4,10 @@ import { initialScene } from '../data/scenes';
 import { BADGES, SECRETS } from '../data/catalog';
 import { MISSIONS } from '../data/missions';
 import { dailyFor, todayKey } from '../data/daily';
-import { STARTER_ACCESSORIES } from '../data/accessories';
+import { STARTER_ACCESSORIES, ACCESSORIES } from '../data/accessories';
+/** Wearable painted accessories (caps, glasses, bags, headphones) were retired. */
+const OLD_WEARABLES = new Set(ACCESSORIES.filter((a) => a.wear && !a.toy).map((a) => a.id));
+const STARTER = STARTER_ACCESSORIES.filter((id) => !OLD_WEARABLES.has(id));
 import { FAMILY_DOLLS, FAMILY_PAPER, lookToDoll } from '../data/dollLooks';
 import { localSave, SAVE_VERSION, ACTIVE_PROFILE, migrate, type SaveAdapter } from './save';
 import { uid } from './ids';
@@ -29,7 +32,7 @@ export const DEFAULT_PETS: PetData[] = [
 /** Everyone gets the accessory starter pack once (new and existing saves). */
 export function addStarterPack(g: GameState): GameState {
   if (!g.owned.includes('pack:accessories-1'))
-    g = { ...g, owned: [...g.owned, ...STARTER_ACCESSORIES.filter((id) => !g.owned.includes(id)), 'pack:accessories-1'] };
+    g = { ...g, owned: [...g.owned, ...STARTER.filter((id) => !g.owned.includes(id)), 'pack:accessories-1'] };
   // New living-room furniture: existing saves find it in My stuff.
   if (!g.owned.includes('pack:living-1'))
     g = { ...g, owned: [...g.owned, ...['armchair', 'plant'].filter((id) => !g.owned.includes(id)), 'pack:living-1'] };
@@ -52,6 +55,12 @@ export function addStarterPack(g: GameState): GameState {
   }
   // The family is now drawn as vector dress-up characters: give each one their look
   // (worn hats, glasses and bags stay on; the old hand-drawn recolours no longer apply).
+  // The old painted accessories are gone: take them off everyone and out of My stuff and the rooms.
+  if (!g.owned.includes('pack:no-old-acc-1')) {
+    const scenes = Object.fromEntries(Object.entries(g.scenes).map(([k, es]) => [k, es.filter((e) => !(e.kind === 'item' && OLD_WEARABLES.has(e.ref)))]));
+    g = { ...g, owned: [...g.owned.filter((id) => !OLD_WEARABLES.has(id)), 'pack:no-old-acc-1'], scenes: scenes as typeof g.scenes,
+      characters: g.characters.map((c) => (c.wear ? { ...c, wear: undefined } : c)) };
+  }
   // Yuna and Nene are now painted YunaVerse characters (their old look is kept underneath).
   if (!g.owned.includes('pack:paper-family-1')) {
     g = { ...g, owned: [...g.owned, 'pack:paper-family-1'],
@@ -100,7 +109,7 @@ export function freshGame(): GameState {
   );
   return {
     version: SAVE_VERSION, playerName: 'Player', coins: 20, xp: 0, careerXp: {}, badges: [],
-    completedMissions: {}, owned: [...STARTER_ACCESSORIES, 'pack:accessories-1'], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
+    completedMissions: {}, owned: [...STARTER, 'pack:accessories-1', 'pack:no-old-acc-1'], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
     scenes: { 'home-kitchen': kitchen, 'home-living': living }, secrets: [],
     daily: { date, id: dailyFor(date).id, progress: 0, done: false },
     stats: {}, settings: { sound: true }, activeCharacterId: 'yuna', seenIntro: false,

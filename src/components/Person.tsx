@@ -150,7 +150,8 @@ export function LayeredArt({ lay, outfit, face, sit = false, wear, name, colors,
   const [hx, hy, hw, hh] = lay.head;
   const body = lay.outfits[outfit] ?? lay.outfits[0];
   const piece = (slot: WearSlot) => {
-    const a = wear?.[slot] ? ACC_BY_ID[wear[slot]!] : undefined;
+    // The old painted accessories were retired (Oct 2026); YunaVerse characters use their own Extras.
+    const a = undefined as (typeof ACC_BY_ID)[string] | undefined; void wear;
     if (!a) return null;
     if (slot === 'ears') return <Headphones key="ears" lay={lay} src={a.img} />;
     const [x, y, w, h] = wearBox(lay, slot, a.w / a.h);
