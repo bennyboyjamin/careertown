@@ -32,6 +32,7 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
   const [found, setFound] = useState<number[]>([]);
   const [chat, setChat] = useState(false);
   const [cheeky, setCheeky] = useState(false);
+  const [closeKids, setCloseKids] = useState(0);
   useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
 
   // the place's own piece of the town picture, zoomed out a little so there's room to search
@@ -87,7 +88,7 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
           {canSpeak() && <button aria-label="Read to me" onClick={() => say(line)} className="shrink-0 h-11 w-11 rounded-2xl border-[3px] border-ink bg-white shadow-chunkysm">🔊</button>}
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
-          <Btn tone="white" onClick={() => { sfx('tap'); setChat(!chat); }}>💬 Chat</Btn>
+          <Btn tone="white" onClick={() => { sfx('tap'); if (!chat) setCloseKids((k) => k + 1); setChat(!chat); }}>💬 Chat</Btn>
           {step === 'hello' && <Btn tone="sun" onClick={() => setStep('fact')}>What do you do?</Btn>}
           {onPlay && b.rooms[0] && <Btn tone="sky" onClick={() => onPlay(b.rooms[0].sceneId)}>🧸 Free play</Btn>}
           {onMission && b.missions.map((m) => <Btn key={m} tone="berry" onClick={() => onMission(m)}>⭐ {MISSIONS[m].title}</Btn>)}
@@ -97,7 +98,7 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
         {chat && <NpcChat npc={{ name: t.name, job: t.job, fact: t.fact }} onMood={(m) => setCheeky(m === 'cheeky')} />}
       </div>
 
-      {step !== 'find' && <div className="absolute inset-0 pointer-events-none visit-kids" style={{ left: '22%' }}><Visitors building={id} /></div>}
+      {step !== 'find' && <div className="absolute inset-0 pointer-events-none visit-kids" style={{ left: '22%' }}><Visitors building={id} closeKey={closeKids} onOpen={() => setChat(false)} /></div>}
 
       {/* things to find */}
       {step === 'find' && items.map((e, i) => (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BuildingId } from '../engine/types';
 import { NPC_PAPER } from '../data/dollLooks';
 import { PAPER_BASES } from '../data/paperArt';
@@ -20,10 +20,12 @@ const WHO: Partial<Record<BuildingId, string[]>> = {
   shopping: ['chloe', 'zina'], bank: ['ben'], kpop: ['ava', 'zina'],
 };
 
-export function Visitors({ building }: { building: BuildingId }) {
+/** onOpen: a kid's bubble opened. closeKey: change it to close any open bubble. */
+export function Visitors({ building, onOpen, closeKey }: { building: BuildingId; onOpen?: () => void; closeKey?: number }) {
   const ids = WHO[building] ?? [];
   const [open, setOpen] = useState<string | null>(null);
   const [face, setFace] = useState<Record<string, string>>({});
+  useEffect(() => { if (closeKey) setOpen(null); }, [closeKey]);
   if (!ids.length) return null;
   return (
     <div className="visitors absolute" style={{ left: '2%', bottom: '9%', height: '44%', display: 'flex', gap: '1%', zIndex: 24, pointerEvents: 'none' }}>
@@ -32,7 +34,7 @@ export function Visitors({ building }: { building: BuildingId }) {
         const B = PAPER_BASES[look.base]; void i;
         return (
           <div key={id} className="visitor" style={{ position: 'relative', height: '100%', aspectRatio: String(B.canvas[2] / B.canvas[3]), zIndex: open === id ? 2 : 1 }}>
-            <button aria-label={`Talk to ${k.name}`} className="worker-btn w-full h-full" onClick={() => { sfx('pop'); setOpen(open === id ? null : id); setFace((f) => ({ ...f, [id]: 'laughing' })); }}>
+            <button aria-label={`Talk to ${k.name}`} className="worker-btn w-full h-full" onClick={() => { sfx('pop'); if (open !== id) onOpen?.(); setOpen(open === id ? null : id); setFace((f) => ({ ...f, [id]: 'laughing' })); }}>
               <PaperArt p={look} face={face[id] ?? 'happy'} />
             </button>
             {open === id
