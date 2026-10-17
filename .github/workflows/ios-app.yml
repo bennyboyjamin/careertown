@@ -8,8 +8,9 @@
 #   ASC_KEY_ID      App Store Connect API key ID
 #   ASC_ISSUER_ID   App Store Connect API issuer ID
 #   ASC_KEY_P8      full text of the AuthKey_XXXX.p8 file (including BEGIN/END lines)
-# Also requires APPLE_DISTRIBUTION_P12_BASE64, APPLE_DISTRIBUTION_P12_PASSWORD, APP_STORE_PROFILE_BASE64 repository secrets.
-# Signing is reusable; no certificates are created or revoked by this workflow.
+# Signing is automatic: Xcode uses the App Store Connect key to get Apple's cloud-managed signing for this app.
+# Nothing is revoked, and no certificate or profile files need to be stored in the repo.
+# The ASC key must be a Team Key with the Admin role.
 # Also uses index.html + assets/ (the built game), app-icon.png (1024x1024) and app-splash.png (2732x2732) from the repo root.
 
 name: Build iPhone app
@@ -32,9 +33,6 @@ jobs:
       KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ISSUER: ${{ secrets.ASC_ISSUER_ID }}
       P8: ${{ secrets.ASC_KEY_P8 }}
-      SIGNING_P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
-      SIGNING_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
-      SIGNING_PROFILE_BASE64: ${{ secrets.APP_STORE_PROFILE_BASE64 }}
       VER: ${{ inputs.version }}
       BUILD: ${{ github.run_number }}
       APP_NAME: CareerTown
@@ -111,10 +109,10 @@ jobs:
             t.build_configurations.each do |c|
               s = c.build_settings
               s['DEVELOPMENT_TEAM'] = ENV['TEAM']
-              s['CODE_SIGN_STYLE'] = 'Manual'
-              s['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
-              s['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
-              s['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
+              s['CODE_SIGN_STYLE'] = 'Automatic'
+              s['CODE_SIGN_IDENTITY'] = 'Apple Development'
+              s.delete('CODE_SIGN_IDENTITY[sdk=iphoneos*]')
+              s.delete('PROVISIONING_PROFILE_SPECIFIER')
               s['PRODUCT_BUNDLE_IDENTIFIER'] = ENV['BUNDLE_ID']
               s['MARKETING_VERSION'] = ENV['VER']
               s['CURRENT_PROJECT_VERSION'] = ENV['BUILD']
@@ -177,32 +175,6 @@ jobs:
           EOF
           KEYFILE=~/private_keys/AuthKey_$KEY_ID.p8 ruby /tmp/check.rb
 
-      - name: Import reusable Apple signing credentials
-        shell: bash
-        run: |
-          for key in SIGNING_P12_BASE64 SIGNING_P12_PASSWORD SIGNING_PROFILE_BASE64; do
-            if [ -z "${!key}" ]; then echo "::error::Missing $key: add the reusable distribution certificate (.p12) and this app's provisioning profile to repository secrets."; exit 1; fi
-          done
-          mkdir -p "$RUNNER_TEMP/apple-signing"
-          SIGN_PATH="$RUNNER_TEMP/apple-signing"
-          printf '%s' "$SIGNING_P12_BASE64" | base64 --decode > "$SIGN_PATH/distribution.p12"
-          printf '%s' "$SIGNING_PROFILE_BASE64" | base64 --decode > "$SIGN_PATH/app.mobileprovision"
-          openssl pkcs12 -in "$SIGN_PATH/distribution.p12" -passin env:SIGNING_P12_PASSWORD -noout >/dev/null
-          security cms -D -i "$SIGN_PATH/app.mobileprovision" > "$SIGN_PATH/profile.plist"
-          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$SIGN_PATH/profile.plist")
-          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$SIGN_PATH/profile.plist")
-          KEYCHAIN_PASSWORD="$(openssl rand -hex 20)"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$SIGN_PATH/signing.keychain-db"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$SIGN_PATH/signing.keychain-db"
-          security set-keychain-settings -lut 21600 "$SIGN_PATH/signing.keychain-db"
-          security import "$SIGN_PATH/distribution.p12" -k "$SIGN_PATH/signing.keychain-db" -P "$SIGNING_P12_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$SIGN_PATH/signing.keychain-db"
-          security list-keychains -d user -s "$SIGN_PATH/signing.keychain-db"
-          security find-identity -v -p codesigning "$SIGN_PATH/signing.keychain-db"
-          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do mkdir -p "$d"; cp "$SIGN_PATH/app.mobileprovision" "$d/$PROFILE_UUID.mobileprovision"; done
-          echo "PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
-          echo "KEYCHAIN_PATH=$SIGN_PATH/signing.keychain-db" >> "$GITHUB_ENV"
-
       - name: Build the app
         run: |
           cd app/ios/App
@@ -210,6 +182,10 @@ jobs:
           xcodebuild $SRC -scheme App -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/CareerTown.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_$KEY_ID.p8 \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER" \
             archive > "$RUNNER_TEMP/build.log" 2>&1 || true
           tail -n 200 "$RUNNER_TEMP/build.log"
           grep -E "error:|\*\* ARCHIVE FAILED" "$RUNNER_TEMP/build.log" | sort -u | head -n 8 | while IFS= read -r l; do echo "::error::$l"; done
@@ -224,9 +200,7 @@ jobs:
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>upload</string>
             <key>teamID</key><string>$TEAM</string>
-            <key>signingStyle</key><string>manual</string>
-            <key>signingCertificate</key><string>Apple Distribution</string>
-            <key>provisioningProfiles</key><dict><key>$BUNDLE_ID</key><string>$PROFILE_NAME</string></dict>
+            <key>signingStyle</key><string>automatic</string>
             <key>manageAppVersionAndBuildNumber</key><false/>
             <key>uploadSymbols</key><true/>
           </dict></plist>
@@ -235,6 +209,7 @@ jobs:
             -archivePath "$RUNNER_TEMP/CareerTown.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
             -authenticationKeyPath ~/private_keys/AuthKey_$KEY_ID.p8 \
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER"
@@ -243,7 +218,6 @@ jobs:
       - name: Remove signing files from this computer
         if: always()
         run: |
-          [ -n "${KEYCHAIN_PATH:-}" ] && security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
           rm -rf "$RUNNER_TEMP/apple-signing"
 
       - name: Clean up key
