@@ -410,3 +410,203 @@ GARMENTS = {
     'clogs':        ('shoes', 'Clogs', clog('#B9A3F0'), ''),
     'boots':        ('shoes', 'Yellow boots', boots('#FFC94A'), ''),
 }
+
+# ───────────────────────── YunaVerse family pieces ─────────────────────────
+def sweater(c, deco=''):
+    """Crew-neck sweatshirt: long sleeves, ribbed cuffs and hem."""
+    d, o = dark(c, .86), dark(c, .62)
+    return (g(HOOD_SHAPE, c, o) +
+            g('M84 432 C94 444 108 448 120 442 L118 456 C106 462 90 458 82 448 Z M300 432 C290 444 276 448 264 442 L266 456 C278 462 294 458 302 448 Z', d, o) +
+            g('M120 474 C152 488 232 488 264 474 L264 492 C232 506 152 506 120 492 Z', d, o) +
+            g('M156 342 C170 364 214 364 228 342 L222 340 C210 354 174 354 162 340 Z', d, o) +
+            ln('M122 412 C126 380 132 364 140 356 M262 412 C258 380 252 364 244 356', o, 2.5, .6) + deco)
+
+def raglan_tee(c, trim):
+    """Tee with contrast raglan seams, neckline and sleeve bands."""
+    o = dark(c, .7)
+    return (tee(c, sleeve_band=trim) + ln('M162 342 C150 352 136 360 122 362 M222 342 C234 352 248 360 262 362', trim, 5) +
+            ln('M162 340 C172 358 212 358 222 340', trim, 5))
+
+def bunny_dress(c):
+    """Long-sleeve party dress with a round white collar, little bunny face, bows and a ruffle hem."""
+    d, o = dark(c, .9), dark(c, .62)
+    collar = 'M150 342 C140 362 156 380 176 372 C184 368 190 360 192 354 C194 360 200 368 208 372 C228 380 244 362 234 342 C214 352 170 352 150 342 Z'
+    s = g('M84 432 C94 444 108 448 120 442 L118 456 C106 462 90 458 82 448 Z M300 432 C290 444 276 448 264 442 L266 456 C278 462 294 458 302 448 Z', '#FFFFFF', '#C9B5BF')
+    s += g('M128 350 C104 360 92 392 86 434 C96 446 110 448 122 440 L126 404 Z M256 350 C280 360 292 392 298 434 C288 446 274 448 262 440 L258 404 Z', c, o)
+    s += g('M130 350 C150 338 234 338 254 350 L262 452 C276 500 290 550 298 586 C240 604 144 604 86 586 C94 550 108 500 122 452 Z', c, o)
+    s += g('M86 584 C144 602 240 602 298 584 L302 600 C292 610 284 600 274 610 C264 600 254 612 242 604 C230 614 218 602 206 612 C196 602 188 612 178 604 C166 614 154 602 142 612 C130 602 120 612 110 604 C100 612 92 604 82 602 Z', '#FFF3F7', '#D9A9BC', 2.5)
+    s += ln('M88 578 C146 594 238 594 296 578', '#FFFFFF', 3, .9)
+    s += ln('M122 452 C152 462 232 462 262 452', o, 2.5, .6)
+    s += g(collar, '#FFFFFF', '#C9B5BF', 2.5)
+    # bunny face on the chest
+    s += ('<g transform="translate(192 410)"><ellipse cx="-7" cy="-17" rx="5" ry="11" fill="#FFFFFF" stroke="#E7B4C6" stroke-width="2"/>'
+          '<ellipse cx="7" cy="-17" rx="5" ry="11" fill="#FFFFFF" stroke="#E7B4C6" stroke-width="2"/>'
+          '<ellipse cx="0" cy="0" rx="15" ry="13" fill="#FFFFFF" stroke="#E7B4C6" stroke-width="2"/>'
+          '<circle cx="-5" cy="-1" r="2" fill="#5A3A40"/><circle cx="5" cy="-1" r="2" fill="#5A3A40"/>'
+          '<ellipse cx="-9" cy="5" rx="3" ry="2" fill="#FFB8CC"/><ellipse cx="9" cy="5" rx="3" ry="2" fill="#FFB8CC"/></g>')
+    for x in (146, 238):
+        s += f'<g transform="translate({x} 448)"><path d="M0 0 c-10 -9 -20 1 -10 7 c-10 6 0 16 10 7 c10 9 20 -1 10 -7 c10 -6 0 -16 -10 -7 Z" fill="{light(c, .35)}" stroke="{o}" stroke-width="2"/><circle r="3" fill="{o}"/></g>'
+    return s
+
+def track_pants(c, stripe):
+    """Loose track pants with side stripes and a drawstring."""
+    s = pants(c, wide=True, cuff=False)
+    s += ln('M130 488 C120 540 108 596 102 636 M254 488 C264 540 276 596 282 636', stripe, 5)
+    s += ln('M184 474 L178 498 M200 474 L206 498', stripe, 2.5) + f'<ellipse cx="192" cy="478" rx="8" ry="4" fill="none" stroke="{stripe}" stroke-width="2.5"/>'
+    return s
+
+def cargo_shorts(c):
+    o, d = dark(c, .62), dark(c, .88)
+    s = g('M126 470 L258 470 C262 510 266 548 270 584 L202 588 L196 524 L188 524 L182 588 L114 584 C118 548 122 510 126 470 Z', c, o)
+    s += g('M126 470 L258 470 L259 488 L125 488 Z', d, o)
+    s += g('M110 528 L140 528 L142 566 L112 568 Z M274 528 L244 528 L242 566 L272 568 Z', d, o, 2.5) + ln('M110 538 L140 538 M274 538 L244 538', o, 2, .7)
+    s += ln('M192 490 L192 522 M148 494 C154 506 166 508 174 500 M236 494 C230 506 218 508 210 500', o, 2, .5)
+    return s
+
+def wide_trousers(c):
+    o = dark(c, .62)
+    return (pants(c, wide=True, cuff=False) + ln('M160 492 C162 540 158 600 150 640 M224 492 C222 540 226 600 234 640', o, 2, .45) +
+            g('M186 470 L198 470 L198 488 L186 488 Z', light(c, .3), o, 2))
+
+def cardigan(c, under, stripe):
+    """Open cardigan with buttons over a striped tee."""
+    s = jacket(c, under)
+    for y in range(362, 492, 14):
+        f = (y - 344) / 150
+        s += ln(f'M{164 + 12 * f + 3:.0f} {y} L{220 - 12 * f - 3:.0f} {y}', stripe, 4)
+    s += ln('M164 344 L176 494 M220 344 L208 494', dark(c, .62), 3)
+    for y in (392, 428, 464):
+        s += f'<circle cx="{224 - (y - 344) / 150 * 12:.0f}" cy="{y}" r="5" fill="#A0764E" stroke="#6E4E30" stroke-width="2"/>'
+    return s
+
+def socks(frill=False):
+    out = ''
+    for cx in (152, 232):
+        out += g(f'M{cx-18} 606 L{cx+18} 606 L{cx+20} 648 L{cx-20} 648 Z', '#FFFFFF', '#C9CCD6', 2.5)
+        if frill:
+            out += g(f'M{cx-22} 604 C{cx-16} 596 {cx-8} 610 {cx} 600 C{cx+8} 610 {cx+16} 596 {cx+22} 604 L{cx+20} 614 L{cx-20} 614 Z', '#FFFFFF', '#E3C2CF', 2)
+            out += f'<g transform="translate({cx+10} 616)"><path d="M0 0 c-6 -6 -12 0 -6 4 c-6 4 0 10 6 4 c6 6 12 0 6 -4 c6 -4 0 -10 -6 -4 Z" fill="#FFB8CC" stroke="#E08AA8" stroke-width="1.5"/></g>'
+        else:
+            out += ln(f'M{cx-18} 614 L{cx+18} 614 M{cx-18} 620 L{cx+18} 620', '#D5D9E2', 2)
+    return out
+
+def bunny_clip(x, y):
+    return (f'<g transform="translate({x} {y})"><ellipse cx="-6" cy="-14" rx="4.5" ry="10" fill="#FFC2D6" stroke="#D97A9E" stroke-width="2"/>'
+            '<ellipse cx="6" cy="-14" rx="4.5" ry="10" fill="#FFC2D6" stroke="#D97A9E" stroke-width="2"/>'
+            '<ellipse cx="0" cy="0" rx="13" ry="11" fill="#FFC2D6" stroke="#D97A9E" stroke-width="2"/>'
+            '<circle cx="-4" cy="-1" r="1.8" fill="#5A3A40"/><circle cx="4" cy="-1" r="1.8" fill="#5A3A40"/></g>')
+
+LOW_BUN = ('<circle cx="318" cy="268" r="38" fill="{H}" stroke="{HO}" stroke-width="3"/>' +
+           strands('M290 252 C306 238 330 240 344 256 M294 278 C310 264 334 266 348 282', .6))
+FACE_WISPS = strands('M84 214 C76 250 80 284 92 304 M300 214 C308 250 304 284 292 304', .8)
+
+HAIR.update({
+    'lowbun':    ('Low bun', LOW_BUN, part_front() + FACE_WISPS),
+    'bunnybob':  ('Bob with bunny clip', hp(BOB_BACK, '{HD}'), hp(CAP_BANGS) + BANGS_LINES + bunny_clip(272, 132)),
+})
+
+GARMENTS.update({
+    'red-hoodie':    ('top', 'Red hoodie', hoodie('#E8573F'), ''),
+    'raglan-tee':    ('top', 'Sporty tee', raglan_tee('#FFFFFF', '#F28BB0'), ''),
+    'royal-hoodie':  ('top', 'Cobalt hoodie', hoodie('#2F6BD9'), ''),
+    'bunny-dress':   ('top', 'Bunny dress', bunny_dress('#F7A8C4'), ''),
+    'cardigan':      ('top', 'Cozy cardigan', cardigan('#F2E6CF', '#FFFFFF', '#3C3550'), ''),
+    'navy-sweater':  ('top', 'Navy sweater', sweater('#2C3352'), ''),
+    'track-pants':   ('bottom', 'Track pants', track_pants('#2E2B33', '#F28BB0'), ''),
+    'cargo-shorts':  ('bottom', 'Cargo shorts', cargo_shorts('#2F3340'), ''),
+    'khaki-wide':    ('bottom', 'Wide trousers', wide_trousers('#D8C3A0'), ''),
+    'red-sneakers':  ('shoes', 'Red sneakers', sneaker('#FFFFFF', '#E8573F', '#F1F1F1'), ''),
+    'blue-sneakers': ('shoes', 'Blue sneakers', socks() + sneaker('#FFFFFF', '#2F6BD9', '#F1F1F1'), ''),
+    'bow-shoes':     ('shoes', 'Bow shoes', socks(True) + maryjane('#F7A8C4'), ''),
+    'cream-sneakers':('shoes', 'Cream sneakers', sneaker('#F7F1E6', '#CDB48C', '#EDE3D2', '#F7F1E6'), ''),
+    'gray-sneakers': ('shoes', 'Gray sneakers', sneaker('#FFFFFF', '#6E7179', '#E9EEF6'), ''),
+})
+
+# ───────────────────────── grown-up build ─────────────────────────
+# Grown-ups use the same head and the same outfits, re-drawn on a longer body: every point
+# below the neck is moved by grow(), so all clothes still fit with no extra drawing.
+# Bands: neck and head unchanged; chest/arms stretched; the hand/hip band kept rigid (hands
+# stay hand-shaped); legs stretched; feet unchanged (just moved down).
+ADULT_TORSO = (344, 440, 1.32)    # y from, y to, stretch
+ADULT_LEGS = (500, 640, 1.5)
+ADULT_WIDEN = 1.07
+def _gy(y):
+    a0, a1, ak = ADULT_TORSO; b0, b1, bk = ADULT_LEGS
+    if y <= a0: return y
+    if y <= a1: return a0 + (y - a0) * ak
+    t = a0 + (a1 - a0) * ak
+    if y <= b0: return t + (y - a1)
+    t += b0 - a1
+    if y <= b1: return t + (y - b0) * bk
+    return t + (b1 - b0) * bk + (y - b1)
+grow_y = _gy
+ADULT_GROW = round(_gy(720) - 720)      # extra canvas height for grown-ups
+def _gx(x, y):
+    k = 1 + (ADULT_WIDEN - 1) * max(0, min(1, (y - 344) / 40))
+    return 192 + (x - 192) * k
+def _grow_pt(x, y): return _gx(x, y), _gy(y)
+
+import re as _re
+_NUM = r'-?\d*\.?\d+(?:e-?\d+)?'
+def _grow_path(d):
+    toks = _re.findall(r'[MLCQZHVmlcqzhv]|' + _NUM, d)
+    out, i, cmd = [], 0, None
+    cx = cy = sx = sy = 0.0
+    def num():
+        nonlocal i
+        v = float(toks[i]); i += 1; return v
+    f = lambda v: f'{v:.1f}'.rstrip('0').rstrip('.')
+    while i < len(toks):
+        t = toks[i]
+        if _re.fullmatch('[A-Za-z]', t): cmd = t; i += 1
+        if cmd in 'Zz':
+            out.append('Z'); cx, cy = sx, sy; continue
+        rel = cmd.islower(); C = cmd.upper()
+        n = {'M': 1, 'L': 1, 'C': 3, 'Q': 2, 'H': 1, 'V': 1}[C]
+        if C == 'H':
+            x = num() + (cx if rel else 0); pts = [(x, cy)]; C = 'L'
+        elif C == 'V':
+            y = num() + (cy if rel else 0); pts = [(cx, y)]; C = 'L'
+        else:
+            pts = []
+            for _ in range(n):
+                x, y = num(), num()
+                pts.append((x + cx, y + cy) if rel else (x, y))
+        cx, cy = pts[-1]
+        if C == 'M':
+            sx, sy = cx, cy
+            cmd = 'l' if rel else 'L'      # extra pairs after M are line-tos
+        out.append(C + ' '.join(f(a) + ' ' + f(b) for a, b in (_grow_pt(*p) for p in pts)))
+    return ' '.join(out)
+
+def grow(svg):
+    """Re-draw a body-space SVG snippet on the grown-up body."""
+    out, depth_rigid, pos = [], 0, 0
+    for m in _re.finditer(r'<(/?)(\w+)([^>]*?)(/?)>', svg):
+        out.append(svg[pos:m.start()]); pos = m.end()
+        close, tag, attrs, selfclose = m.groups()
+        if close:
+            if tag == 'g' and depth_rigid: depth_rigid -= 1
+            out.append(m.group(0)); continue
+        if depth_rigid:
+            if tag == 'g' and not selfclose: depth_rigid += 1
+            out.append(m.group(0)); continue
+        tr = _re.search(r'transform="translate\((' + _NUM + r')[ ,](' + _NUM + r')\)"', attrs)
+        if tr and tag == 'g':          # a little rigid group (flower, bow): move it, don't stretch it
+            x, y = _grow_pt(float(tr.group(1)), float(tr.group(2)))
+            attrs = attrs.replace(tr.group(0), f'transform="translate({x:.1f} {y:.1f})"')
+            if not selfclose: depth_rigid += 1
+        elif tag == 'path':
+            attrs = _re.sub(r' d="([^"]*)"', lambda mm: f' d="{_grow_path(mm.group(1))}"', attrs)
+        elif tag in ('circle', 'ellipse'):
+            cxm = _re.search(r' cx="(' + _NUM + ')"', attrs); cym = _re.search(r' cy="(' + _NUM + ')"', attrs)
+            if cxm and cym:
+                x, y = _grow_pt(float(cxm.group(1)), float(cym.group(1)))
+                attrs = attrs.replace(cxm.group(0), f' cx="{x:.1f}"').replace(cym.group(0), f' cy="{y:.1f}"')
+        elif tag == 'text':
+            xm = _re.search(r' x="(' + _NUM + ')"', attrs); ym = _re.search(r' y="(' + _NUM + ')"', attrs)
+            x, y = _grow_pt(float(xm.group(1)), float(ym.group(1)))
+            attrs = attrs.replace(xm.group(0), f' x="{x:.1f}"').replace(ym.group(0), f' y="{y:.1f}"')
+        out.append(f'<{tag}{attrs}{selfclose}>')
+    out.append(svg[pos:])
+    return ''.join(out)

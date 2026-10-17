@@ -1,8 +1,8 @@
 import { useId, useMemo } from 'react';
 import type { DollLook } from '../engine/types';
 import type { Face } from '../data/sprites';
-import { DOLL_PAD, DOLL_H, DOLL_W } from '../data/doll';
-import { ART_DEFS, ART_BODY, ART_HEAD, ART_TEE, ART_SHORTS, ART_FACES, ART_HAIR, ART_GARMENTS } from '../data/dollArt';
+import { DOLL_PAD, DOLL_W, dollHeight } from '../data/doll';
+import { ART_DEFS, ART_BODY, ART_HEAD, ART_TEE, ART_SHORTS, ART_FACES, ART_HAIR, ART_GARMENTS, ART_ADULT_BODY, ART_ADULT_TEE, ART_ADULT_SHORTS, ART_ADULT_GARMENTS } from '../data/dollArt';
 import { SKIN_SWATCH, HAIR_TINTS, EYE_TINTS, BASIC_TINTS } from '../data/dollLooks';
 
 /* ── colours ── */
@@ -30,9 +30,9 @@ function colours(d: DollLook, uid: string): Record<string, string> {
 const paint = (svg: string, c: Record<string, string>) => svg.replace(/\{(\w+)\}/g, (_, k: string) => c[k] ?? '');
 
 /** One drawing layer covering the whole doll canvas (the canvas has DOLL_PAD px of headroom above the drawing). */
-function Layer({ markup, className }: { markup: string; className?: string }) {
+function Layer({ markup, className, adult }: { markup: string; className?: string; adult?: boolean }) {
   return (
-    <svg viewBox={`0 ${-DOLL_PAD} ${DOLL_W} ${DOLL_H}`} preserveAspectRatio="xMidYMid meet" className={className}
+    <svg viewBox={`0 ${-DOLL_PAD} ${DOLL_W} ${dollHeight(adult)}`} preserveAspectRatio="xMidYMid meet" className={className}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}
       dangerouslySetInnerHTML={{ __html: markup }} />
   );
@@ -44,13 +44,15 @@ export function DollBody({ d }: { d: DollLook }) {
   const uid = useUid();
   const markup = useMemo(() => {
     const c = colours(d, uid);
-    const g = (id: string | null) => (id ? ART_GARMENTS[id] : undefined);
+    // Grown-ups wear the same pieces, re-drawn on the longer body.
+    const g = (id: string | null) => (id && ART_GARMENTS[id] ? (d.adult ? ART_ADULT_GARMENTS[id] : ART_GARMENTS[id]) : undefined);
     const top = g(d.top), bottom = g(d.bottom), shoes = g(d.shoes);
     const hair = d.hair ? ART_HAIR[d.hair] : undefined;
-    return paint(ART_DEFS + (hair?.back ?? '') + ART_BODY + (bottom ? '' : ART_SHORTS) + (top ? '' : ART_TEE)
+    const [body, tee, shorts] = d.adult ? [ART_ADULT_BODY, ART_ADULT_TEE, ART_ADULT_SHORTS] : [ART_BODY, ART_TEE, ART_SHORTS];
+    return paint(ART_DEFS + (hair?.back ?? '') + body + (bottom ? '' : shorts) + (top ? '' : tee)
       + (shoes?.svg ?? '') + (bottom?.svg ?? '') + (top?.svg ?? '') + (bottom?.over ?? ''), c);
   }, [d, uid]);
-  return <Layer markup={markup} className="sprite-img" />;
+  return <Layer markup={markup} className="sprite-img" adult={d.adult} />;
 }
 
 /** The 8 drawn expressions: the 4 shared faces plus laugh, cry, grumpy and silly for dress-up characters. */
@@ -71,13 +73,16 @@ export function DollHead({ d, face, mood }: { d: DollLook; face: Face; mood?: st
     const hair = d.hair ? ART_HAIR[d.hair] : undefined;
     return paint(ART_DEFS + ART_HEAD + (faces[expr] ?? faces.happy) + (hair?.front ?? ''), c);
   }, [d, uid, expr]);
-  return <Layer markup={markup} className="layered-head" />;
+  return <Layer markup={markup} className="layered-head" adult={d.adult} />;
 }
+
+/** Tops that reach past the hips (dresses) get a taller picker tile. */
+const LONG_TOPS = new Set(['bunny-dress']);
 
 /** A single garment drawn on its own, for the character maker's picker tiles. */
 export function GarmentPic({ id }: { id: string }) {
   const g = ART_GARMENTS[id];
   if (!g) return null;
-  const vb = g.kind === 'top' ? '70 318 244 196' : g.kind === 'bottom' ? '86 340 212 330' : '104 600 176 96';
+  const vb = g.kind === 'top' ? (LONG_TOPS.has(id) ? '50 318 284 300' : '70 318 244 196') : g.kind === 'bottom' ? '86 340 212 330' : '104 600 176 96';
   return <svg viewBox={vb} style={{ width: '100%', height: '100%' }} dangerouslySetInnerHTML={{ __html: g.svg + (g.over ?? '') }} />;
 }

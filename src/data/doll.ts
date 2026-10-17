@@ -1,5 +1,5 @@
 /** Dress-up characters: canvas size and the lists the character maker offers. The drawings live in dollArt.ts. */
-import { ART_GARMENTS, ART_HAIR, ART_DEFAULT_PIC, type GarmentKind } from './dollArt';
+import { ART_GARMENTS, ART_HAIR, ART_DEFAULT_PIC, ADULT_GROW, ADULT_WAIST, type GarmentKind } from './dollArt';
 export type { GarmentKind };
 
 /** Drawing canvas is 384 x 720; DOLL_PAD extra px above it leave room for tall hair and hats. */
@@ -12,6 +12,10 @@ export const DOLL_EYES: [[number, number], [number, number]] = [[138, 236], [246
 export const DOLL_CROWN = 70;
 /** Waist line in drawing px (where the legs fold when sitting). */
 export const DOLL_WAIST = 484;
+/** Grown-ups: the same head on a longer body, so the canvas is ADULT_GROW px taller. */
+export const DOLL_H_ADULT = DOLL_H + ADULT_GROW;
+export const DOLL_WAIST_ADULT = ADULT_WAIST;
+export const dollHeight = (adult?: boolean) => (adult ? DOLL_H_ADULT : DOLL_H);
 
 export const DOLL_HAIR: Record<string, { label: string }> = Object.fromEntries(Object.entries(ART_HAIR).map(([k, h]) => [k, { label: h.label }]));
 export const DOLL_GARMENTS: Record<string, { kind: GarmentKind; label: string }> = Object.fromEntries(Object.entries(ART_GARMENTS).map(([k, g]) => [k, { kind: g.kind, label: g.label }]));

@@ -1,51 +1,21 @@
-// Family artwork. Each family member is a headless body (one per outfit) plus four
-// interchangeable faces, positioned by a rig measured from the source sheets.
+// Character artwork sizes and rigs. The YunaVerse family are vector dress-up characters
+// (data/doll.ts) like the ones kids make; each keeps their own height.
 // `h` is standing height in room units.
-import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_EYES, DOLL_CROWN, DOLL_WAIST, DOLL_PIC } from './doll';
+import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_EYES, DOLL_CROWN, DOLL_WAIST, DOLL_PIC, DOLL_H_ADULT, DOLL_WAIST_ADULT } from './doll';
 import snowy from '../assets/yuna/snowy.webp';
 import coco from '../assets/yuna/coco.webp';
-import yunaBody from '../assets/yuna/yuna-body.webp';
-import yunaHappy from '../assets/yuna/yuna-head-happy.webp';
-import yunaWink from '../assets/yuna/yuna-head-wink.webp';
-import yunaSad from '../assets/yuna/yuna-head-sad.webp';
-import yunaWow from '../assets/yuna/yuna-head-wow.webp';
-import natalieBody from '../assets/yuna/natalie-body.webp';
-import natalieHappy from '../assets/yuna/natalie-head-happy.webp';
-import natalieWink from '../assets/yuna/natalie-head-wink.webp';
-import natalieSad from '../assets/yuna/natalie-head-sad.webp';
-import natalieWow from '../assets/yuna/natalie-head-wow.webp';
-import brotherBody from '../assets/yuna/brother-body.webp';
-import brotherHappy from '../assets/yuna/brother-head-happy.webp';
-import brotherWink from '../assets/yuna/brother-head-wink.webp';
-import brotherSad from '../assets/yuna/brother-head-sad.webp';
-import brotherWow from '../assets/yuna/brother-head-wow.webp';
-import neneBody from '../assets/yuna/nene-body.webp';
-import neneHappy from '../assets/yuna/nene-head-happy.webp';
-import neneWink from '../assets/yuna/nene-head-wink.webp';
-import neneSad from '../assets/yuna/nene-head-sad.webp';
-import neneWow from '../assets/yuna/nene-head-wow.webp';
-import momBody from '../assets/yuna/mom-body.webp';
-import momHappy from '../assets/yuna/mom-head-happy.webp';
-import momWink from '../assets/yuna/mom-head-wink.webp';
-import momSad from '../assets/yuna/mom-head-sad.webp';
-import momWow from '../assets/yuna/mom-head-wow.webp';
-import dadBody from '../assets/yuna/dad-body.webp';
-import dadHappy from '../assets/yuna/dad-head-happy.webp';
-import dadWink from '../assets/yuna/dad-head-wink.webp';
-import dadSad from '../assets/yuna/dad-head-sad.webp';
-import dadWow from '../assets/yuna/dad-head-wow.webp';
 
 export interface Sprite { src: string; w: number; h: number; head: number }
 const S = (src: string, pw: number, ph: number, head = 0.42): Sprite => ({ src, w: Math.round(ph * 0.82 * pw / ph), h: Math.round(ph * 0.82), head });
 
+/** Room size for a vector character `h` tall (kid or grown-up canvas). */
+const V = (h: number, adult = false): Sprite => ({ src: DOLL_PIC, w: Math.round(h * DOLL_W / (adult ? DOLL_H_ADULT : DOLL_H)), h, head: adult ? 0.4 : 0.45 });
+
 export const SPRITES: Record<string, Sprite> = {
-  yuna: { src: yunaHappy, w: 96, h: 245, head: 0.4 },
   doll: { src: DOLL_PIC, w: 133, h: 270, head: 0.45 },
-  natalie: { src: natalieHappy, w: 99, h: 252, head: 0.4 },
-  brother: { src: brotherHappy, w: 85, h: 205, head: 0.4 },
-  nene: { src: neneHappy, w: 86, h: 182, head: 0.4 },
-  mom: { src: momHappy, w: 104, h: 262, head: 0.4 },
-  dad: { src: dadHappy, w: 105, h: 272, head: 0.4 },
+  // the family, from tallest to smallest
+  dad: V(300, true), mom: V(290, true),
+  natalie: V(262), yuna: V(256), brother: V(232), nene: V(208),
   snowy: S(snowy, 113, 136), coco: S(coco, 104, 140),
 };
 
@@ -64,6 +34,8 @@ export interface Layered {
   crown: number;
   /** Hip line as a fraction of the full rig height: when sitting, the legs below it fold toward the viewer. */
   hip: number;
+  /** Optional fit for worn hats/glasses on this rig: width multiplier and how far to lower them (in eye-distances). */
+  fit?: Partial<Record<'head' | 'eyes', { w: number; drop: number }>>;
 }
 /** Seated look: we draw the torso and the top of the thighs; the seat's front is drawn
  *  over the rest (Room puts a copy of the seat front on top), so they sink into the seat. */
@@ -72,6 +44,9 @@ export const SIT_EXTRA = 0.1;
 export const sitDrop = (_l: Layered) => SIT_EXTRA + 0.05;
 /** Seated height as a fraction of standing height. */
 export const sitFrac = (l: Layered) => l.hip + SIT_EXTRA;
+
+/** Vector heads are rounder and wider-eyed than the painted art: hats sit lower and a bit smaller. */
+const DOLL_FIT: Layered['fit'] = { head: { w: 0.82, drop: 0.42 }, eyes: { w: 0.9, drop: 0 } };
 
 export const LAYERED: Record<string, Layered> = {
   /** Dress-up characters from the character maker: the parts come from data/doll.ts (see components/Doll.tsx). */
@@ -82,47 +57,21 @@ export const LAYERED: Record<string, Layered> = {
     faces: { happy: DOLL_PIC, wink: DOLL_PIC, sad: DOLL_PIC, wow: DOLL_PIC },
     eyes: [[DOLL_EYES[0][0], DOLL_EYES[0][1] + DOLL_PAD], [DOLL_EYES[1][0], DOLL_EYES[1][1] + DOLL_PAD]],
     crown: DOLL_PAD + DOLL_CROWN, hip: (DOLL_PAD + DOLL_WAIST) / DOLL_H,
-  },
-  yuna: {
-    W: 527, H: 1343, body: [0, 283, 527, 1060], head: [47, 0, 429, 416],
-    outfits: [{ id: 'default', label: 'Red hoodie', src: yunaBody }],
-    faces: { happy: yunaHappy, wink: yunaWink, sad: yunaSad, wow: yunaWow },
-    eyes: [[215, 210], [318, 210]],
-    crown: 12, hip: 0.645,
-  },
-  natalie: {
-    W: 556, H: 1411, body: [0, 335, 556, 1076], head: [94, 0, 435, 421],
-    outfits: [{ id: 'default', label: 'Track pants', src: natalieBody }],
-    faces: { happy: natalieHappy, wink: natalieWink, sad: natalieSad, wow: natalieWow },
-    eyes: [[225, 250], [330, 250]],
-    crown: 72, hip: 0.655,
-  },
-  brother: {
-    W: 563, H: 1357, body: [0, 302, 563, 1055], head: [71, 0, 392, 328],
-    outfits: [{ id: 'default', label: 'Blue hoodie', src: brotherBody }],
-    faces: { happy: brotherHappy, wink: brotherWink, sad: brotherSad, wow: brotherWow },
-    eyes: [[227, 225], [330, 225]],
-    crown: 18, hip: 0.66,
-  },
-  nene: {
-    W: 560, H: 1188, body: [0, 298, 560, 890], head: [47, 0, 438, 334],
-    outfits: [{ id: 'default', label: 'Bunny dress', src: neneBody }],
-    faces: { happy: neneHappy, wink: neneWink, sad: neneSad, wow: neneWow },
-    eyes: [[228, 215], [338, 215]],
-    crown: 8, hip: 0.665,
-  },
-  mom: {
-    W: 552, H: 1393, body: [0, 292, 552, 1101], head: [84, 0, 358, 367],
-    outfits: [{ id: 'default', label: 'Cozy cardigan', src: momBody }],
-    faces: { happy: momHappy, wink: momWink, sad: momSad, wow: momWow },
-    eyes: [[222, 215], [330, 215]],
-    crown: 18, hip: 0.628,
-  },
-  dad: {
-    W: 567, H: 1468, body: [0, 321, 567, 1147], head: [115, 0, 323, 344],
-    outfits: [{ id: 'default', label: 'Navy sweater', src: dadBody }],
-    faces: { happy: dadHappy, wink: dadWink, sad: dadSad, wow: dadWow },
-    eyes: [[225, 200], [328, 200]],
-    crown: 15, hip: 0.618,
+    fit: DOLL_FIT,
   },
 };
+
+/** Grown-up dress-up characters: same head, longer body. */
+const DOLL_ADULT: Layered = {
+  W: DOLL_W, H: DOLL_H_ADULT, body: [0, DOLL_PAD, DOLL_W, DOLL_H_ADULT - DOLL_PAD],
+  head: [40, DOLL_PAD + 40, 304, 300],
+  outfits: [{ id: 'doll', label: 'Outfit', src: DOLL_PIC }],
+  faces: { happy: DOLL_PIC, wink: DOLL_PIC, sad: DOLL_PIC, wow: DOLL_PIC },
+  eyes: [[DOLL_EYES[0][0], DOLL_EYES[0][1] + DOLL_PAD], [DOLL_EYES[1][0], DOLL_EYES[1][1] + DOLL_PAD]],
+  crown: DOLL_PAD + DOLL_CROWN, hip: (DOLL_PAD + DOLL_WAIST_ADULT) / DOLL_H_ADULT,
+  fit: DOLL_FIT,
+};
+for (const k of ['yuna', 'natalie', 'brother', 'nene']) LAYERED[k] = LAYERED.doll;
+for (const k of ['mom', 'dad']) LAYERED[k] = DOLL_ADULT;
+/** Rig for a dress-up look (kid or grown-up). */
+export const dollRig = (adult?: boolean) => (adult ? DOLL_ADULT : LAYERED.doll);

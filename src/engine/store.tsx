@@ -5,6 +5,7 @@ import { BADGES, SECRETS } from '../data/catalog';
 import { MISSIONS } from '../data/missions';
 import { dailyFor, todayKey } from '../data/daily';
 import { STARTER_ACCESSORIES } from '../data/accessories';
+import { FAMILY_DOLLS } from '../data/dollLooks';
 import { localSave, SAVE_VERSION, ACTIVE_PROFILE, type SaveAdapter } from './save';
 import { uid } from './ids';
 import { setSoundEnabled, sfx } from './sfx';
@@ -18,7 +19,7 @@ export const DEFAULT_CHARACTERS: CharacterData[] = [
   { id: 'nene', name: 'Nene', age: 'child', sprite: 'nene', look: { ...L, hair: 'bob', bottom: 'dress', bottomColor: '#FF9FBF' } },
   { id: 'mom', name: 'Mom', age: 'adult', sprite: 'mom', look: { ...L, hair: 'topknot', top: 'sweater', topColor: '#F2E6CF', bottom: 'widejeans', bottomColor: '#C8B08A' } },
   { id: 'dad', name: 'Dad', age: 'adult', sprite: 'dad', look: { ...L, hair: 'short', top: 'sweatshirt', topColor: '#2B2B2B' } },
-];
+].map((c) => ({ ...c, doll: FAMILY_DOLLS[c.sprite!] }) as CharacterData);
 export const DEFAULT_PETS: PetData[] = [
   { id: 'snowy', species: 'puppy', name: 'Snowy', accessory: 'none', sprite: 'snowy' },
   { id: 'coco', species: 'puppy', name: 'Coco', accessory: 'none', sprite: 'coco' },
@@ -48,6 +49,12 @@ export function addStarterPack(g: GameState): GameState {
     if (scene && sink) scene = scene.map((e) => (e.ref === 'mirror' ? { ...e, x: sink.x, y: sink.y - 112 } : e));
     const extra = ['towel-rack', 'laundry-basket', 'bath-shelf', 'bath-cart', 'trash-can', 'step-stool'].filter((id) => !g.owned.includes(id));
     g = { ...g, owned: [...g.owned, ...extra, 'pack:bathroom-1'], scenes: scene ? { ...g.scenes, 'home-bathroom': scene } : g.scenes };
+  }
+  // The family is now drawn as vector dress-up characters: give each one their look
+  // (worn hats, glasses and bags stay on; the old hand-drawn recolours no longer apply).
+  if (!g.owned.includes('pack:vector-family-1')) {
+    g = { ...g, owned: [...g.owned, 'pack:vector-family-1'],
+      characters: g.characters.map((c) => (c.sprite && FAMILY_DOLLS[c.sprite] && !c.doll ? { ...c, doll: { ...FAMILY_DOLLS[c.sprite] }, colors: undefined, outfit: undefined } : c)) };
   }
   return g;
 }

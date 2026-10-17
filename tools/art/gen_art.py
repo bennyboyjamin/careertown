@@ -26,10 +26,22 @@ L.append('export const ART_GARMENTS: Record<string, { kind: GarmentKind; label: 
 for k, (kind, lab, s, over) in GARMENTS.items():
     L.append(f'  {js(k)}: {{ kind: {js(kind)}, label: {js(lab)}, svg: {js(s)}' + (f', over: {js(over)}' if over else '') + ' },')
 L.append('};')
+# grown-ups: the same pieces re-drawn on the longer body (parts.grow)
+L.append(f'/** Grown-up build: body-space art re-drawn {ADULT_GROW}px taller (head unchanged). */')
+L.append(f'export const ADULT_GROW = {ADULT_GROW};')
+L.append(f'export const ADULT_WAIST = {round(grow_y(484))};')
+L.append(f'export const ART_ADULT_BODY = {js(grow(BODY))};')
+L.append(f'export const ART_ADULT_TEE = {js(grow(BASIC_TEE))};')
+L.append(f'export const ART_ADULT_SHORTS = {js(grow(BASIC_SHORTS))};')
+L.append('export const ART_ADULT_GARMENTS: Record<string, { svg: string; over?: string }> = {')
+for k, (kind, lab, s, over) in GARMENTS.items():
+    L.append(f'  {js(k)}: {{ svg: {js(grow(s))}' + (f', over: {js(grow(over))}' if over else '') + ' },')
+L.append('};')
 # a ready-made picture of the default character, for places that need an image file
 d = dict(tone=1, face='girl', hair='long', hairColor='darkbrown', eyes='brown', top='pink-hoodie', bottom='jeans', shoes='white-sneakers')
 pic = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -60 384 780">{compose(d)}</svg>'
 import urllib.parse
 L.append(f'export const ART_DEFAULT_PIC = {js("data:image/svg+xml;charset=utf-8," + urllib.parse.quote(pic))};')
-open('/home/claude/careertown/src/data/dollArt.ts', 'w').write('\n'.join(L) + '\n')
-print('ok', os.path.getsize('/home/claude/careertown/src/data/dollArt.ts') // 1024, 'KB')
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'src', 'data', 'dollArt.ts')
+open(OUT, 'w').write('\n'.join(L) + '\n')
+print('ok', os.path.getsize(OUT) // 1024, 'KB')

@@ -68,6 +68,8 @@ export interface DollLook {
   shoes: string | null;
   teeColor?: string;            // the plain tee underneath
   shortsColor?: string;
+  /** Grown-up build: same head, longer body (dollArt ART_ADULT_*). */
+  adult?: boolean;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';
