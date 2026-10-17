@@ -194,7 +194,7 @@ export function Shop({ onClose }: { onClose: () => void }) {
           );
         })}
       </div>
-      <p className="font-body text-ink/70 mt-3 text-sm">Decorations appear in “My stuff” at home. Outfits appear in the closet. Pet accessories are in your Career Passport.</p>
+      <p className="font-body text-ink/70 mt-3 text-sm">Decorations appear in “My stuff” at home. Pet accessories are in your Career Passport.</p>
     </Modal>
   );
 }

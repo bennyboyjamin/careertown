@@ -25,7 +25,7 @@ function GrownUpGate({ onPass, onClose }: { onPass: () => void; onClose: () => v
       <p className="font-display text-2xl font-bold text-ink mt-1">What is {WORDS[q.a]} times {WORDS[q.b]}?</p>
       <div className="font-display text-3xl text-ink text-center h-12 mt-2 rounded-xl border-[3px] border-ink bg-white grid place-items-center">{typed || ' '}</div>
       {wrong && <p className="font-body mt-1" style={{ color: '#E5476F' }}>Not quite. Try again.</p>}
-      <div className="grid grid-cols-5 gap-2 mt-3">
+      <div className="gap-2 mt-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
         {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map((d) => (
           <button key={d} onClick={() => press(d)} className="h-12 rounded-xl border-[3px] border-ink bg-sky/30 font-display text-xl font-bold text-ink">{d}</button>
         ))}

@@ -31,5 +31,5 @@ export const STYLE_PACK_FRIENDS: CharacterData[] = [
   friend('lily', 'Lily', { base: 'kid', tone: 0, hair: 'longwaves', hairColor: 'brown', top: 'white-pink-puff-top', bottom: 'cream-ruffle-skirt', shoes: 'pink-chunky-sneakers', acc: { bag: 'bunny-bag' } }),
   friend('maya', 'Maya', { base: 'kid', tone: 1, hair: 'long', hairColor: 'black', top: 'denim-corset', bottom: 'star-baggy-jeans', shoes: 'blue-high-tops', acc: {} }),
   friend('rosie', 'Rosie', { base: 'kid', tone: 1, hair: 'braids', hairColor: 'black', top: 'pink-heart-cami', bottom: 'navy-pleated-skirt', shoes: 'black-combat-boots', acc: { bag: 'backpack' } }),
-  friend('ivy', 'Ivy', { base: 'kid', tone: 1, hair: 'messy', hairColor: 'brown', top: 'white-butterfly-sweater', bottom: 'pink-cargos', shoes: 'white-platform-sneakers', acc: {} }),
+  friend('ivy', 'Ivy', { base: 'kid', tone: 1, hair: 'spacebuns', hairColor: 'darkbrown', top: 'white-butterfly-sweater', bottom: 'pink-cargos', shoes: 'white-platform-sneakers', acc: {} }),
 ];
