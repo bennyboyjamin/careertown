@@ -42,7 +42,7 @@ export const BUILDINGS: BuildingDef[] = [
   { id: 'fishing', name: 'Fishing', icon: '🎣', playable: false, x: 365, y: 870, w: 150, wall: '#CDEFFF', roof: '#3D7BFF', shape: 'shop', rooms: [], missions: [] },
   { id: 'playground', name: 'Playground', icon: '🛝', playable: false, x: 635, y: 880, w: 150, wall: '#FFE08A', roof: '#FF5D8F', shape: 'shop', rooms: [], missions: [] },
   { id: 'nature-trail', name: 'Nature Trail', icon: '🌲', playable: false, x: 880, y: 890, w: 150, wall: '#D4F7E8', roof: '#5FB894', shape: 'house', rooms: [], missions: [] },
-  { id: 'kpop', name: 'K-pop Training Academy', icon: '🎵', playable: false, x: 640, y: 610, w: 150, wall: '#F3DDFF', roof: '#C77DFF', shape: 'lab', rooms: [], missions: [] },
+  { id: 'kpop', name: 'K-pop Training Academy', icon: '🎵', playable: false, x: 640, y: 610, w: 150, wall: '#F3DDFF', roof: '#C77DFF', shape: 'lab', rooms: [], missions: ['kpop-star'] },
   { id: 'bank', name: 'Bank', icon: '🏦', playable: false, x: 925, y: 280, w: 120, wall: '#EFEFEF', roof: '#8E8E9A', shape: 'civic', rooms: [], missions: [] },
 ];
 

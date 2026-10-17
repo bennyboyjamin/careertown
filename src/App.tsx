@@ -17,6 +17,7 @@ import { DoctorMission } from './missions/DoctorMission';
 import { VetMission } from './missions/VetMission';
 import { RobotMission } from './missions/RobotMission';
 import { ChefMission } from './missions/ChefMission';
+import { KpopMission } from './missions/KpopMission';
 import { Person } from './components/Person';
 import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
@@ -29,6 +30,7 @@ const MISSION_VIEWS: Record<string, (p: { onExit: () => void }) => ReactElement>
   'vet-checkup': VetMission,
   'software-robot': RobotMission,
   'chef-pizza': ChefMission,
+  'kpop-star': KpopMission,
 };
 
 function Game() {
@@ -56,12 +58,13 @@ function Game() {
   let body: ReactElement;
   switch (screen.name) {
     case 'map': body = <TownMap onEnter={enter} onVisit={(id) => setScreen({ name: 'visit', id })} />; break;
-    case 'visit': body = <VisitScreen key={screen.id} id={screen.id} onBack={() => setScreen({ name: 'map' })} />; break;
+    case 'visit': body = <VisitScreen key={screen.id} id={screen.id} onBack={() => setScreen({ name: 'map' })} onMission={(m) => setScreen({ name: 'mission', id: m })} />; break;
     case 'building': body = <BuildingScreen id={screen.id} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'scene': body = <SceneScreen key={screen.sceneId} sceneId={screen.sceneId} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'mission': {
       const View = MISSION_VIEWS[screen.id];
-      const back = () => setScreen({ name: 'building', id: MISSIONS[screen.id].building });
+      const bid = MISSIONS[screen.id].building;
+      const back = () => setScreen(building(bid).playable ? { name: 'building', id: bid } : { name: 'visit', id: bid });
       body = <View key={screen.id} onExit={back} />; break;
     }
     case 'creator': body = <CharacterCreator editId={screen.editId} onDone={() => setScreen({ name: 'map' })} />; break;

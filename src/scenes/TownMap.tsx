@@ -86,7 +86,7 @@ export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => voi
                 {b.icon} {b.name}
               </span>}
               {!b.playable && !TOWNFOLK[b.id] && <span className="absolute rounded-full border-ink bg-lilac text-white font-display font-bold rotate-6" style={{ top: '6%', right: '4%', fontSize: '1.2cqw', padding: '0 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>Soon</span>}
-              {b.playable && b.missions.some((m) => !game.completedMissions[m]) && <span className="mission-dot absolute rounded-full bg-berry border-ink grid place-items-center text-white font-display font-extrabold" style={{ top: '6%', left: '6%', width: '2.4cqw', height: '2.4cqw', fontSize: '1.5cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>!</span>}
+              {(b.playable || TOWNFOLK[b.id]) && b.missions.some((m) => !game.completedMissions[m]) && <span className="mission-dot absolute rounded-full bg-berry border-ink grid place-items-center text-white font-display font-extrabold" style={{ top: '6%', left: '6%', width: '2.4cqw', height: '2.4cqw', fontSize: '1.5cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>!</span>}
             </button>
           );
         })}
