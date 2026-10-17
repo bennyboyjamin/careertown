@@ -129,6 +129,7 @@ for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
 HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38)), 'dadshort': ('adult', dict(w=530, cx=512, top=12), (47, 40, 38)),
               'scrunchieponytail': ('kid', dict(w=1027, cx=594, top=-62), (79, 47, 39)),
               'sleekbob': ('adult', dict(w=740, cx=512, top=-50), (87, 54, 44)),
+              'lowbun': ('adult', dict(w=700, cx=482, top=-40), (88, 54, 44)),
               'boyshort': ('kid', dict(w=600, cx=512, top=200), (67, 54, 53))}
 for style, (drawn_on, fit, ref) in HAIR_LOOSE.items():
     img, bb = trim(load(os.path.join(SRC, 'hair-loose', style + '.png'))); kb = fit_box(bb, **fit)
