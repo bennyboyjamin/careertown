@@ -6,6 +6,7 @@ import { PAPER_BASES } from '../data/paperArt';
 import { PaperArt } from './Paper';
 import { useGame } from '../engine/store';
 import { sfx } from '../engine/sfx';
+import { NpcChat } from './NpcChat';
 
 const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
 
@@ -16,12 +17,14 @@ export function Worker({ building }: { building: BuildingId }) {
   const w = WORKERS[building] ?? (t ? { name: t.name, job: t.job, look: t.look, lines: [t.hello, t.fact, 'Try it: bring your friends in and play! Tap things to see what they do.'] } : undefined);
   const { game, dispatch } = useGame();
   const [line, setLine] = useState<number | null>(null);
+  const [chat, setChat] = useState(false);
+  const [cheeky, setCheeky] = useState(false);
   useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
   if (!w) return null;
   const aspect = PAPER_BASES[w.look.base].canvas[2] / PAPER_BASES[w.look.base].canvas[3];
   const tap = () => {
     sfx('pop');
-    if (line === w.lines.length - 1) { setLine(null); return; }   // “Bye!”
+    if (line === w.lines.length - 1) { setLine(null); setChat(false); setCheeky(false); return; }   // “Bye!”
     const next = line === null ? 0 : line + 1;
     setLine(next);
     // listened to everything: a small thank-you, once per building
@@ -38,7 +41,7 @@ export function Worker({ building }: { building: BuildingId }) {
   return (
     <div className="worker absolute" style={{ right: '1.5%', bottom: '10%', height: '58%', aspectRatio: String(aspect), zIndex: 25 }}>
       <button aria-label={`Talk to ${w.name}`} onClick={tap} className="worker-btn w-full h-full">
-        <PaperArt p={w.look} face={line === null ? 'happy' : line % 2 ? 'giggle' : 'laughing'} />
+        <PaperArt p={w.look} face={cheeky ? 'silly' : line === null ? 'happy' : line % 2 ? 'giggle' : 'laughing'} />
       </button>
       {line === null
         ? <span className="worker-tag">💬 {w.name}</span>
@@ -50,9 +53,11 @@ export function Worker({ building }: { building: BuildingId }) {
               <button onClick={tap} className="rounded-xl border-[3px] border-ink bg-sun px-3 h-9 font-display font-bold text-ink text-sm">
                 {line === w.lines.length - 1 ? 'Bye!' : 'Tell me more'}
               </button>
+              <button onClick={() => { sfx('tap'); setChat(!chat); }} aria-pressed={chat} className="rounded-xl border-[3px] border-ink bg-white px-2 h-9 font-display font-bold text-ink text-sm">💬 Chat</button>
               {canSpeak() && <button aria-label="Read to me" onClick={read} className="rounded-xl border-[3px] border-ink bg-white h-9 w-9">🔊</button>}
               <span className="font-body text-ink/70" style={{ marginLeft: 'auto', fontSize: 12 }}>{line + 1}/{w.lines.length}</span>
             </div>
+            {chat && <NpcChat npc={{ name: w.name, job: w.job, fact: w.lines[1] ?? w.lines[0] }} onMood={(m) => setCheeky(m === 'cheeky')} />}
           </div>
         )}
     </div>

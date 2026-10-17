@@ -19,6 +19,7 @@ import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
 import { MISSIONS } from '../data/missions';
 import { Worker } from '../components/Worker';
+import { Visitors } from '../components/Visitors';
 import { useDayPhase } from '../engine/dayPhase';
 import { PhotoMode } from '../components/PhotoMode';
 
@@ -125,6 +126,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
       )}
 
       <Worker building={b.id} />
+      <Visitors building={b.id} />
       {photo && <PhotoMode title={b.rooms.find((r) => r.sceneId === sceneId)?.label ?? b.name} onClose={() => setPhoto(false)} />}
 
       {wardrobe && <WardrobeSheet characterId={wardrobe} onClose={() => setWardrobe(null)} />}

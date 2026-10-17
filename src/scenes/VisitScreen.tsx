@@ -8,6 +8,8 @@ import { PaperArt } from '../components/Paper';
 import { useGame } from '../engine/store';
 import { sfx } from '../engine/sfx';
 import { Btn } from '../ui/kit';
+import { NpcChat } from '../components/NpcChat';
+import { Visitors } from '../components/Visitors';
 import townArt from '../assets/town/town-map.webp';
 import { SPOTS, IMG_W, IMG_H } from './TownMap';
 
@@ -28,6 +30,9 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
   const b = building(id); const t = TOWNFOLK[id]!;
   const [step, setStep] = useState<Step>('hello');
   const [found, setFound] = useState<number[]>([]);
+  const [chat, setChat] = useState(false);
+  const [cheeky, setCheeky] = useState(false);
+  const [closeKids, setCloseKids] = useState(0);
   useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
 
   // the place's own piece of the town picture, zoomed out a little so there's room to search
@@ -69,7 +74,7 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
       {/* the town person */}
       <button aria-label={`Talk to ${t.name}`} onClick={() => { sfx('pop'); if (step === 'hello') setStep('fact'); }}
         className="visit-person absolute" style={{ left: '3%', bottom: '2%', height: '78%', aspectRatio: String(aspect) }}>
-        <PaperArt p={t.look} face={step === 'done' ? 'laughing' : step === 'find' ? 'happy' : 'giggle'} />
+        <PaperArt p={t.look} face={cheeky ? 'silly' : step === 'done' ? 'laughing' : step === 'find' ? 'happy' : 'giggle'} />
       </button>
 
       {/* speech bubble */}
@@ -83,13 +88,17 @@ export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId;
           {canSpeak() && <button aria-label="Read to me" onClick={() => say(line)} className="shrink-0 h-11 w-11 rounded-2xl border-[3px] border-ink bg-white shadow-chunkysm">🔊</button>}
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
+          <Btn tone="white" onClick={() => { sfx('tap'); if (!chat) setCloseKids((k) => k + 1); setChat(!chat); }}>💬 Chat</Btn>
           {step === 'hello' && <Btn tone="sun" onClick={() => setStep('fact')}>What do you do?</Btn>}
           {onPlay && b.rooms[0] && <Btn tone="sky" onClick={() => onPlay(b.rooms[0].sceneId)}>🧸 Free play</Btn>}
           {onMission && b.missions.map((m) => <Btn key={m} tone="berry" onClick={() => onMission(m)}>⭐ {MISSIONS[m].title}</Btn>)}
           {step === 'fact' && <Btn tone="mint" onClick={() => { setFound([]); setStep('find'); }}>Can I help?</Btn>}
           {step === 'done' && <><Btn tone="mint" onClick={again}>Play again</Btn><Btn tone="white" onClick={onBack}>Back to town</Btn></>}
         </div>
+        {chat && <NpcChat npc={{ name: t.name, job: t.job, fact: t.fact }} onMood={(m) => setCheeky(m === 'cheeky')} />}
       </div>
+
+      {step !== 'find' && <div className="absolute inset-0 pointer-events-none visit-kids" style={{ left: '22%' }}><Visitors building={id} closeKey={closeKids} onOpen={() => setChat(false)} /></div>}
 
       {/* things to find */}
       {step === 'find' && items.map((e, i) => (
