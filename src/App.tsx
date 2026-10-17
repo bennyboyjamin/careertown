@@ -98,7 +98,7 @@ function Game() {
   switch (screen.name) {
     case 'map': body = <TownMap onEnter={enter} onVisit={(id) => setScreen({ name: 'visit', id })} onPlaydate={() => setScreen({ name: 'playdate' })} />; break;
     case 'playdate': body = <Playdate onBack={() => setScreen({ name: 'map' })} />; break;
-    case 'visit': body = <VisitScreen key={screen.id} id={screen.id} onBack={() => setScreen({ name: 'map' })} onMission={(m) => setScreen({ name: 'mission', id: m })} />; break;
+    case 'visit': body = <VisitScreen key={screen.id} id={screen.id} onBack={() => setScreen({ name: 'map' })} onMission={(m) => setScreen({ name: 'mission', id: m })} onPlay={(sceneId) => setScreen({ name: 'scene', sceneId })} />; break;
     case 'building': body = <BuildingScreen id={screen.id} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'scene': body = <SceneScreen key={screen.sceneId} sceneId={screen.sceneId} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'mission': {

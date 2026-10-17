@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { BuildingId } from '../engine/types';
 import { WORKERS } from '../data/workers';
+import { TOWNFOLK } from '../data/townfolk';
 import { PAPER_BASES } from '../data/paperArt';
 import { PaperArt } from './Paper';
 import { useGame } from '../engine/store';
@@ -10,7 +11,9 @@ const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in win
 
 /** The person who works in this building: stands in the room; tap to hear about their job (one line per tap). */
 export function Worker({ building }: { building: BuildingId }) {
-  const w = WORKERS[building];
+  const t = TOWNFOLK[building];
+  // places without a worker use their town person (hello + what the job is like)
+  const w = WORKERS[building] ?? (t ? { name: t.name, job: t.job, look: t.look, lines: [t.hello, t.fact, 'Try it: bring your friends in and play! Tap things to see what they do.'] } : undefined);
   const { game, dispatch } = useGame();
   const [line, setLine] = useState<number | null>(null);
   useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);

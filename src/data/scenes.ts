@@ -7,6 +7,7 @@ import artClassroom from '../assets/rooms/school-classroom.webp';
 import artHospital from '../assets/rooms/hospital-exam.webp';
 import artCourt from '../assets/rooms/courthouse-room.webp';
 import artEngineering from '../assets/rooms/engineering-lab.webp';
+import artKpop from '../assets/rooms/kpop-studio.webp';
 import artVet from '../assets/rooms/vet-clinic.webp';
 
 export interface SceneDef {
@@ -19,6 +20,8 @@ export interface SceneDef {
   horizon: number; // y where wall meets floor
   /** Painted background (wide image: the room is the middle 1/1.6, the sides extend it for wide screens). */
   art?: string;
+  /** Outdoor places: sky, ground and scenery drawn by RoomBackdrop. */
+  outdoor?: 'beach' | 'park' | 'dock' | 'playground' | 'trail';
   /** Things painted into the art: [x, y, w, h] in room units. `hide` = don't draw our own picture of it. */
   anchors?: Partial<Record<string, { box?: [number, number, number, number]; hide?: boolean }>>;
 }
@@ -37,6 +40,15 @@ export const SCENES: Record<SceneId, SceneDef> = {
   'vet-clinic': { id: 'vet-clinic', label: 'Pet clinic', wall: '#D4F7E8', wallPattern: 'dots', floor: '#FFE3B3', floorPattern: 'checker', horizon: 450, art: artVet, anchors: { window: { box: [250, 130, 370, 250], hide: true }, pawposter: { hide: true } } },
   'restaurant-kitchen': { id: 'restaurant-kitchen', label: 'Café kitchen', wall: '#FFE3D1', wallPattern: 'tiles', floor: '#E9B98F', floorPattern: 'checker', horizon: 460 },
   'tech-lab': { id: 'tech-lab', label: 'Coding lab', wall: '#DCE6FF', wallPattern: 'grid', floor: '#B7C6D6', floorPattern: 'tiles', horizon: 440 },
+  'beach-shore': { id: 'beach-shore', label: 'Beach', wall: '#8FD8FF', wallPattern: 'plain', floor: '#FFE3A3', floorPattern: 'carpet', horizon: 430, outdoor: 'beach' },
+  'park-lawn': { id: 'park-lawn', label: 'Park', wall: '#A8E3FF', wallPattern: 'plain', floor: '#8FD46B', floorPattern: 'carpet', horizon: 440, outdoor: 'park' },
+  'fishing-dock': { id: 'fishing-dock', label: 'Fishing dock', wall: '#9EDCFF', wallPattern: 'plain', floor: '#B98258', floorPattern: 'boards', horizon: 450, outdoor: 'dock' },
+  'playground-yard': { id: 'playground-yard', label: 'Playground', wall: '#A8E3FF', wallPattern: 'plain', floor: '#F2C48D', floorPattern: 'carpet', horizon: 440, outdoor: 'playground' },
+  'trail-woods': { id: 'trail-woods', label: 'Nature trail', wall: '#B6E6FF', wallPattern: 'plain', floor: '#7DBF6A', floorPattern: 'carpet', horizon: 450, outdoor: 'trail' },
+  'cafe-room': { id: 'cafe-room', label: 'Cafe', wall: '#FFE3D1', wallPattern: 'stripes', floor: '#C98F63', floorPattern: 'boards', horizon: 450 },
+  'shop-floor': { id: 'shop-floor', label: 'Clothes shop', wall: '#FFE0F0', wallPattern: 'dots', floor: '#F6E8F0', floorPattern: 'tiles', horizon: 450 },
+  'bank-hall': { id: 'bank-hall', label: 'Bank', wall: '#EEF0F6', wallPattern: 'panels', floor: '#D9D2C3', floorPattern: 'checker', horizon: 450 },
+  'kpop-studio': { id: 'kpop-studio', label: 'Dance studio', wall: '#F3DDFF', wallPattern: 'plain', floor: '#E8B47E', floorPattern: 'boards', horizon: 470, art: artKpop },
   'engineering-lab': { id: 'engineering-lab', label: 'Workshop', wall: '#D8EEFF', wallPattern: 'grid', floor: '#9AA6B8', floorPattern: 'checker', horizon: 450, art: artEngineering, anchors: { window: { box: [300, 130, 300, 240], hide: true } } },
 };
 
@@ -148,6 +160,36 @@ function baseScene(id: SceneId): Entity[] {
         it('computer', 360, 600, { on: true }), it('computer', 660, 600), it('chair', 250, 650), it('chair', 770, 650),
         it('robot', 900, 660), it('keyboard', 520, 680), it('headset', 160, 680), it('floppy', 600, 690),
       ];
+    case 'beach-shore':
+      return [it('umbrella', 200, 520), it('sandcastle', 760, 600), it('palm', 40, 520), it('towel', 420, 640), it('shell', 560, 680), it('crab', 860, 690), it('volleyball', 320, 690), it('bucket', 640, 690), it('icecream', 120, 690)];
+    case 'park-lawn':
+      return [it('tree', 120, 500), it('fountain', 520, 500), it('tree', 900, 500), it('bench', 300, 600), it('picnic', 720, 640), it('flowers', 420, 690), it('frisbee', 580, 690), it('kite', 860, 600), it('bird', 640, 460), it('ball', 200, 690)];
+    case 'fishing-dock':
+      return [it('boat', 260, 540), it('fishrod', 520, 640), it('bucket', 620, 680), it('fish', 720, 690), it('fish', 780, 700), it('duck', 900, 640), it('bench', 120, 620), it('tacklebox', 400, 690)];
+    case 'playground-yard':
+      return [it('slide', 230, 560), it('carousel', 760, 560), it('tree', 960, 480), it('ball', 420, 690), it('basketball', 520, 695), it('jumprope', 620, 690), it('sandbucket', 860, 690), it('bench', 470, 600)];
+    case 'trail-woods':
+      return [it('pine', 100, 480), it('pine', 300, 450), it('tent', 620, 530), it('pine', 920, 470), it('rock', 420, 640), it('mushroom', 520, 690), it('butterfly', 760, 480), it('squirrel', 860, 660), it('compass', 300, 690), it('trailmap', 680, 695), it('binoculars', 200, 690)];
+    case 'cafe-room': {
+      const table = it('table', 660, 610);
+      return [
+        it('window', 300, 240), it('counter', 160, 470), it('plant', 900, 540), table, it('chair', 500, 625), it('chair', 830, 625),
+        { ...it('cup', 620, 478), state: { on: table.id } }, { ...it('croissant', 700, 478), state: { on: table.id } },
+        it('cake', 120, 300), it('waffle', 360, 690), it('kettle', 230, 300), it('orderbell', 420, 690),
+      ];
+    }
+    case 'shop-floor':
+      return [
+        it('mirror', 520, 280), it('rug', 500, 660), it('dress', 160, 560), it('tshirt', 280, 560), it('handbag', 740, 560), it('sneaker', 860, 580),
+        it('cap', 640, 680), it('shoppingbag', 380, 690), it('piggybank', 920, 690), it('plant', 60, 600),
+      ];
+    case 'bank-hall':
+      return [
+        it('window', 250, 240), it('lawtable', 520, 560), it('safe', 330, 530), it('plant', 120, 600), it('piggybank', 400, 690),
+        it('coins', 600, 690), it('moneybag', 700, 690), it('chair', 760, 640), it('photo', 700, 280),
+      ];
+    case 'kpop-studio':
+      return [it('kp-mic', 380, 690), it('kp-lightstick', 520, 690), it('kp-trophy', 660, 690), it('kp-folder', 240, 690), it('guitar', 800, 690), it('drum', 900, 690), it('kp-bottle', 120, 690)];
     case 'engineering-lab': {
       const bench = it('workbench', 300, 570);
       return [
