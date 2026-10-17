@@ -106,4 +106,5 @@ export const FAMILY_PAPER: Record<string, PaperLook> = {
   yuna: { base: 'kid', tone: 2, hair: 'wavy', hairColor: 'black', top: 'red-hoodie', bottom: 'wide-jeans', shoes: 'red-sneakers', acc: {} },
   nene: { base: 'preschool', tone: 2, hair: 'bob', hairColor: 'black', top: 'bunny-dress', bottom: null, shoes: 'bow-shoes', acc: {} },
   mom: { base: 'adult', tone: 2, hair: 'momwaves', hairColor: 'black', top: 'mom-cream-cardigan', bottom: 'mom-blue-jeans', shoes: 'mom-white-sneakers', acc: {} },
+  dad: { base: 'adult', tone: 2, hair: 'dadshort', hairColor: 'black', top: 'dad-navy-hoodie', bottom: 'dad-blue-jeans', shoes: 'dad-brown-loafers', acc: {} },
 };

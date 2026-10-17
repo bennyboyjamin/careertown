@@ -9,6 +9,7 @@ import { Btn, Coin, Face, Modal } from '../ui/kit';
 import { PetPic } from '../components/Person';
 import { PET_LOOKS } from '../data/accessories';
 import { sfx } from '../engine/sfx';
+import { StylePackCard } from '../components/StylePack';
 
 export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onScene: (s: SceneId) => void; onMission: (m: string) => void }) {
   const { game } = useGame();
@@ -155,7 +156,7 @@ export function Passport() {
 
         <section className="rounded-[28px] border-[4px] border-dashed border-ink/50 p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold text-ink">For grown-ups</h2>
-          <p className="font-body text-ink/80 mt-1">CareerTown saves progress only on this device. There are no chats, ads, real purchases or sharing. Career suggestions describe what a child enjoyed, never what they should become.</p>
+          <p className="font-body text-ink/80 mt-1">CareerTown saves progress only on this device. There are no chats, ads or sharing. In the iPhone and iPad app, a grown-up can buy the optional Style Pack after a grown-ups check; everything else is free. Career suggestions describe what a child enjoyed, never what they should become.</p>
           <Btn tone="white" className="mt-3" onClick={() => setConfirmReset(true)}>Start over</Btn>
         </section>
       </div>
@@ -173,6 +174,7 @@ export function Shop({ onClose }: { onClose: () => void }) {
   const { game, dispatch } = useGame();
   return (
     <Modal title="Town Shop" onClose={onClose} wide>
+      <StylePackCard />
       <p className="font-body text-ink/80 -mt-1 mb-3 flex items-center gap-2">Spend pretend coins you earned. You have <Coin /> <b>{game.coins}</b></p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {SHOP.map((s) => {

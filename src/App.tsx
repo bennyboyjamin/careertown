@@ -1,4 +1,6 @@
-import { useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
+import { refreshOwned, useOwned } from './engine/iap';
+import { STYLE_PACK, STYLE_PACK_FRIENDS } from './data/stylePack';
 import type { BuildingId, Screen } from './engine/types';
 import { GameProvider, useGame } from './engine/store';
 import { building } from './data/buildings';
@@ -32,6 +34,10 @@ function Game() {
   const { game, dispatch } = useGame();
   const [screen, setScreen] = useState<Screen>({ name: 'map' });
   const [shop, setShop] = useState(false);
+  // Style Pack (bought in the iPhone/iPad app): check with Apple at launch; the friends join each save once.
+  const stylePack = useOwned(STYLE_PACK.productId);
+  useEffect(() => { refreshOwned(); }, []);
+  useEffect(() => { if (stylePack) dispatch({ type: 'ADD_CHARACTERS', characters: STYLE_PACK_FRIENDS, mark: 'pack:style-friends' }); }, [stylePack, dispatch]);
 
   const enter = (id: BuildingId) => {
     const b = building(id);

@@ -66,7 +66,11 @@ export function addStarterPack(g: GameState): GameState {
     g = { ...g, owned: [...g.owned, 'pack:paper-family-1'],
       characters: g.characters.map((c) => (c.sprite && FAMILY_PAPER[c.sprite] && !c.paper ? { ...c, paper: { ...FAMILY_PAPER[c.sprite] } } : c)) };
   }
-  // Mom joins the YunaVerse style (Oct 2026).
+  if (!g.owned.includes('pack:paper-dad-1')) {
+    g = { ...g, owned: [...g.owned, 'pack:paper-dad-1'],
+      characters: g.characters.map((c) => (c.sprite === 'dad' && !c.paper ? { ...c, paper: { ...FAMILY_PAPER.dad } } : c)) };
+  }
+  // Mom and Dad join the YunaVerse style (Oct 2026).
   if (!g.owned.includes('pack:paper-mom-1')) {
     g = { ...g, owned: [...g.owned, 'pack:paper-mom-1'],
       characters: g.characters.map((c) => (c.sprite === 'mom' && !c.paper ? { ...c, paper: { ...FAMILY_PAPER.mom } } : c)) };
@@ -151,6 +155,7 @@ export type Action =
   | { type: 'DISMISS_POPUP' }
   | { type: 'TOAST'; text: string }
   | { type: 'OWN'; id: string }
+  | { type: 'ADD_CHARACTERS'; characters: CharacterData[]; mark: string }
   | { type: 'RESET' };
 
 export const sceneOf = (g: GameState, id: SceneId): Entity[] => g.scenes[id] ?? initialScene(id);
@@ -296,6 +301,11 @@ function reducer(root: Root, a: Action): Root {
     case 'SEEN_INTRO': return { ...root, game: { ...g, seenIntro: true } };
     case 'DISMISS_POPUP': return { ...root, queue: root.queue.slice(1) };
     case 'TOAST': return { ...root, toast: { id: uid('t'), text: a.text } };
+    case 'ADD_CHARACTERS': {
+      if (g.owned.includes(a.mark)) return root;
+      const fresh = a.characters.filter((c) => !g.characters.some((x) => x.id === c.id));
+      return { ...root, game: { ...g, owned: [...g.owned, a.mark], characters: [...g.characters, ...fresh] } };
+    }
     case 'OWN': return g.owned.includes(a.id) ? root : { ...root, game: { ...g, owned: [...g.owned, a.id] } };
     case 'RESET': return { game: freshGame(), queue: [] };
   }

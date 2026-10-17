@@ -126,7 +126,7 @@ for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
                'at': {b: place(hair_fit(style, bb), transform(heads[drawn_on], heads[b])) for b in BASES}}
 
 # one-piece hairstyles drawn loose: fitted onto one head (w = width, top = top edge), drawn over the face (front only)
-HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38))}
+HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38)), 'dadshort': ('adult', dict(w=530, cx=512, top=12), (47, 40, 38))}
 for style, (drawn_on, fit, ref) in HAIR_LOOSE.items():
     img, bb = trim(load(os.path.join(SRC, 'hair-loose', style + '.png'))); kb = fit_box(bb, **fit)
     box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
@@ -171,11 +171,19 @@ for p in sorted(glob.glob(os.path.join(SRC, 'accessories', '*.png'))):
 TOP_FIT = {'w': 440, 'top': 700}
 TOP_FIT_EACH = {'heart-crop-tee': dict(w=420, top=724), 'jersey-23': dict(w=410, top=722), 'fairy-dress': dict(w=430, top=724),
                 'cream-top': dict(w=440, top=724), 'bear-sweater': dict(w=450, top=716), 'tan-blazer': dict(w=455, top=712),
-                'pink-cardigan': dict(w=455, top=712)}
+                'pink-cardigan': dict(w=455, top=712),
+                # Style Pack: drawn on a smaller template (neck at y=735), all scaled x1.48 about the neck
+                **{t: dict(k=1.48, at=(512, 735, 712)) for t in ('black-star-tank', 'pink-heart-cami', 'denim-corset', 'pink-ruffle-cardigan', 'black-pink-zip-hoodie',
+                   'cream-bow-cardigan', 'pink-off-shoulder-sweater', 'white-butterfly-sweater', 'white-pink-puff-top', 'black-layered-top')}}
 # bottoms: ChatGPT draws long legs, so width follows the waist and length the ankles (on every body)
 BOTTOM_FIT = {'baggy-jeans': dict(w=340, top=975, bottom=1398), 'cargo-pants': dict(w=330, top=975, bottom=1396),
               'black-shorts': dict(w=300, top=975), 'lavender-skirt': dict(w=370, top=975), 'blue-skirt': dict(w=370, top=975),
-              'plaid-skirt': dict(w=370, top=975), 'overalls': dict(w=300, top=742)}
+              'plaid-skirt': dict(w=370, top=975), 'overalls': dict(w=300, top=742),
+              # Style Pack
+              'black-chain-cargos': dict(w=340, top=975, bottom=1398), 'olive-cargos': dict(w=340, top=975, bottom=1398),
+              'pink-cargos': dict(w=340, top=975, bottom=1398), 'star-baggy-jeans': dict(w=340, top=975, bottom=1398),
+              'black-belted-shorts': dict(w=320, top=970), 'ivory-ruffle-skirt': dict(w=370, top=975), 'cream-ruffle-skirt': dict(w=370, top=975),
+              'navy-pleated-skirt': dict(w=370, top=975), 'blue-lace-skirt': dict(w=370, top=975), 'pink-bow-skirt': dict(w=370, top=975)}
 OVER_TOP = {'overalls'}          # drawn over the top (bib and straps)
 # shoes: fitted to each body's own feet
 FEET = {}
@@ -204,7 +212,10 @@ for p in sorted(glob.glob(os.path.join(SRC, 'clothes-fit', '*.png'))):
             at[b] = [round(v) for v in fb]
         clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': at['kid'], 'atBase': at}
         continue
-    t = (BOTTOM_FIT if kind == 'bottom' else TOP_FIT_EACH).get(cid, TOP_FIT); kb = fit_box(bb, t['w'], 512, top=t['top'], bottom=t.get('bottom'))
+    t = (BOTTOM_FIT if kind == 'bottom' else TOP_FIT_EACH).get(cid, TOP_FIT)
+    if 'k' in t:   # already drawn in place on a template: scale about the neck (x0, y0) and move the neck to y1
+        k = t['k']; x0, y0, y1 = t['at']; kb = [x0 + (bb[0] - x0) * k, y1 + (bb[1] - y0) * k, (bb[2] - bb[0]) * k, (bb[3] - bb[1]) * k]
+    else: kb = fit_box(bb, t['w'], 512, top=t['top'], bottom=t.get('bottom'))
     box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
     clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': place(box, ident), 'overTop': cid in OVER_TOP,
                     'atBase': {b: (short_bottom(box, b) if kind == 'bottom' and 'bottom' not in t and cid not in OVER_TOP else place_xy(box, b) if kind == 'bottom'
@@ -220,6 +231,7 @@ ADULT_FIT = {
     'mom-blue-jeans': dict(w=330, top=845, bottom=1450), 'mom-black-trousers': dict(w=330, top=845, bottom=1450),
     'mom-gray-leggings': dict(w=375, top=845, bottom=1450), 'mom-beige-skirt': dict(w=390, top=845),
     'mom-white-sneakers': {}, 'mom-pink-flats': {},
+    'dad-navy-hoodie': dict(w=560, top=440), 'dad-blue-jeans': dict(w=335, top=845, bottom=1450), 'dad-brown-loafers': {},
 }
 SKIN = {'mom-pink-sweater', 'mom-striped-sweater', 'mom-pink-cardigan', 'mom-blue-bow-blouse', 'mom-pink-flats'}
 def hands_of(img):
@@ -276,7 +288,7 @@ for b in BASES:
 
 # canvas per base: everything that can be drawn on it, plus a little room
 for b in BASES:
-    boxes = [bases[b]['at']] + [f['at'][b] for f in faces.values()] + [h[p]['at'][b] for h in hair.values() for p in h] + [c['at'] for c in clothes.values() if c['base'] == b] + [c['atBase'][b] for c in clothes.values() if c['base'] == 'any' and b in c['atBase']] + [a['at'][b] for a in accessories.values()]
+    boxes = [bases[b]['at']] + [f['at'][b] for f in faces.values()] + [h[p]['at'][b] for s_, h in hair.items() for p in h if b != 'adult' or s_ in HAIR_LOOSE] + [c['at'] for c in clothes.values() if c['base'] == b] + [c['atBase'][b] for c in clothes.values() if c['base'] == 'any' and b in c['atBase']] + ([a['at'][b] for a in accessories.values()] if b != 'adult' else [])
     x0 = min(q[0] for q in boxes) - 6; y0 = min(q[1] for q in boxes) - 6
     x1 = max(q[0] + q[2] for q in boxes) + 6; y1 = bases[b]['feet'] + 8
     bases[b]['canvas'] = [x0, y0, x1 - x0, y1 - y0]
