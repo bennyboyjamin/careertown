@@ -28,8 +28,8 @@ const friend = (id: string, name: string, paper: PaperLook): CharacterData =>
 /** The five friends that come with the pack (wearing pack clothes). */
 export const STYLE_PACK_FRIENDS: CharacterData[] = [
   friend('jade', 'Jade', { base: 'kid', tone: 1, hair: 'ponytail', hairColor: 'darkbrown', top: 'black-star-tank', bottom: 'black-chain-cargos', shoes: 'white-platform-sneakers', acc: {} }),
-  friend('lily', 'Lily', { base: 'kid', tone: 0, hair: 'longwaves', hairColor: 'brown', top: 'pink-heart-cami', bottom: 'cream-ruffle-skirt', shoes: 'pink-chunky-sneakers', acc: { bag: 'bunny-bag' } }),
+  friend('lily', 'Lily', { base: 'kid', tone: 0, hair: 'longwaves', hairColor: 'brown', top: 'white-pink-puff-top', bottom: 'cream-ruffle-skirt', shoes: 'pink-chunky-sneakers', acc: { bag: 'bunny-bag' } }),
   friend('maya', 'Maya', { base: 'kid', tone: 1, hair: 'long', hairColor: 'black', top: 'denim-corset', bottom: 'star-baggy-jeans', shoes: 'blue-high-tops', acc: {} }),
-  friend('rosie', 'Rosie', { base: 'kid', tone: 1, hair: 'braids', hairColor: 'black', top: 'black-star-tank', bottom: 'navy-pleated-skirt', shoes: 'black-combat-boots', acc: { bag: 'backpack' } }),
-  friend('ivy', 'Ivy', { base: 'kid', tone: 1, hair: 'messy', hairColor: 'brown', top: 'pink-heart-cami', bottom: 'pink-cargos', shoes: 'white-platform-sneakers', acc: {} }),
+  friend('rosie', 'Rosie', { base: 'kid', tone: 1, hair: 'braids', hairColor: 'black', top: 'pink-heart-cami', bottom: 'navy-pleated-skirt', shoes: 'black-combat-boots', acc: { bag: 'backpack' } }),
+  friend('ivy', 'Ivy', { base: 'kid', tone: 1, hair: 'messy', hairColor: 'brown', top: 'white-butterfly-sweater', bottom: 'pink-cargos', shoes: 'white-platform-sneakers', acc: {} }),
 ];

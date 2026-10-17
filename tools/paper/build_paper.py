@@ -174,7 +174,10 @@ TOP_FIT_EACH = {'heart-crop-tee': dict(w=420, top=724), 'jersey-23': dict(w=410,
                 'pink-cardigan': dict(w=455, top=712),
                 # Style Pack: drawn on a smaller template (neck at y=735), all scaled x1.48 about the neck
                 **{t: dict(k=1.48, at=(512, 735, 712)) for t in ('black-star-tank', 'pink-heart-cami', 'denim-corset', 'pink-ruffle-cardigan', 'black-pink-zip-hoodie',
-                   'cream-bow-cardigan', 'pink-off-shoulder-sweater', 'white-butterfly-sweater', 'white-pink-puff-top', 'black-layered-top')}}
+                   'cream-bow-cardigan', 'pink-off-shoulder-sweater', 'white-butterfly-sweater', 'white-pink-puff-top', 'black-layered-top')},
+                # Style Pack tops redrawn one per picture (loose)
+                'black-layered-top': dict(w=500, top=745), 'white-pink-puff-top': dict(w=470, top=745), 'white-butterfly-sweater': dict(w=450, top=716),
+                'black-pink-zip-hoodie': dict(w=455, top=700), 'cream-bow-cardigan': dict(w=455, top=716), 'pink-off-shoulder-sweater': dict(w=455, top=716)}
 # bottoms: ChatGPT draws long legs, so width follows the waist and length the ankles (on every body)
 BOTTOM_FIT = {'baggy-jeans': dict(w=340, top=975, bottom=1398), 'cargo-pants': dict(w=330, top=975, bottom=1396),
               'black-shorts': dict(w=300, top=975), 'lavender-skirt': dict(w=370, top=975), 'blue-skirt': dict(w=370, top=975),
