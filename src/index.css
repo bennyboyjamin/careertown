@@ -418,3 +418,16 @@ body.photo-mode .hud-float, body.photo-mode .room-tabs, body.photo-mode .scene-a
 .gu-switch.on { background: #5FE0B7; } .gu-switch.on > span { left: 27px; }
 .gu-chip { height: 36px; padding: 0 12px; border-radius: 999px; border: 3px solid #2B2350; background: #fff; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; color: #2B2350; }
 .gu-chip.on { background: #FFC93C; }
+/* Nearby playdates (scenes/Playdate.tsx). */
+.playdate-btn { position: fixed; right: 10px; bottom: 10px; z-index: 40; height: 48px; padding: 0 12px; display: flex; align-items: center; gap: 6px; font-size: 18px; }
+.playdate-room { background-size: cover; background-position: center; border-top: 4px solid #2B2350; touch-action: none; }
+.playdate-char { position: absolute; transform: translate(-50%, -100%); touch-action: none; }
+.playdate-char.mine { cursor: grab; }
+.playdate-name { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 3px solid #2B2350; border-radius: 999px; padding: 0 10px; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; font-size: 14px; color: #2B2350; }
+.playdate-char.mine .playdate-name { background: #FFC93C; }
+.playdate-emote { position: absolute; left: 50%; top: -6%; transform: translateX(-50%); font-size: 48px; animation: playdate-emote 2.2s ease-out forwards; pointer-events: none; }
+@keyframes playdate-emote { 0% { transform: translate(-50%, 20px) scale(.4); opacity: 0; } 15% { transform: translate(-50%, 0) scale(1.15); opacity: 1; } 80% { opacity: 1; } 100% { transform: translate(-50%, -30px); opacity: 0; } }
+.playdate-emote-btn { width: 44px; height: 44px; border-radius: 14px; border: 3px solid #2B2350; background: #fff; font-size: 22px; box-shadow: 0 3px 0 #2B2350; }
+.playdate-toy { position: absolute; transform: translate(-50%, -50%); font-size: clamp(34px, 6vmin, 56px); line-height: 1; touch-action: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,.2)); z-index: 90; }
+.playdate-wait { position: absolute; right: 8%; bottom: 30%; background: #fff; border: 3px solid #2B2350; border-radius: 999px; padding: 4px 14px; font-family: Lexend, ui-rounded, system-ui, sans-serif; color: #2B2350; }
+.playdate-looking span { animation: twinkle 1s infinite alternate; } .playdate-looking span:nth-child(2) { animation-delay: .3s; } .playdate-looking span:nth-child(3) { animation-delay: .6s; }
