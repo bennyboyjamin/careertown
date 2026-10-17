@@ -3,15 +3,17 @@ import type { Mood } from './art/Character';
 import type { Face } from '../data/sprites';
 import { PAPER_BASES, PAPER_FACES, PAPER_HAIR, PAPER_CLOTHES, PAPER_ACCESSORIES, type Box, type PaperBase } from '../data/paperArt';
 
+/** Kids' clothes ('any') fit both kid bodies; grown-up clothes only the adult body. */
+const fits = (c: PaperBase | 'any', b: PaperBase) => c === b || (c === 'any' && b !== 'adult');
 /** Where a piece sits on this body (some clothes have one box per body). */
 export function clothBox(id: string, base: PaperBase): Box | undefined {
   const c = PAPER_CLOTHES[id];
-  if (!c || (c.base !== 'any' && c.base !== base)) return undefined;
+  if (!c || !fits(c.base, base)) return undefined;
   return c.atBase?.[base] ?? c.at;
 }
 /** Clothes this body can wear. */
 export const paperClothesFor = (base: PaperBase, kind: 'top' | 'bottom' | 'shoes') =>
-  Object.entries(PAPER_CLOTHES).filter(([, c]) => c.kind === kind && (c.base === 'any' || c.base === base)).map(([id]) => id);
+  Object.entries(PAPER_CLOTHES).filter(([, c]) => c.kind === kind && fits(c.base, base)).map(([id]) => id);
 
 /** Which drawn face to show for what the character is doing. */
 export function paperFace(mood: Mood | undefined, face: Face): string {
@@ -47,8 +49,13 @@ export function PaperArt({ p, face = 'happy' }: { p: PaperLook; face?: string })
   const hair = p.hair ? PAPER_HAIR[p.hair] : undefined;
   const hc = (part: 'front' | 'back') => (hair?.[part] ? hair[part].src[p.hairColor] ?? Object.values(hair[part].src)[0] : undefined);
   const acc = (slot: string) => { const id = p.acc?.[slot as keyof NonNullable<PaperLook['acc']>]; return id ? PAPER_ACCESSORIES[id] : undefined; };
-  const skin = B.src[Math.max(0, Math.min(B.src.length - 1, p.tone | 0))];
-  const cloth = (id: string | null | undefined) => { const at = id ? clothBox(id, p.base) : undefined; return at ? <Piece key={id!} src={PAPER_CLOTHES[id!].src} at={at} cv={cv} /> : null; };
+  const tone = Math.max(0, Math.min(B.src.length - 1, p.tone | 0));
+  // grown-ups wear tops over a bare body, so wide necklines don't show the plain tee underneath
+  const skin = (p.top && clothBox(p.top, p.base) && B.bare ? B.bare : B.src)[tone];
+  const cloth = (id: string | null | undefined) => {
+    const at = id ? clothBox(id, p.base) : undefined; if (!at) return null; const c = PAPER_CLOTHES[id!];
+    return <Piece key={id!} src={c.srcTone?.[tone] ?? c.src} at={at} cv={cv} />;
+  };
   const overTop = p.bottom && PAPER_CLOTHES[p.bottom]?.overTop;
   const headClip = `inset(0 0 ${Math.max(0, ((B.at[1] + B.at[3] - B.neck) / B.at[3]) * 100)}% 0)`;
   const f = PAPER_FACES[face] ?? PAPER_FACES.happy;

@@ -5,6 +5,9 @@ Sources (full 1024x1536 canvases, from ChatGPT, lined up by hand) live in art/yu
   faces/<expr>.png                  drawn for the KID head (fitted to other heads here)
   hair/<style>_<front|back>.<base>.png   drawn on <base>'s head (fitted to other heads here)
   clothes/<kind>.<id>.<base>.png    drawn for <base> only (top / bottom / shoes)
+  clothes-fit/<kind>.<id>.png       loose kids' clothes, fitted here onto the kid bodies
+  adult-clothes/<kind>.<id>.png     loose grown-up clothes (only those listed in ADULT_FIT), fitted onto the adult body
+  hair-loose/<style>.png            one-piece hairstyles drawn without a template (HAIR_LOOSE)
 
 Writes trimmed WebP images to src/assets/paper/ and their positions to src/data/paperArt.ts.
 Hair is recoloured into every HAIR_COLOURS entry and the bases into every skin tone.
@@ -17,7 +20,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'art', 'yunaverse')
 OUT = os.path.join(ROOT, 'src', 'assets', 'paper')
 TS = os.path.join(ROOT, 'src', 'data', 'paperArt.ts')
-BASES = ['kid', 'preschool']                 # bodies the game uses (adult.png is kept for later)
+BASES = ['kid', 'preschool', 'adult']        # bodies the game uses
+KID_BASES = ['kid', 'preschool']              # bodies the kids' clothes ('any') fit
 SKIN_REF = (247, 188, 140)                   # skin colour of the source bases
 SKIN_TONES = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F']   # same 4 tones as the vector characters
 HAIR_REF = (92, 55, 36)                      # hair colour the hairstyles are drawn in
@@ -69,6 +73,10 @@ def is_not_skin(rgb):
     h, s, v = _hsv(rgb)
     return ~((v > 0.45) & (s > 0.15) & (s < 0.6) & (h > 0.02) & (h < 0.12))
 
+def is_not_dark_hair(rgb):
+    h, s, v = _hsv(rgb)
+    return (v < 0.1) | (v > 0.72)          # outline only (for hair drawn almost black)
+
 def is_not_hair(rgb):
     h, s, v = _hsv(rgb)
     return (v < 0.16) | (rgb[..., 2] > rgb[..., 1]) | (s < 0.2) | (v > 0.72)   # outline, pink clips/bows, white bits
@@ -106,11 +114,24 @@ def hair_fit(style, bb):
     k, dy = HAIR_FIT[style]; t = hair_top[style]
     return (512 + (bb[0] - 512) * k, 220 + dy + (bb[1] - t) * k, 512 + (bb[2] - 512) * k, 220 + dy + (bb[3] - t) * k)
 hair = {}
+def fit_box(bb, w, cx, top=None, bottom=None, cy=None):
+    k = w / (bb[2] - bb[0]); h = (bb[3] - bb[1]) * k
+    if top is not None and bottom is not None: h = bottom - top          # stretch to fit both (legs)
+    y = top if top is not None else (bottom - h if bottom is not None else cy - h / 2)
+    return [round(cx - w / 2), round(y), round(w), round(h)]
 for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
     m = re.match(r'(.+)_(front|back)\.(\w+)\.png$', os.path.basename(p)); style, part, drawn_on = m.groups()
     img, bb = trim(load(p)); h = hair.setdefault(style, {})
     h[part] = {'src': {c: save(recolour(img, HAIR_REF, hexrgb(hx), is_not_hair), f'hair-{style}-{part}-{c}') for c, hx in HAIR_COLOURS.items()},
                'at': {b: place(hair_fit(style, bb), transform(heads[drawn_on], heads[b])) for b in BASES}}
+
+# one-piece hairstyles drawn loose: fitted onto one head (w = width, top = top edge), drawn over the face (front only)
+HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38))}
+for style, (drawn_on, fit, ref) in HAIR_LOOSE.items():
+    img, bb = trim(load(os.path.join(SRC, 'hair-loose', style + '.png'))); kb = fit_box(bb, **fit)
+    box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
+    hair[style] = {'front': {'src': {c: save(recolour(img, ref, hexrgb(hx), is_not_dark_hair), f'hair-{style}-front-{c}') for c, hx in HAIR_COLOURS.items()},
+                             'at': {b: place(box, transform(heads[drawn_on], heads[b])) for b in BASES}}}
 
 # clothes: for one base only
 clothes = {}
@@ -127,11 +148,6 @@ ACC_SLOTS = {   # slot: (target, drawn over the front hair?, follows)
     'hair': (dict(w=180, cx=672, cy=318), True, 'head'),            # bows and clips: top right of the head
     'bag':  (dict(w=360, cx=545, top=735), False, 'body'),          # bags and backpacks: from the shoulders
 }
-def fit_box(bb, w, cx, top=None, bottom=None, cy=None):
-    k = w / (bb[2] - bb[0]); h = (bb[3] - bb[1]) * k
-    if top is not None and bottom is not None: h = bottom - top          # stretch to fit both (legs)
-    y = top if top is not None else (bottom - h if bottom is not None else cy - h / 2)
-    return [round(cx - w / 2), round(y), round(w), round(h)]
 def width_at(img, y):
     a = img.getchannel('A'); xs = [x for x in range(0, img.width, 2) if a.getpixel((x, y)) > 128]
     return xs[-1] - xs[0]
@@ -183,7 +199,7 @@ for p in sorted(glob.glob(os.path.join(SRC, 'clothes-fit', '*.png'))):
     kind, cid = os.path.basename(p)[:-4].split('.'); img, bb = trim(load(p))
     if kind == 'shoes':
         at = {}
-        for b in BASES:
+        for b in KID_BASES:
             x0, x1, f = feet_of(b); k = SHOE_W.get(cid, 1.1); fb = fit_box(bb, (x1 - x0) * k, (x0 + x1) / 2, bottom=f + 10)
             at[b] = [round(v) for v in fb]
         clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': at['kid'], 'atBase': at}
@@ -192,7 +208,52 @@ for p in sorted(glob.glob(os.path.join(SRC, 'clothes-fit', '*.png'))):
     box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
     clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': place(box, ident), 'overTop': cid in OVER_TOP,
                     'atBase': {b: (short_bottom(box, b) if kind == 'bottom' and 'bottom' not in t and cid not in OVER_TOP else place_xy(box, b) if kind == 'bottom'
-                                   else place(box, body_transform(b, 'width'))) for b in BASES}}
+                                   else place(box, body_transform(b, 'width'))) for b in KID_BASES}}
+
+# grown-up clothes: drawn loose by ChatGPT, fitted onto the adult body.
+# Tops with hands are placed so their hands land on the body's hands; others by width (w) and collar (top).
+# Pieces with skin drawn in (SKIN) get one image per skin tone.
+ADULT_HANDS = ((290, 960), (731, 960))
+ADULT_FIT = {
+    'mom-pink-sweater': {}, 'mom-striped-sweater': {}, 'mom-pink-cardigan': {}, 'mom-blue-bow-blouse': {},
+    'mom-cream-cardigan': dict(w=560, top=470), 'mom-black-zip-jacket': dict(w=560, top=470), 'mom-trench-coat': dict(w=600, top=455),
+    'mom-blue-jeans': dict(w=330, top=845, bottom=1450), 'mom-black-trousers': dict(w=330, top=845, bottom=1450),
+    'mom-gray-leggings': dict(w=375, top=845, bottom=1450), 'mom-beige-skirt': dict(w=390, top=845),
+    'mom-white-sneakers': {}, 'mom-pink-flats': {},
+}
+SKIN = {'mom-pink-sweater', 'mom-striped-sweater', 'mom-pink-cardigan', 'mom-blue-bow-blouse', 'mom-pink-flats'}
+def hands_of(img):
+    import numpy as np
+    a = np.asarray(img); bb = trim(img)[1]; m = ~is_not_skin(a[..., :3].astype(np.float32)) & (a[..., 3] > 128)
+    m[:bb[1] + int((bb[3] - bb[1]) * 0.75)] = False; out = []
+    for x0, x1 in ((0, 512), (512, 1024)):
+        ys, xs = np.nonzero(m[:, x0:x1]); out.append((xs.mean() + x0, ys.mean()))
+    return out
+for p in sorted(glob.glob(os.path.join(SRC, 'adult-clothes', '*.png'))):
+    kind, cid = os.path.basename(p)[:-4].split('.')
+    if cid not in ADULT_FIT: continue
+    t = ADULT_FIT[cid]; img, bb = trim(load(p))
+    if kind == 'shoes':
+        x0, x1, f = feet_of('adult'); kb = fit_box(bb, (x1 - x0) * 1.04, (x0 + x1) / 2, bottom=f + 6)
+    elif kind == 'top' and not t:
+        h = hands_of(load(p)); k = (ADULT_HANDS[1][0] - ADULT_HANDS[0][0]) / (h[1][0] - h[0][0])
+        ox = 512 - (h[0][0] + h[1][0]) / 2 * k; oy = ADULT_HANDS[0][1] - (h[0][1] + h[1][1]) / 2 * k
+        kb = [bb[0] * k + ox, bb[1] * k + oy, (bb[2] - bb[0]) * k, (bb[3] - bb[1]) * k]
+    else:
+        kb = fit_box(bb, t['w'], 512, top=t['top'], bottom=t.get('bottom'))
+    c = {'kind': kind, 'base': 'adult', 'src': save(img, f'cloth-{cid}'), 'at': [round(v) for v in kb]}
+    if cid in SKIN: c['srcTone'] = [save(recolour(img, SKIN_REF, hexrgb(tn), is_not_skin), f'cloth-{cid}-{i}') for i, tn in enumerate(SKIN_TONES)]
+    clothes[cid] = c
+
+def bare_body(img):
+    """The adult body with the white tee painted as skin (worn under tops, so necklines don't show the tee)."""
+    import numpy as np
+    from scipy import ndimage
+    a = np.asarray(img).astype(np.float32); rgb = a[..., :3]; al = a[..., 3] > 128
+    white = (rgb.min(-1) > 200) & (np.abs(rgb[..., 0] - rgb[..., 2]) < 25) & al; white[:440] = False
+    m = ndimage.binary_dilation(white, iterations=12) & ndimage.binary_erosion(al, iterations=14); m[:440] = False
+    a[..., :3] = np.where(m[..., None], np.array(SKIN_REF, np.float32), rgb)
+    return Image.fromarray(a.round().astype(np.uint8), 'RGBA')
 
 # bases: one image per skin tone + the rig numbers the game needs
 bases = {}
@@ -210,11 +271,12 @@ for b in BASES:
     a = base_img[b].getchannel('A')
     hip = next(y for y in range(bottom + 200, bb[3]) if a.getpixel((512, y)) < 60)   # where the legs part
     bases[b] = {'src': [save(recolour(img, SKIN_REF, hexrgb(t), is_not_skin), f'base-{b}-{i}') for i, t in enumerate(SKIN_TONES)],
+                **({'bare': [save(recolour(bare_body(base_img[b]).crop(bb), SKIN_REF, hexrgb(t), is_not_skin), f'base-{b}-bare-{i}') for i, t in enumerate(SKIN_TONES)]} if b == 'adult' else {}),
                 'at': list(place(bb, ident)), 'neck': bottom, 'crown': top, 'eyes': ex, 'hip': hip, 'feet': bb[3]}
 
 # canvas per base: everything that can be drawn on it, plus a little room
 for b in BASES:
-    boxes = [bases[b]['at']] + [f['at'][b] for f in faces.values()] + [h[p]['at'][b] for h in hair.values() for p in h] + [c['at'] for c in clothes.values() if c['base'] == b] + [c['atBase'][b] for c in clothes.values() if c['base'] == 'any'] + [a['at'][b] for a in accessories.values()]
+    boxes = [bases[b]['at']] + [f['at'][b] for f in faces.values()] + [h[p]['at'][b] for h in hair.values() for p in h] + [c['at'] for c in clothes.values() if c['base'] == b] + [c['atBase'][b] for c in clothes.values() if c['base'] == 'any' and b in c['atBase']] + [a['at'][b] for a in accessories.values()]
     x0 = min(q[0] for q in boxes) - 6; y0 = min(q[1] for q in boxes) - 6
     x1 = max(q[0] + q[2] for q in boxes) + 6; y1 = bases[b]['feet'] + 8
     bases[b]['canvas'] = [x0, y0, x1 - x0, y1 - y0]
@@ -224,11 +286,11 @@ with open(TS, 'w') as f:
     f.write('/** YunaVerse paper-doll art: GENERATED by tools/paper/build_paper.py from art/yunaverse/. Do not edit by hand.\n'
             ' *  Boxes are [x, y, w, h] in the 1024x1536 source canvas; each base has a `canvas` box the character is drawn in. */\n')
     f.write('\n'.join(imports) + '\n\n')
-    f.write("export type PaperBase = 'kid' | 'preschool';\nexport type Box = [number, number, number, number];\n")
-    f.write(f'export const PAPER_BASES: Record<PaperBase, {{ src: string[]; at: Box; canvas: Box; neck: number; crown: number; eyes: [[number, number], [number, number]]; hip: number; feet: number }}> = {js(bases)};\n')
+    f.write("export type PaperBase = 'kid' | 'preschool' | 'adult';\nexport type Box = [number, number, number, number];\n")
+    f.write(f'export const PAPER_BASES: Record<PaperBase, {{ src: string[]; bare?: string[]; at: Box; canvas: Box; neck: number; crown: number; eyes: [[number, number], [number, number]]; hip: number; feet: number }}> = {js(bases)};\n')
     f.write(f'export const PAPER_FACES: Record<string, {{ src: string; at: Record<PaperBase, Box> }}> = {js(faces)};\n')
     f.write(f'export const PAPER_HAIR: Record<string, Record<\'front\' | \'back\', {{ src: Record<string, string>; at: Record<PaperBase, Box> }}>> = {js(hair)};\n')
-    f.write(f"export const PAPER_CLOTHES: Record<string, {{ kind: 'top' | 'bottom' | 'shoes'; base: PaperBase | 'any'; src: string; at: Box; atBase?: Record<PaperBase, Box>; overTop?: boolean }}> = {js(clothes)};\n")
+    f.write(f"export const PAPER_CLOTHES: Record<string, {{ kind: 'top' | 'bottom' | 'shoes'; base: PaperBase | 'any'; src: string; srcTone?: string[]; at: Box; atBase?: Partial<Record<PaperBase, Box>>; overTop?: boolean }}> = {js(clothes)};\n")
     f.write(f"export const PAPER_ACCESSORIES: Record<string, {{ slot: 'head' | 'eyes' | 'ears' | 'hair' | 'bag'; src: string; overHair: boolean; at: Record<PaperBase, Box> }}> = {js(accessories)};\n")
     f.write(f'export const PAPER_HAIR_COLOURS: Record<string, string> = {json.dumps(HAIR_COLOURS)};\n')
     f.write(f'export const PAPER_SKIN_TONES = {json.dumps(SKIN_TONES)};\n')

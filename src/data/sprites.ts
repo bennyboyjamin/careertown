@@ -94,9 +94,10 @@ function paperRig(b: PaperBase): Layered {
   };
 }
 const paperSprite = (b: PaperBase): Sprite => ({ src: DOLL_PIC, w: Math.round(PAPER_BASES[b].canvas[2] * paperScale), h: Math.round(PAPER_BASES[b].canvas[3] * paperScale), head: 0.45 });
-for (const b of ['kid', 'preschool'] as PaperBase[]) { LAYERED[`paper-${b}`] = paperRig(b); SPRITES[`paper-${b}`] = paperSprite(b); }
-/** Yuna and Nene are drawn in the YunaVerse style. */
+for (const b of ['kid', 'preschool', 'adult'] as PaperBase[]) { LAYERED[`paper-${b}`] = paperRig(b); SPRITES[`paper-${b}`] = paperSprite(b); }
+/** Yuna, Nene and Mom are drawn in the YunaVerse style. */
 LAYERED.yuna = LAYERED['paper-kid']; SPRITES.yuna = SPRITES['paper-kid'];
 LAYERED.nene = LAYERED['paper-preschool']; SPRITES.nene = SPRITES['paper-preschool'];
+LAYERED.mom = LAYERED['paper-adult']; SPRITES.mom = SPRITES['paper-adult'];
 /** Rig/size key for a YunaVerse body. */
 export const paperSpriteKey = (b: PaperBase) => `paper-${b}`;

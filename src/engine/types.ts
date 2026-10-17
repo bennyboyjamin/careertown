@@ -76,7 +76,7 @@ export interface DollLook {
 }
 
 export interface PaperLook {
-  base: 'kid' | 'preschool';
+  base: 'kid' | 'preschool' | 'adult';
   tone: number;                  // skin tone index (data/paperArt.ts PAPER_SKIN_TONES)
   hair: string | null;           // PAPER_HAIR id
   hairColor: string;             // PAPER_HAIR_COLOURS key

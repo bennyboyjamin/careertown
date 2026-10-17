@@ -13,12 +13,12 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 ];
 const HAIR_LABELS: Record<string, string> = {
   wavy: 'Long wavy', bob: 'Bob with clip', bobbangs: 'Bob with bangs', bowwaves: 'Waves with bow', braids: 'Two braids', locs: 'Locs',
-  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns', ponytail: 'High ponytail',
+  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns', ponytail: 'High ponytail', momwaves: 'Long layers',
 };
 const COLOUR_LABELS: Record<string, string> = { black: 'Black', darkbrown: 'Dark brown', brown: 'Brown', blonde: 'Blonde', ginger: 'Ginger', pink: 'Pink' };
 const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 const SLOT_LABELS: Record<string, string> = { head: 'Hats', eyes: 'Glasses', ears: 'Headphones', hair: 'Hair bows', bag: 'Bags' };
-const nice = (id: string) => id.replace(/-/g, ' ').replace(/^\w/, (m) => m.toUpperCase());
+const nice = (id: string) => id.replace(/^mom-/, '').replace(/-/g, ' ').replace(/^\w/, (m) => m.toUpperCase());
 
 /** Character maker for YunaVerse characters: body, skin, hair, clothes and extras. */
 export function PaperEditor({ p, onChange, lockBase = false }: { p: PaperLook; onChange: (p: PaperLook) => void; lockBase?: boolean }) {
@@ -68,7 +68,7 @@ export function PaperEditor({ p, onChange, lockBase = false }: { p: PaperLook; o
           <div className="font-display font-bold text-ink mt-1">Age</div>
           {grid((['kid', 'preschool'] as const).map((b) => tile(b, p.base === b, b === 'kid' ? 'Kid' : 'Little kid', () => {
             // keep only clothes the new body can wear
-            const ok = (id: string | null) => (id && (PAPER_CLOTHES[id]?.base === 'any' || PAPER_CLOTHES[id]?.base === b) ? id : null);
+            const ok = (id: string | null) => (id && paperClothesFor(b, PAPER_CLOTHES[id]?.kind ?? 'top').includes(id) ? id : null);
             set({ base: b, top: ok(p.top), bottom: ok(p.bottom), shoes: ok(p.shoes) });
           }, <PaperFaceIcon p={{ ...p, base: b }} size={62} />)))}
         </>}

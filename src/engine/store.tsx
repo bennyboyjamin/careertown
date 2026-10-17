@@ -66,6 +66,11 @@ export function addStarterPack(g: GameState): GameState {
     g = { ...g, owned: [...g.owned, 'pack:paper-family-1'],
       characters: g.characters.map((c) => (c.sprite && FAMILY_PAPER[c.sprite] && !c.paper ? { ...c, paper: { ...FAMILY_PAPER[c.sprite] } } : c)) };
   }
+  // Mom joins the YunaVerse style (Oct 2026).
+  if (!g.owned.includes('pack:paper-mom-1')) {
+    g = { ...g, owned: [...g.owned, 'pack:paper-mom-1'],
+      characters: g.characters.map((c) => (c.sprite === 'mom' && !c.paper ? { ...c, paper: { ...FAMILY_PAPER.mom } } : c)) };
+  }
   // Characters made with the older character maker: same idea, drawn in the vector style.
   if (!g.owned.includes('pack:vector-all-1')) {
     g = { ...g, owned: [...g.owned, 'pack:vector-all-1'],
