@@ -17,6 +17,8 @@ function say(text: string) {
   const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.92; u.pitch = 1.05; s.speak(u);
 }
 
+const WHERE: Partial<Record<BuildingId, string>> = { fishing: 'the fishing dock', 'nature-trail': 'the nature trail', park: 'the park', beach: 'the beach', playground: 'the playground', cafe: 'the cafe', bank: 'the bank' };
+
 type Step = 'hello' | 'fact' | 'find' | 'done';
 
 /** A place without a mission yet: meet the person who works there and help with a small "find it" job. */
@@ -72,7 +74,7 @@ export function VisitScreen({ id, onBack }: { id: BuildingId; onBack: () => void
       <div className="visit-bubble absolute rounded-[28px] border-[4px] border-ink bg-white p-3 shadow-chunkysm" style={{ left: '30%', top: '4%', maxWidth: 560, right: '3%' }}>
         <div className="flex items-start gap-2">
           <div className="flex-1">
-            <div className="font-display font-bold text-ink">{t.name} · {t.job} at the {b.name}</div>
+            <div className="font-display font-bold text-ink">{t.name} · {t.job} at {WHERE[id] ?? `the ${b.name}`}</div>
             <p className="font-body text-ink text-lg mt-1" style={{ lineHeight: 1.35 }}>{line}</p>
             {step === 'find' && <p className="font-display font-bold text-ink mt-1">Found {found.length} of {t.find.length}</p>}
           </div>
