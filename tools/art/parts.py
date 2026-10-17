@@ -54,13 +54,11 @@ EYES = ((138, 236, -1), (246, 236, 1))
 def eye_open(cx, cy, o, kind, lid=None, wet=False):
     """o = -1 left eye, 1 right eye (the side the outer corner points to). lid: None | 'angry' | 'sad'."""
     # Cute cartoon eye: a dark-rimmed iris shaded darker under the lid, a solid round pupil
-    # and two sparkles (big one up high, small one low on the other side) so it reads friendly.
+    # and one tiny highlight dot so it reads soft and friendly.
     out = (f'<ellipse cx="{cx}" cy="{cy+4}" rx="24" ry="27" fill="url(#iris{{U}})" stroke="{INK}" stroke-width="3"/>'
            f'<ellipse cx="{cx}" cy="{cy+5}" rx="14" ry="17" fill="#1E120D"/>'
            f'<path d="M{cx-17} {cy+20} Q{cx} {cy+30} {cx+17} {cy+20}" fill="none" stroke="{{EL}}" stroke-width="3" stroke-linecap="round" opacity=".8"/>'
-           f'<ellipse cx="{cx+7*o}" cy="{cy-6}" rx="{11 if wet else 10}" ry="{12 if wet else 11}" fill="#FFFFFF"/>'
-           f'<circle cx="{cx-9*o}" cy="{cy+13}" r="{6 if wet else 5}" fill="#FFFFFF"/>'
-           f'<circle cx="{cx+12*o}" cy="{cy+12}" r="2.2" fill="#FFFFFF" opacity=".8"/>')
+           f'<circle cx="{cx+7*o}" cy="{cy-4}" r="{5.5 if wet else 4.5}" fill="#FFFFFF"/>')
     ox, ix = cx + 30 * o, cx - 30 * o
     if lid:
         oy, iy = ((cy - 24, cy - 6) if lid == 'angry' else (cy - 8, cy - 22))
