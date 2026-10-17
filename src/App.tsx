@@ -32,6 +32,7 @@ import { CafeMission } from './missions/CafeMission';
 import { FishingMission } from './missions/FishingMission';
 import { PlaygroundMission } from './missions/PlaygroundMission';
 import { TrailMission } from './missions/TrailMission';
+import { UpstanderMission } from './missions/UpstanderMission';
 import { Person } from './components/Person';
 import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
@@ -53,6 +54,7 @@ const MISSION_VIEWS: Record<string, (p: { onExit: () => void }) => ReactElement>
   'fishing-release': FishingMission,
   'playground-coach': PlaygroundMission,
   'trail-ranger': TrailMission,
+  'playground-upstander': UpstanderMission,
 };
 
 function Game() {

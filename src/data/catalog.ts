@@ -96,6 +96,7 @@ export const BADGES: Record<string, { label: string; icon: string; desc: string 
   'garden-helper': { label: 'Garden Helper', icon: '🌷', desc: 'Planted and watered the park garden' },
   'star-barista': { label: 'Star Barista', icon: '☕', desc: 'Made every drink just right at the cafe' },
   'lake-keeper': { label: 'Lake Keeper', icon: '🎣', desc: 'Caught, released and cleaned up at the lake' },
+  'upstander': { label: 'Upstander', icon: '🦸', desc: 'Helped Pip and made friends with Zina' },
   'team-player': { label: 'Team Player', icon: '🏅', desc: 'Practised with Coach Jay' },
   'junior-ranger': { label: 'Junior Ranger', icon: '🌲', desc: 'Explored the nature trail with Willow' },
   'beach-hero': { label: 'Beach Hero', icon: '🛟', desc: 'Kept everyone safe as a lifeguard' },
