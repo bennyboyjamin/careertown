@@ -45,7 +45,7 @@ HEAD = f'''<g {J} stroke="{{SO}}" stroke-width="3">
 <ellipse cx="278" cy="280" rx="28" ry="17" fill="url(#blush{{U}})"/>
 <path d="M188 258 Q192 262 196 258" fill="none" stroke="{{SO}}" stroke-width="3" stroke-linecap="round" opacity=".6"/>'''
 
-DEFS = '''<defs><radialGradient id="iris{U}" cx="50%" cy="68%" r="65%"><stop offset="0" stop-color="{EL}"/><stop offset=".55" stop-color="{E}"/><stop offset="1" stop-color="{EDD}"/></radialGradient>
+DEFS = '''<defs><linearGradient id="iris{U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{ED}"/><stop offset=".5" stop-color="{ED}"/><stop offset=".85" stop-color="{E}"/><stop offset="1" stop-color="{EL}"/></linearGradient>
 <radialGradient id="blush{U}"><stop offset="0" stop-color="#FF7F96" stop-opacity=".55"/><stop offset="1" stop-color="#FF7F96" stop-opacity="0"/></radialGradient></defs>'''
 
 INK = '#3A2016'
@@ -53,11 +53,14 @@ EYES = ((138, 236, -1), (246, 236, 1))
 
 def eye_open(cx, cy, o, kind, lid=None, wet=False):
     """o = -1 left eye, 1 right eye (the side the outer corner points to). lid: None | 'angry' | 'sad'."""
-    out = (f'<ellipse cx="{cx}" cy="{cy+4}" rx="25" ry="28" fill="url(#iris{{U}})"/>'
-           f'<ellipse cx="{cx}" cy="{cy+6}" rx="11" ry="12" fill="{{ED}}" opacity=".85"/>'
-           f'<ellipse cx="{cx-8}" cy="{cy-6}" rx="{11 if wet else 9.5}" ry="{10 if wet else 9}" fill="#FFFFFF"/>'
-           f'<circle cx="{cx+9}" cy="{cy+15}" r="{6 if wet else 4.5}" fill="#FFFFFF"/>'
-           f'<circle cx="{cx+11}" cy="{cy-2}" r="2.5" fill="#FFFFFF" opacity=".85"/>')
+    # Cute cartoon eye: a dark-rimmed iris shaded darker under the lid, a solid round pupil
+    # and two sparkles (big one up high, small one low on the other side) so it reads friendly.
+    out = (f'<ellipse cx="{cx}" cy="{cy+4}" rx="24" ry="27" fill="url(#iris{{U}})" stroke="{INK}" stroke-width="3"/>'
+           f'<ellipse cx="{cx}" cy="{cy+5}" rx="14" ry="17" fill="#1E120D"/>'
+           f'<path d="M{cx-17} {cy+20} Q{cx} {cy+30} {cx+17} {cy+20}" fill="none" stroke="{{EL}}" stroke-width="3" stroke-linecap="round" opacity=".8"/>'
+           f'<ellipse cx="{cx+7*o}" cy="{cy-6}" rx="{11 if wet else 10}" ry="{12 if wet else 11}" fill="#FFFFFF"/>'
+           f'<circle cx="{cx-9*o}" cy="{cy+13}" r="{6 if wet else 5}" fill="#FFFFFF"/>'
+           f'<circle cx="{cx+12*o}" cy="{cy+12}" r="2.2" fill="#FFFFFF" opacity=".8"/>')
     ox, ix = cx + 30 * o, cx - 30 * o
     if lid:
         oy, iy = ((cy - 24, cy - 6) if lid == 'angry' else (cy - 8, cy - 22))
