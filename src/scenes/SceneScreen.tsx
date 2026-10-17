@@ -18,6 +18,7 @@ import { LookEditor } from './CharacterCreator';
 import { uid } from '../engine/ids';
 import { sfx } from '../engine/sfx';
 import { MISSIONS } from '../data/missions';
+import { Worker } from '../components/Worker';
 
 export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId; onScene: (s: SceneId) => void; onMission: (id: string) => void }) {
   const { game, dispatch } = useGame();
@@ -96,6 +97,8 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
           </div>
         </div>
       )}
+
+      <Worker building={b.id} />
 
       {wardrobe && <WardrobeSheet characterId={wardrobe} onClose={() => setWardrobe(null)} />}
       {petCloset && <Modal title="Pet closet" onClose={() => setPetCloset(null)}><PetCloset only={petCloset} /></Modal>}
