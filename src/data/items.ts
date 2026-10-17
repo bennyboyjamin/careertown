@@ -1,5 +1,6 @@
 import type { SfxName } from '../engine/sfx';
 import { ACCESSORIES, TOY_IDS } from './accessories';
+import { KPOP_PROPS } from './kpopProps';
 import pCouch from '../assets/furniture/couch.webp';
 import pArmchair from '../assets/furniture/armchair.webp';
 import pTv from '../assets/furniture/tv.webp';
@@ -185,6 +186,54 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     prop('screwdriver', 'Screwdriver', '🪛', ['tool']),
     prop('bolts', 'Nuts and bolts', '🔩', ['tool']),
     prop('ladder', 'Ladder', '🪜', ['tool'], { w: 90, h: 130 }),
+
+
+    // ── Outdoor places and shops (free play, Oct 2026) ─
+    ...([
+      ['tree', 'Tree', '🌳', 220], ['pine', 'Pine tree', '🌲', 240], ['palm', 'Palm tree', '🌴', 240], ['fountain', 'Fountain', '⛲', 200],
+      ['umbrella', 'Beach umbrella', '⛱️', 200], ['tent', 'Tent', '⛺', 190], ['sandcastle', 'Sandcastle', '🏰', 130], ['rock', 'Rock', '🪨', 110],
+      ['safe', 'Bank safe', '🔐', 150], ['dress', 'Dress', '👗', 150], ['tshirt', 'T-shirt', '👕', 140], ['handbag', 'Handbag', '👜', 130],
+    ] as [string, string, string, number][]).map(([id, name, emoji, h]): ItemDef => ({ id, name, emoji, w: h, h, tags: ['decor'],
+      tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ({ tree: ['Rustle rustle!', 'Birds live up here.'], pine: ['Smells like the forest!'], palm: ['Coconuts!'], fountain: ['Splish splash!', 'Make a wish!'],
+        umbrella: ['Nice and shady!'], tent: ['Camping time!', 'Cozy in here!'], sandcastle: ['A castle for crabs!'], rock: ['A smooth rock!'], safe: ['Locked tight! Money is safe here.'],
+        dress: ['So pretty!'], tshirt: ['Comfy!'], handbag: ['Lots of pockets!'] } as Record<string, string[]>)[id] } })),
+    { id: 'slide', name: 'Slide', emoji: '🛝', w: 230, h: 230, tags: ['seat', 'decor'], seatLift: 120, tap: { type: 'anim', anim: 'shake', sfx: 'whoosh', bubble: ['Wheee!', 'Down we go!'] } },
+    { id: 'carousel', name: 'Merry-go-round', emoji: '🎠', w: 210, h: 210, tags: ['seat', 'decor'], seatLift: 90, tap: { type: 'anim', anim: 'spin', sfx: 'whoosh', bubble: ['Round and round!'] } },
+    { id: 'bench', name: 'Bench', emoji: '🪑', w: 130, h: 130, tags: ['seat', 'decor'], seatLift: 55 },
+    { id: 'boat', name: 'Rowboat', emoji: '🛶', w: 240, h: 150, tags: ['seat', 'decor'], seatLift: 50, tap: { type: 'anim', anim: 'shake', sfx: 'splash', bubble: ['Row row row your boat!'] } },
+    { id: 'towel', name: 'Beach towel', art: 'starrug', w: 240, h: 60, tags: ['floor', 'decor'] },
+    prop('shell', 'Seashell', '🐚', ['toy'], { tap: { type: 'anim', anim: 'shake', sfx: 'splash', bubble: ['I can hear the ocean!'] } }),
+    prop('crab', 'Crab', '🦀', ['toy'], { tap: { type: 'anim', anim: 'hop', sfx: 'pop', bubble: ['Pinch pinch!', 'I walk sideways!'] } }),
+    prop('volleyball', 'Beach ball', '🏐', ['toy'], { tap: { type: 'roll', sfx: 'pop' } }),
+    prop('bucket', 'Bucket', '🪣', ['tool']),
+    prop('sandbucket', 'Sand toys', '🪣', ['toy']),
+    prop('picnic', 'Picnic basket', '🧺', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Sandwiches and juice!'] } }),
+    prop('flowers', 'Flowers', '🌷', ['decor'], { tap: { type: 'anim', anim: 'shake', sfx: 'sparkle', bubble: ['Smells sweet!'] } }),
+    prop('frisbee', 'Flying disc', '🥏', ['toy'], { tap: { type: 'roll', sfx: 'whoosh' } }),
+    prop('bird', 'Bird', '🐦', ['toy', 'float'], { tap: { type: 'anim', anim: 'hop', sfx: 'sparkle', bubble: ['Tweet tweet!'] } }),
+    prop('fishrod', 'Fishing rod', '🎣', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'splash', bubble: ['Cast the line… wait… a nibble!'] } }),
+    { id: 'fish', name: 'Fish', emoji: '🐟', w: 60, h: 60, tags: ['petfood', 'small'], tap: { type: 'anim', anim: 'hop', sfx: 'splash', bubble: ['Blub!'] } },
+    prop('tacklebox', 'Tackle box', '🧰', ['tool']),
+    prop('basketball', 'Basketball', '🏀', ['toy'], { tap: { type: 'roll', sfx: 'pop' } }),
+    prop('jumprope', 'Jump rope', '🪢', ['toy'], { tap: { type: 'anim', anim: 'hop', sfx: 'tick', bubble: ['1, 2, 3, jump!'] } }),
+    prop('butterfly', 'Butterfly', '🦋', ['toy', 'float'], { tap: { type: 'anim', anim: 'hop', sfx: 'sparkle', bubble: ['Flutter flutter!'] } }),
+    prop('squirrel', 'Squirrel', '🐿️', ['toy'], { tap: { type: 'anim', anim: 'hop', sfx: 'pop', bubble: ['Got any nuts?'] } }),
+    prop('compass', 'Compass', '🧭', ['tool'], { tap: { type: 'anim', anim: 'spin', sfx: 'tick', bubble: ['The needle points north!'] } }),
+    prop('trailmap', 'Trail map', '🗺️', ['tool']),
+    prop('binoculars', 'Telescope', '🔭', ['tool'], { tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['I spy an owl!'] } }),
+    food('croissant', 'Croissant', '🥐'),
+    food('waffle', 'Waffle', '🧇'),
+    food('cake', 'Cake', '🍰', { tags: ['food', 'small'] }),
+    prop('sneaker', 'Sneakers', '👟', ['tool']),
+    prop('cap', 'Cap', '🧢', ['tool']),
+    prop('shoppingbag', 'Shopping bags', '🛍️', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'pop', bubble: ['Shopping day!'] } }),
+    prop('coins', 'Coins', '🪙', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'coin', bubble: ['Clink clink!'] } }),
+    prop('moneybag', 'Money bag', '💰', ['tool'], { tap: { type: 'anim', anim: 'shake', sfx: 'coin', bubble: ['Saving for something big!'] } }),
+    ...(['mic', 'lightstick', 'folder', 'trophy', 'planner', 'bottle', 'phone', 'bunny'] as const).map((k, i): ItemDef => ({
+      id: `kp-${k}`, name: ({ mic: 'Microphone', lightstick: 'Lightstick', folder: 'Music folder', trophy: 'Trophy', planner: 'Dance planner', bottle: 'Water bottle', phone: 'Phone', bunny: 'Bunny plush' } as Record<string, string>)[k],
+      img: KPOP_PROPS[i], w: 70, h: 90, tags: ['small', 'toy'],
+      ...(k === 'mic' ? { tap: { type: 'anim', anim: 'shake', sfx: 'sparkle', bubble: ['La la laaa! 🎤', 'Hello, everyone!'] } as TapAction } : k === 'lightstick' ? { tap: { type: 'anim', anim: 'shine', sfx: 'sparkle', bubble: ['Wave it high! ✨'] } as TapAction } : {}),
+    })),
 
     // ── Building blocks (engineering free play) ───────
     { id: 'block-red', name: 'Red block', art: 'block', w: 90, h: 70, tags: ['block', 'small'], },

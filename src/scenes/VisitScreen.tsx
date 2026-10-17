@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { BuildingId } from '../engine/types';
+import type { BuildingId, SceneId } from '../engine/types';
 import { building } from '../data/buildings';
 import { TOWNFOLK } from '../data/townfolk';
 import { MISSIONS } from '../data/missions';
@@ -23,7 +23,7 @@ const WHERE: Partial<Record<BuildingId, string>> = { fishing: 'the fishing dock'
 type Step = 'hello' | 'fact' | 'find' | 'done';
 
 /** A place without a mission yet: meet the person who works there and help with a small "find it" job. */
-export function VisitScreen({ id, onBack, onMission }: { id: BuildingId; onBack: () => void; onMission?: (m: string) => void }) {
+export function VisitScreen({ id, onBack, onMission, onPlay }: { id: BuildingId; onBack: () => void; onMission?: (m: string) => void; onPlay?: (s: SceneId) => void }) {
   const { game, dispatch } = useGame();
   const b = building(id); const t = TOWNFOLK[id]!;
   const [step, setStep] = useState<Step>('hello');
@@ -84,6 +84,7 @@ export function VisitScreen({ id, onBack, onMission }: { id: BuildingId; onBack:
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           {step === 'hello' && <Btn tone="sun" onClick={() => setStep('fact')}>What do you do?</Btn>}
+          {onPlay && b.rooms[0] && <Btn tone="sky" onClick={() => onPlay(b.rooms[0].sceneId)}>🧸 Free play</Btn>}
           {onMission && b.missions.map((m) => <Btn key={m} tone="berry" onClick={() => onMission(m)}>⭐ {MISSIONS[m].title}</Btn>)}
           {step === 'fact' && <Btn tone="mint" onClick={() => { setFound([]); setStep('find'); }}>Can I help?</Btn>}
           {step === 'done' && <><Btn tone="mint" onClick={again}>Play again</Btn><Btn tone="white" onClick={onBack}>Back to town</Btn></>}

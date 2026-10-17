@@ -115,7 +115,8 @@ export interface Entity {
 export type SceneId =
   | 'home-kitchen' | 'home-bedroom' | 'home-living' | 'home-bathroom'
   | 'school-classroom' | 'hospital-exam' | 'courthouse-room' | 'engineering-lab'
-  | 'vet-clinic' | 'tech-lab' | 'restaurant-kitchen';
+  | 'vet-clinic' | 'tech-lab' | 'restaurant-kitchen'
+  | 'beach-shore' | 'park-lawn' | 'cafe-room' | 'fishing-dock' | 'playground-yard' | 'trail-woods' | 'shop-floor' | 'bank-hall' | 'kpop-studio';
 
 export interface Reward {
   coins?: number;
