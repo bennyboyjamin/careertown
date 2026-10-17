@@ -431,3 +431,14 @@ body.photo-mode .hud-float, body.photo-mode .room-tabs, body.photo-mode .scene-a
 .playdate-toy { position: absolute; transform: translate(-50%, -50%); font-size: clamp(34px, 6vmin, 56px); line-height: 1; touch-action: none; filter: drop-shadow(0 4px 0 rgba(0,0,0,.2)); z-index: 90; }
 .playdate-wait { position: absolute; right: 8%; bottom: 30%; background: #fff; border: 3px solid #2B2350; border-radius: 999px; padding: 4px 14px; font-family: Lexend, ui-rounded, system-ui, sans-serif; color: #2B2350; }
 .playdate-looking span { animation: twinkle 1s infinite alternate; } .playdate-looking span:nth-child(2) { animation-delay: .3s; } .playdate-looking span:nth-child(3) { animation-delay: .6s; }
+/* Be an Upstander (missions/UpstanderMission.tsx). */
+.up-stage { height: min(42vh, 330px); position: relative; background-repeat: no-repeat; }
+.up-row { position: absolute; left: 0; right: 0; bottom: 4%; height: 92%; display: flex; justify-content: center; align-items: flex-end; gap: 3%; }
+.up-fig { position: relative; transition: transform .2s; }
+.up-fig.talking { transform: translateY(-3%); }
+.up-name { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 3px solid #2B2350; border-radius: 999px; padding: 0 10px; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; color: #2B2350; }
+.up-fig.talking .up-name { background: #FFC93C; }
+.up-choice { text-align: left; min-height: 52px; padding: 8px 14px; border-radius: 16px; border: 3px solid #2B2350; background: #fff; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; font-size: 17px; color: #2B2350; box-shadow: 0 3px 0 #2B2350; }
+.up-choice.good { background: #5FE0B7; } .up-choice.oops { background: #FFE0E8; }
+.up-choice:disabled:not(.good) { opacity: .55; }
+.up-steps li { margin: 4px 0; }

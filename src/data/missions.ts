@@ -12,6 +12,14 @@ export interface MissionDef {
 }
 
 export const MISSIONS: Record<string, MissionDef> = {
+  'playground-upstander': {
+    id: 'playground-upstander', career: 'coach', building: 'playground',
+    title: 'Be an Upstander',
+    pitch: 'Zina is being unkind to Pip at the playground. Help Pip, speak up, get help, and see what happens when you choose kindness.',
+    minutes: 5,
+    reward: { coins: 55, xp: 75, career: 'coach', careerXp: 120, badge: 'upstander', title: 'You’re an upstander!' },
+    repeatReward: { coins: 15, xp: 20, career: 'coach', careerXp: 40, title: 'Kindness wins again!' },
+  },
   'park-garden': {
     id: 'park-garden', career: 'gardener', building: 'park',
     title: 'Garden Helper',

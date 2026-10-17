@@ -67,6 +67,7 @@ export const NPC_DOLLS: Record<string, DollLook> = {
 /** A stand-in character record for drawing an NPC with <Person>. */
 /** Mission kids drawn in the painted YunaVerse style (grown-ups keep the vector look until their body is added). */
 export const NPC_PAPER: Record<string, PaperLook> = {
+  zina:  { base: 'kid', tone: 0, hair: 'bowwaves', hairColor: 'ginger', top: 'ghost-hoodie', bottom: 'black-shorts', shoes: 'black-boots', acc: {} },
   pip:   { base: 'kid', tone: 1, hair: 'spacebuns', hairColor: 'ginger', top: 'heart-crop-tee', bottom: 'overalls', shoes: 'pink-sneakers', acc: {} },
   ava:   { base: 'kid', tone: 3, hair: 'ponytail', hairColor: 'black', top: 'pink-cardigan', bottom: 'lavender-skirt', shoes: 'loafers', acc: {} },
   ben:   { base: 'kid', tone: 0, hair: 'sideswept', hairColor: 'blonde', top: 'jersey-23', bottom: 'black-shorts', shoes: 'navy-sneakers', acc: {} },
