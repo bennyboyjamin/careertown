@@ -1,5 +1,5 @@
 import type { BuildingId, CareerId, PaperLook } from '../engine/types';
-import kpopStudio from '../assets/places/kpop-studio.webp';
+import kpopStudio from '../assets/places/kpop-studio-2.webp';  // kpop-studio.webp is kept for the dance room
 
 /**
  * Town people: someone to meet at each place that has no mission yet.
