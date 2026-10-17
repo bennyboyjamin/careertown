@@ -110,8 +110,9 @@ jobs:
               s = c.build_settings
               s['DEVELOPMENT_TEAM'] = ENV['TEAM']
               s['CODE_SIGN_STYLE'] = 'Automatic'
-              s['CODE_SIGN_IDENTITY'] = 'Apple Development'
-              s.delete('CODE_SIGN_IDENTITY[sdk=iphoneos*]')
+              # App Store signing straight away: a development profile would need a registered iPhone.
+              s['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
+              s['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
               s.delete('PROVISIONING_PROFILE_SPECIFIER')
               s['PRODUCT_BUNDLE_IDENTIFIER'] = ENV['BUNDLE_ID']
               s['MARKETING_VERSION'] = ENV['VER']
