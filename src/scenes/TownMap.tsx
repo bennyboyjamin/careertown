@@ -10,17 +10,25 @@ import type { BuildingId } from '../engine/types';
 /** Where each building sits in the painted town picture (px in a 1536 × 1024 image): [x, y, w, h]. */
 const IMG_W = 1536, IMG_H = 1024;
 const SPOTS: Record<string, [number, number, number, number]> = {
-  home: [36, 158, 268, 186],
-  school: [338, 92, 366, 294],
-  hospital: [706, 122, 274, 260],
-  courthouse: [1022, 156, 252, 202],
-  bank: [1306, 182, 222, 176],
-  engineering: [36, 466, 316, 178],
-  'animal-hospital': [412, 470, 222, 178],
-  'tech-lab': [684, 470, 210, 182],
-  restaurant: [946, 480, 258, 182],
-  shopping: [1232, 486, 276, 178],
+  home: [50, 120, 260, 230],
+  school: [395, 95, 290, 250],
+  hospital: [690, 95, 330, 260],
+  courthouse: [1045, 135, 215, 220],
+  bank: [1300, 130, 200, 220],
+  engineering: [55, 360, 290, 215],
+  park: [370, 395, 310, 190],
+  'tech-lab': [810, 380, 240, 215],
+  'animal-hospital': [1195, 380, 250, 220],
+  beach: [10, 570, 290, 180],
+  shopping: [390, 585, 370, 240],
+  restaurant: [790, 600, 265, 230],
+  cafe: [1160, 625, 250, 200],
+  fishing: [440, 830, 240, 140],
+  playground: [855, 832, 240, 145],
+  'nature-trail': [1180, 820, 330, 180],
 };
+/** The town picture has every place's name painted on it, so we don't draw our own signs. */
+const PAINTED_LABELS = true;
 const px = (v: number, of: number) => `${(v / of) * 100}%`;
 
 export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
@@ -70,10 +78,10 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
               style={{ left: px(x, IMG_W), top: px(y, IMG_H), width: px(w, IMG_W), height: px(h, IMG_H) }}>
               {/* the building's own piece of the picture, so it can bounce when tapped */}
               <span className="art-crop absolute inset-0" style={{ backgroundImage: `url(${townArt})`, backgroundSize: `${(IMG_W / w) * 100}% ${(IMG_H / h) * 100}%`, backgroundPosition: `${(x / (IMG_W - w)) * 100}% ${(y / (IMG_H - h)) * 100}%` }} />
-              <span className="sign absolute left-1/2 -translate-x-1/2 w-max leading-tight text-center rounded-2xl border-ink bg-white font-display font-bold text-ink shadow-chunkysm"
+              {!PAINTED_LABELS && <span className="sign absolute left-1/2 -translate-x-1/2 w-max leading-tight text-center rounded-2xl border-ink bg-white font-display font-bold text-ink shadow-chunkysm"
                 style={{ bottom: '-6%', fontSize: '1.25cqw', padding: '0.15cqw 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid', borderRadius: '1cqw' }}>
                 {b.icon} {b.name}
-              </span>
+              </span>}
               {!b.playable && <span className="absolute rounded-full border-ink bg-lilac text-white font-display font-bold rotate-6" style={{ top: '6%', right: '4%', fontSize: '1.2cqw', padding: '0 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>Soon</span>}
               {b.playable && b.missions.some((m) => !game.completedMissions[m]) && <span className="mission-dot absolute rounded-full bg-berry border-ink grid place-items-center text-white font-display font-extrabold" style={{ top: '6%', left: '6%', width: '2.4cqw', height: '2.4cqw', fontSize: '1.5cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>!</span>}
             </button>

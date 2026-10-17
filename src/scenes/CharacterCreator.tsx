@@ -9,6 +9,7 @@ import { Person, LayeredArt } from '../components/Person';
 import { WearPicker } from '../components/WearPicker';
 import { ClothesPicker } from '../components/ClothesPicker';
 import { DollEditor } from '../components/DollEditor';
+import { PaperEditor } from '../components/PaperEditor';
 import { DEFAULT_DOLL } from '../data/dollLooks';
 import { LAYERED } from '../data/sprites';
 import { uid } from '../engine/ids';
@@ -98,7 +99,9 @@ const NEW_LOOK: Look = {
 };
 
 function newDoll(): CharacterData {
-  return { id: uid('c'), name: 'New friend', age: 'child', look: NEW_LOOK, sprite: 'doll', doll: { ...DEFAULT_DOLL, tone: Math.floor(Math.random() * 4) } };
+  // New characters are YunaVerse characters (the older vector look stays for existing ones).
+  return { id: uid('c'), name: 'New friend', age: 'child', look: NEW_LOOK, sprite: 'paper-kid', doll: { ...DEFAULT_DOLL },
+    paper: { base: 'kid', tone: Math.floor(Math.random() * 4), hair: 'wavy', hairColor: 'darkbrown', top: 'pink-hoodie', bottom: 'baggy-jeans', shoes: 'gray-sneakers', acc: {} } };
 }
 
 export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: () => void }) {
@@ -147,7 +150,9 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
           <Btn tone="sky" className="mt-2 w-full" onClick={() => { if (!isNew) save(); onDone(); }}>Done</Btn>
         </div>
         <div className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4">
-          {draft.doll ? <div className="p-2"><DollEditor d={draft.doll} onChange={(doll) => setDraft({ ...draft, doll })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite && LAYERED[draft.sprite] ? <div className="p-2"><ClothesPicker preview={false} c={draft} onChange={(colors) => setDraft({ ...draft, colors })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
+          {draft.paper ? <div className="p-2"><PaperEditor p={draft.paper} lockBase={!!draft.sprite && !draft.sprite.startsWith('paper-')}
+            onChange={(paper) => setDraft({ ...draft, paper, sprite: draft.sprite?.startsWith('paper-') ? `paper-${paper.base}` : draft.sprite })} /></div>
+          : draft.doll ? <div className="p-2"><DollEditor d={draft.doll} onChange={(doll) => setDraft({ ...draft, doll })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite && LAYERED[draft.sprite] ? <div className="p-2"><ClothesPicker preview={false} c={draft} onChange={(colors) => setDraft({ ...draft, colors })} /><WearPicker wear={draft.wear} onChange={(slot, item) => { const wear = { ...(draft.wear ?? {}) }; if (item) wear[slot] = item; else delete wear[slot]; setDraft({ ...draft, wear }); dispatch({ type: 'WEAR', character: draft.id, slot, item }); }} /></div> : draft.sprite ? <div className="h-full grid place-items-center text-center p-6"><div><div className="text-5xl">🎨</div><p className="font-display text-2xl font-extrabold text-ink mt-2">{draft.name}’s look is hand-drawn artwork</p><p className="font-body text-ink mt-2 max-w-sm">Their outfit stays the same. Tap <b>+</b> to make a new character you can dress up any way you like.</p></div></div> : <LookEditor age={draft.age} look={draft.look} onChange={(look) => setDraft({ ...draft, look })} />}
         </div>
       </div>
     </div>

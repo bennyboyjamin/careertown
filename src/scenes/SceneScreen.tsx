@@ -10,6 +10,7 @@ import { Person, PetPic } from '../components/Person';
 import { ItemIcon } from '../components/ItemIcon';
 import { ClothesPicker } from '../components/ClothesPicker';
 import { DollEditor } from '../components/DollEditor';
+import { PaperEditor } from '../components/PaperEditor';
 import { WearPicker } from '../components/WearPicker';
 import { PetCloset } from '../components/PetCloset';
 import { LAYERED } from '../data/sprites';
@@ -192,9 +193,15 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
   const lay = LAYERED[c.sprite!];
   return (
     <div>
-      {c.doll && <DollEditor d={c.doll} onChange={(doll) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, doll } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
-      <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
-      <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />
+      {c.paper ? (
+        <div className="grid sm:grid-cols-[160px_1fr] gap-4">
+          <div className="hidden sm:grid place-items-center rounded-2xl border-[3px] border-ink bg-sky/30 h-64 p-2"><div className="h-full" style={{ aspectRatio: `${LAYERED[c.sprite!].W} / ${LAYERED[c.sprite!].H}` }}><Person c={c} mood="happy" /></div></div>
+          <PaperEditor p={c.paper} lockBase={!!c.sprite && c.sprite !== 'paper-kid' && c.sprite !== 'paper-preschool'}
+            onChange={(paper) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, paper, sprite: c.sprite === 'paper-kid' || c.sprite === 'paper-preschool' ? `paper-${paper.base}` : c.sprite } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />
+        </div>
+      ) : c.doll && <DollEditor d={c.doll} onChange={(doll) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, doll } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
+      {!c.paper && <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
+      {!c.paper && <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />}
       <PetCloset />
     </div>
   );

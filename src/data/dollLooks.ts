@@ -1,4 +1,4 @@
-import type { CharacterData, DollLook, Look } from '../engine/types';
+import type { CharacterData, DollLook, Look, PaperLook } from '../engine/types';
 
 export const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
 export const SKIN_SWATCH = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F'];
@@ -88,3 +88,9 @@ export function lookToDoll(look: Look, adult: boolean): DollLook {
     shoes: 'white-sneakers', ...(shorts && shorts !== 'white' ? { shortsColor: shorts } : {}), ...(adult ? { adult: true } : {}),
   };
 }
+
+/** Family members drawn in the painted YunaVerse style (the rest keep their vector look until their pieces exist). */
+export const FAMILY_PAPER: Record<string, PaperLook> = {
+  yuna: { base: 'kid', tone: 2, hair: 'wavy', hairColor: 'black', top: 'red-hoodie', bottom: 'wide-jeans', shoes: 'red-sneakers', acc: {} },
+  nene: { base: 'preschool', tone: 2, hair: 'bob', hairColor: 'black', top: 'bunny-dress', bottom: null, shoes: 'bow-shoes', acc: {} },
+};

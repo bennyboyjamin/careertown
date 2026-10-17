@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { SPRITES, LAYERED, sitFrac, dollRig, type Face, type Layered } from '../data/sprites';
 import { CLOTHES } from '../data/clothes';
 import { DollBody, DollHead } from './Doll';
+import { PaperArt, paperFace } from './Paper';
 
 /** Draws a character: hand-drawn artwork if it has a sprite, otherwise the vector style. */
 export function Person({ c, pose = 'stand', mood = 'normal', bandage = false }: { c: CharacterData; pose?: Pose; mood?: Mood; bandage?: boolean }) {
@@ -37,7 +38,8 @@ function useFace(mood: Mood): Face {
 
 function LayeredPerson({ c, lay, pose, mood }: { c: CharacterData; lay: Layered; pose: Pose; mood: Mood }) {
   const face = useFace(mood);
-  const art = <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} doll={c.doll} mood={mood} />;
+  const art = c.paper ? <PaperArt p={c.paper} face={paperFace(mood, face)} />
+    : <LayeredArt lay={lay} outfit={c.outfit ?? 0} face={face} wear={c.wear} name={c.sprite} colors={c.colors} doll={c.doll} mood={mood} />;
   if (pose !== 'sit') return art;
   // Sitting: torso and the top of the thighs; the seat front (drawn over by Room) hides the rest.
   const f = sitFrac(lay);

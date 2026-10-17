@@ -4,6 +4,7 @@ import { BADGES, TOPS, HATS, GLASSES, ACCESSORIES } from '../data/catalog';
 import { ITEMS } from '../data/items';
 import { CharacterArt, charViewBox } from '../components/art/Character';
 import { garmentForUnlock } from '../data/dollLooks';
+import { PaperFaceIcon } from '../components/Paper';
 import { DOLL_GARMENTS } from '../data/doll';
 import { SpriteFace, DollFace } from '../components/Person';
 import type { CharacterData, Reward } from '../engine/types';
@@ -64,7 +65,7 @@ export function HeadCrop({ look, age = 'child', size }: { look: CharacterData['l
 export function Face({ c, size = 56 }: { c: CharacterData; size?: number }) {
   return (
     <div style={{ width: size, height: size }} className="rounded-full overflow-hidden border-[3px] border-ink bg-sky/40 shrink-0">
-      {c.doll ? <DollFace d={c.doll} size={size - 6} /> : c.sprite ? <SpriteFace sprite={c.sprite} size={size - 6} /> : <HeadCrop look={c.look} age={c.age} size={size} />}
+      {c.paper ? <PaperFaceIcon p={c.paper} size={size - 6} /> : c.doll ? <DollFace d={c.doll} size={size - 6} /> : c.sprite ? <SpriteFace sprite={c.sprite} size={size - 6} /> : <HeadCrop look={c.look} age={c.age} size={size} />}
     </div>
   );
 }
