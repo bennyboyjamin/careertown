@@ -71,9 +71,11 @@ export const NPC_PAPER: Record<string, PaperLook> = {
   ava:   { base: 'kid', tone: 3, hair: 'ponytail', hairColor: 'black', top: 'pink-cardigan', bottom: 'lavender-skirt', shoes: 'loafers', acc: {} },
   ben:   { base: 'kid', tone: 0, hair: 'sideswept', hairColor: 'blonde', top: 'jersey-23', bottom: 'black-shorts', shoes: 'navy-sneakers', acc: {} },
   chloe: { base: 'kid', tone: 2, hair: 'braids', hairColor: 'brown', top: 'ghost-hoodie', bottom: 'baggy-jeans', shoes: 'black-boots', acc: { eyes: 'heart-glasses' } },
+  judge: { base: 'adult', tone: 2, hair: 'lowbun', hairColor: 'black', top: 'judge-suit', bottom: 'gray-trousers', shoes: 'black-shoes', acc: {} },
+  sunny: { base: 'adult', tone: 1, hair: 'sleekbob', hairColor: 'darkbrown', top: 'chef-coat', bottom: 'blue-jeans', shoes: 'white-clogs', acc: {} },
 };
 export const npc = (id: string, name: string): CharacterData => NPC_PAPER[id]
-  ? { id: `npc-${id}`, name, age: 'child', look: {} as Look, sprite: `paper-${NPC_PAPER[id].base}`, doll: NPC_DOLLS[id], paper: NPC_PAPER[id] }
+  ? { id: `npc-${id}`, name, age: NPC_PAPER[id].base === 'adult' ? 'adult' : 'child', look: {} as Look, sprite: `paper-${NPC_PAPER[id].base}`, doll: NPC_DOLLS[id], paper: NPC_PAPER[id] }
   : { id: `npc-${id}`, name, age: NPC_DOLLS[id].adult ? 'adult' : 'child', look: {} as Look, sprite: NPC_DOLLS[id].adult ? 'doll-adult' : 'doll', doll: NPC_DOLLS[id] };
 /** Width / height of how a character is drawn (for sizing boxes). */
 export const npcAspect = (c: CharacterData) => (c.paper ? PAPER_ASPECT[c.paper.base] ?? PAPER_ASPECT.kid : c.age === 'adult' ? 384 / 881 : 384 / 780);
