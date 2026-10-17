@@ -371,3 +371,35 @@ body.photo-mode .hud-float, body.photo-mode .room-tabs, body.photo-mode .scene-a
 .photo-btn.shoot { background: #FF5D8F; color: #fff; font-size: 18px; }
 .photo-flash { position: fixed; inset: 0; background: #fff; z-index: 80; pointer-events: none; animation: photo-flash .45s ease-out forwards; }
 @keyframes photo-flash { from { opacity: .95; } to { opacity: 0; } }
+/* Park, Cafe, Fishing, Playground and Trail missions. */
+.park-bed { height: 110px; background: linear-gradient(#CDEFFF 55%, #A0703F 55%); display: grid; place-items: center; font-size: 56px; }
+.park-pots { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; }
+.park-pot { height: 110px; border-radius: 16px; border: 3px solid #2B2350; background: #EAF8E0; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.park-pot .flower { font-size: 44px; line-height: 1; margin-bottom: 4px; }
+.park-pot .soil { width: 80%; height: 22px; border-radius: 0 0 14px 14px; border: 3px solid #2B2350; margin-bottom: 6px; background: #C9925A; }
+.park-pot.ok .soil, .park-pot.bloom .soil { background: #6B4226; }
+.park-pot.dry .flower { filter: saturate(.6); }
+.cafe-cup { width: 74px; height: 86px; border: 4px solid #2B2350; border-top: none; border-radius: 0 0 22px 22px; background: rgba(255,255,255,.7); position: relative; overflow: visible; flex-shrink: 0; }
+.cafe-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 0 0 18px 18px; transition: height .3s; }
+.cafe-tops { position: absolute; left: 0; right: 0; top: -26px; text-align: center; font-size: 22px; white-space: nowrap; }
+.cafe-pick { border: 3px solid #2B2350; border-radius: 14px; background: #fff; padding: 6px 10px; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; color: #2B2350; }
+.cafe-pick.on { background: #FFC93C; }
+.cafe-customer { min-width: 130px; padding: 30px 10px 10px; border: 3px solid #2B2350; border-radius: 18px; background: #FFF6E0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: Lexend, ui-rounded, system-ui, sans-serif; color: #2B2350; }
+.cafe-customer small { font-size: 12px; text-align: center; max-width: 130px; }
+.cafe-drink { padding: 30px 10px 8px; border: 3px solid #2B2350; border-radius: 18px; background: #fff; }
+.cafe-drink.on { background: #FFC93C; transform: translateY(-4px); }
+.fish-water { height: 260px; background: linear-gradient(#7FD3F7, #2F8FD8); }
+.fish-dock { position: absolute; left: 0; right: 0; bottom: 0; height: 16px; background: repeating-linear-gradient(90deg, #A86F3F 0 30px, #8A5A33 30px 32px); border-top: 3px solid #2B2350; }
+.fish-swim { position: absolute; left: -10%; line-height: 1; animation: fish-swim 8s linear infinite; }
+@keyframes fish-swim { 0% { left: -10%; transform: scaleX(-1); } 49% { transform: scaleX(-1); } 50% { left: 100%; transform: scaleX(1); } 100% { left: -10%; transform: scaleX(1); } }
+.fish-float { position: absolute; font-size: 36px; line-height: 1; animation: visit-bob 2.4s ease-in-out infinite; }
+.fish-ruler { display: flex; border: 3px solid #2B2350; border-radius: 8px; overflow: hidden; background: #FFF6C8; }
+.fish-ruler span { width: 28px; text-align: center; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; color: #2B2350; border-right: 1px solid rgba(43,35,80,.35); padding: 2px 0; }
+.fish-ruler span.on { background: #7FD3F7; }
+.coach-move { height: 104px; border-radius: 20px; border: 4px solid #2B2350; box-shadow: 0 5px 0 #2B2350; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform .1s, filter .1s; filter: saturate(.75) brightness(.95); }
+.coach-move.lit { transform: scale(1.08); filter: saturate(1.3) brightness(1.12); box-shadow: 0 0 0 5px #fff, 0 5px 0 #2B2350; }
+.trail-woods { height: 300px; background: linear-gradient(#BFE8C8, #7CC48E); }
+.trail-tree { position: absolute; font-size: 40px; line-height: 1; pointer-events: none; }
+.trail-animal { position: absolute; font-size: 22px; line-height: 1; opacity: .55; filter: saturate(.4); z-index: 2; padding: 6px; }
+.trail-animal.found { opacity: 1; filter: none; font-size: 40px; z-index: 3; animation: sticker-in .4s cubic-bezier(.3,1.6,.6,1); }
+@media (prefers-reduced-motion: reduce) { .fish-swim { animation-duration: 30s; } .fish-float { animation: none; } }

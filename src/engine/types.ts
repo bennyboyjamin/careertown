@@ -5,7 +5,7 @@
 
 export type CareerId =
   | 'lawyer' | 'engineer' | 'doctor' | 'teacher'
-  | 'vet' | 'software' | 'entrepreneur' | 'chef' | 'performer' | 'lifeguard';
+  | 'vet' | 'software' | 'entrepreneur' | 'chef' | 'performer' | 'lifeguard' | 'gardener' | 'fisher' | 'coach' | 'ranger';
 
 export type BuildingId =
   | 'home' | 'school' | 'hospital' | 'courthouse' | 'engineering'

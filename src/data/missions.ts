@@ -12,6 +12,46 @@ export interface MissionDef {
 }
 
 export const MISSIONS: Record<string, MissionDef> = {
+  'park-garden': {
+    id: 'park-garden', career: 'gardener', building: 'park',
+    title: 'Garden Helper',
+    pitch: 'Help Rosa plant seeds, learn what plants need and water the flower bed.',
+    minutes: 4,
+    reward: { coins: 55, xp: 75, career: 'gardener', careerXp: 120, badge: 'garden-helper', title: 'The park is blooming!' },
+    repeatReward: { coins: 15, xp: 20, career: 'gardener', careerXp: 40, title: 'Great job again!' },
+  },
+  'cafe-barista': {
+    id: 'cafe-barista', career: 'chef', building: 'cafe',
+    title: 'Barista for a Day',
+    pitch: 'Make drinks just how customers order them, then remember everyone’s order.',
+    minutes: 4,
+    reward: { coins: 55, xp: 75, career: 'chef', careerXp: 120, badge: 'star-barista', title: 'Every customer is happy!' },
+    repeatReward: { coins: 15, xp: 20, career: 'chef', careerXp: 40, title: 'Great job again!' },
+  },
+  'fishing-release': {
+    id: 'fishing-release', career: 'fisher', building: 'fishing',
+    title: 'Catch and Release',
+    pitch: 'Help Leo catch fish, measure them, put the little ones back and clean the lake.',
+    minutes: 4,
+    reward: { coins: 55, xp: 75, career: 'fisher', careerXp: 120, badge: 'lake-keeper', title: 'The lake is happy and clean!' },
+    repeatReward: { coins: 15, xp: 20, career: 'fisher', careerXp: 40, title: 'Great job again!' },
+  },
+  'playground-coach': {
+    id: 'playground-coach', career: 'coach', building: 'playground',
+    title: 'Coach Jay’s Practice',
+    pitch: 'Warm up by copying Coach Jay’s moves, then learn how to be a great teammate.',
+    minutes: 4,
+    reward: { coins: 55, xp: 75, career: 'coach', careerXp: 120, badge: 'team-player', title: 'What a great practice!' },
+    repeatReward: { coins: 15, xp: 20, career: 'coach', careerXp: 40, title: 'Great job again!' },
+  },
+  'trail-ranger': {
+    id: 'trail-ranger', career: 'ranger', building: 'nature-trail',
+    title: 'Trail Explorer',
+    pitch: 'Spot hidden animals, read their tracks and learn how to care for the trail with Willow.',
+    minutes: 4,
+    reward: { coins: 55, xp: 75, career: 'ranger', careerXp: 120, badge: 'junior-ranger', title: 'You’re a junior ranger!' },
+    repeatReward: { coins: 15, xp: 20, career: 'ranger', careerXp: 40, title: 'Great job again!' },
+  },
   'lifeguard-duty': {
     id: 'lifeguard-duty', career: 'lifeguard', building: 'beach',
     title: 'Lifeguard on Duty',

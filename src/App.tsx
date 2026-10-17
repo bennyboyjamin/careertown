@@ -25,6 +25,11 @@ import { KpopMission } from './missions/KpopMission';
 import { BeachMission } from './missions/BeachMission';
 import { BankMission } from './missions/BankMission';
 import { ShopMission } from './missions/ShopMission';
+import { ParkMission } from './missions/ParkMission';
+import { CafeMission } from './missions/CafeMission';
+import { FishingMission } from './missions/FishingMission';
+import { PlaygroundMission } from './missions/PlaygroundMission';
+import { TrailMission } from './missions/TrailMission';
 import { Person } from './components/Person';
 import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
@@ -41,6 +46,11 @@ const MISSION_VIEWS: Record<string, (p: { onExit: () => void }) => ReactElement>
   'lifeguard-duty': BeachMission,
   'bank-saver': BankMission,
   'shop-owner': ShopMission,
+  'park-garden': ParkMission,
+  'cafe-barista': CafeMission,
+  'fishing-release': FishingMission,
+  'playground-coach': PlaygroundMission,
+  'trail-ranger': TrailMission,
 };
 
 function Game() {
