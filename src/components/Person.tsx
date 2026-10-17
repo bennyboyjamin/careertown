@@ -3,7 +3,7 @@ import { CharacterArt, type Mood } from './art/Character';
 import { PetArt } from './art/Pet';
 import { PET_LOOKS, ACC_BY_ID, type WearSlot } from '../data/accessories';
 import { useEffect, useState } from 'react';
-import { SPRITES, LAYERED, sitFrac, type Face, type Layered } from '../data/sprites';
+import { SPRITES, LAYERED, sitFrac, dollRig, type Face, type Layered } from '../data/sprites';
 import { CLOTHES } from '../data/clothes';
 import { DollBody, DollHead } from './Doll';
 
@@ -58,7 +58,7 @@ export function PetPic({ p, sleeping = false, bandage = false }: { p: PetData; s
 
 /** Round face icon for a dress-up character: the head (with hair) cropped from their own art. */
 export function DollFace({ d, size }: { d: NonNullable<CharacterData['doll']>; size: number }) {
-  const lay = LAYERED.doll; const k = size / 330;
+  const lay = dollRig(d.adult); const k = size / 330;
   return (
     <div style={{ width: size, height: size, overflow: 'hidden', position: 'relative' }}>
       <div style={{ position: 'absolute', width: lay.W * k, height: lay.H * k, left: (size - lay.W * k) / 2, top: -(lay.crown - 30) * k }}>
@@ -101,8 +101,9 @@ function wearBox(lay: Layered, slot: WearSlot, aspect: number): [number, number,
   const [[lx, ly], [rx, ry]] = lay.eyes;
   const d = rx - lx, mx = (lx + rx) / 2, ey = (ly + ry) / 2;
   const [bx, by, bw, bh] = lay.body;
-  if (slot === 'eyes') { const w = d * 2.05; const h = w / aspect; return [mx - w / 2, ey - h / 2 + d * 0.1, w, h]; }
-  if (slot === 'head') { const w = d * 3.05; const h = w / aspect; return [mx - w / 2, ey - d * 0.6 - h, w, h]; }
+  const fit = (s: 'head' | 'eyes') => lay.fit?.[s] ?? { w: 1, drop: 0 };
+  if (slot === 'eyes') { const w = d * 2.05 * fit('eyes').w; const h = w / aspect; return [mx - w / 2, ey - h / 2 + d * (0.1 + fit('eyes').drop), w, h]; }
+  if (slot === 'head') { const w = d * 3.05 * fit('head').w; const h = w / aspect; return [mx - w / 2, ey - d * (0.6 - fit('head').drop) - h, w, h]; }
   if (slot === 'ears') { const w = d * 3.7; const h = w / aspect; return [mx - w / 2, ey + d * 0.3 - h * 0.74, w, h]; }
   const h = d * 1.9; const w = h * aspect; // bag: hangs at the hip
   return [bx + bw * 0.27 - w / 2, by + bh * 0.33, w, h];

@@ -14,6 +14,7 @@ import { DoctorMission } from './missions/DoctorMission';
 import { VetMission } from './missions/VetMission';
 import { RobotMission } from './missions/RobotMission';
 import { Person } from './components/Person';
+import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
 
 // Mission registry: add a new career mission by adding one line here + data in data/missions.ts
@@ -100,9 +101,13 @@ function Intro({ onPlay }: { onPlay: () => void }) {
     <div className="fixed inset-0 z-[90] intro grid place-items-center p-4 overflow-y-auto">
       <div className="intro-card text-center relative">
         <div className="flex justify-center items-end gap-2 h-40 sm:h-56 mb-2">
-          {game.characters.slice(0, 2).map((c, i) => (
-            <div key={c.id} className={`${c.age === 'adult' ? 'w-24 sm:w-32 h-full' : 'w-20 sm:w-28 h-[80%]'} intro-wave`} style={{ animationDelay: `${i * 0.2}s` }}><Person c={c} mood="happy" /></div>
-          ))}
+          {game.characters.slice(0, 2).map((c, i) => {
+            // Characters with artwork keep their real shape and relative height (tallest = full height).
+            const sp = c.sprite ? SPRITES[c.sprite] : undefined;
+            return sp
+              ? <div key={c.id} className="intro-wave" style={{ animationDelay: `${i * 0.2}s`, height: `${Math.min(100, (sp.h / 262) * 100)}%`, aspectRatio: `${sp.w} / ${sp.h}` }}><Person c={c} mood="happy" /></div>
+              : <div key={c.id} className={`${c.age === 'adult' ? 'w-24 sm:w-32 h-full' : 'w-20 sm:w-28 h-[80%]'} intro-wave`} style={{ animationDelay: `${i * 0.2}s` }}><Person c={c} mood="happy" /></div>;
+          })}
         </div>
         <h1 className="logo-big font-display font-extrabold text-ink leading-none">CareerTown</h1>
         <p className="font-body text-ink text-lg sm:text-2xl mt-3 max-w-md mx-auto">Build a family, explore the town and try out real jobs.</p>
