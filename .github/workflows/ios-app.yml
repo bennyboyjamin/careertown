@@ -107,6 +107,7 @@ jobs:
           cat > /tmp/settings.rb <<'EOF'
           require 'xcodeproj'
           p = Xcodeproj::Project.open('app/ios/App/App.xcodeproj')
+          p.build_configurations.each { |c| c.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0' }
           p.targets.select { |t| t.name == 'App' }.each do |t|
             t.build_configurations.each do |c|
               s = c.build_settings
@@ -119,6 +120,7 @@ jobs:
               s['MARKETING_VERSION'] = ENV['VER']
               s['CURRENT_PROJECT_VERSION'] = ENV['BUILD']
               s['TARGETED_DEVICE_FAMILY'] = '1,2'
+              s['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'   # in-app purchases use StoreKit 2 (iOS 15+)
               s['ASSETCATALOG_COMPILER_APPICON_NAME'] = 'AppIcon'
             end
           end
