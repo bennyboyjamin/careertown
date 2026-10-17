@@ -146,6 +146,7 @@ export function HUD({ onPassport, onMap, onShop, onCreator, title }: { onPasspor
       <Btn tone="sky" onClick={onCreator} aria-label="Characters" className="!px-2.5 sm:!px-3">🧑‍🎨</Btn>
       <Btn tone="berry" onClick={onShop} aria-label="Shop" className="!px-2.5 sm:!px-3">🛍️</Btn>
       <Btn tone="white" onClick={() => dispatch({ type: 'TOGGLE_SOUND' })} aria-label="Sound" className="!px-3 hidden sm:block">{game.settings.sound ? '🔊' : '🔇'}</Btn>
+      <Btn tone="white" onClick={() => dispatch({ type: 'TOGGLE_MUSIC' })} aria-label="Music" aria-pressed={game.settings.music !== false} className="!px-3 hidden sm:block" style={{ opacity: game.settings.music === false ? 0.45 : 1 }}>🎵</Btn>
       <FullscreenButton />
       {showDaily && (
         <Modal title="Today’s challenge" onClose={() => setShowDaily(false)}>

@@ -1,5 +1,9 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { refreshOwned, useOwned } from './engine/iap';
+import { playTune, type Tune } from './engine/music';
+import { useDayPhase } from './engine/dayPhase';
+import { todayKey } from './data/daily';
+import { SPECIAL_STICKERS } from './data/stickers';
 import { STYLE_PACK, STYLE_PACK_FRIENDS } from './data/stylePack';
 import type { BuildingId, Screen } from './engine/types';
 import { GameProvider, useGame } from './engine/store';
@@ -46,6 +50,20 @@ function Game() {
   // Style Pack (bought in the iPhone/iPad app): check with Apple at launch; the friends join each save once.
   const stylePack = useOwned(STYLE_PACK.productId);
   useEffect(() => { refreshOwned(); }, []);
+  // a sticker for each day you play, and special stickers when you earn them
+  useEffect(() => { if (game.seenIntro) dispatch({ type: 'NEW_DAY', date: todayKey() }); }, [game.seenIntro, dispatch]);
+  useEffect(() => {
+    const have = game.stickers ?? [];
+    const s = SPECIAL_STICKERS.find((x) => !have.includes(x.id) && x.got(game));
+    if (s) dispatch({ type: 'STICKER', id: s.id });
+  }, [game, dispatch]);
+  // background music for each area
+  const phase = useDayPhase();
+  const homeScene = screen.name === 'scene' && screen.sceneId.startsWith('home-');
+  const tune: Tune = screen.name === 'map' ? (phase === 'night' ? 'night' : 'town')
+    : homeScene ? (phase === 'night' ? 'night' : 'home')
+    : screen.name === 'creator' || screen.name === 'passport' ? 'home' : 'work';
+  useEffect(() => { playTune(tune); }, [tune]);
   useEffect(() => { if (stylePack) dispatch({ type: 'ADD_CHARACTERS', characters: STYLE_PACK_FRIENDS, mark: 'pack:style-friends' }); }, [stylePack, dispatch]);
 
   const enter = (id: BuildingId) => {

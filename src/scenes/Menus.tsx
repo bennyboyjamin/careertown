@@ -10,6 +10,7 @@ import { PetPic } from '../components/Person';
 import { PET_LOOKS } from '../data/accessories';
 import { sfx } from '../engine/sfx';
 import { StylePackCard } from '../components/StylePack';
+import { StickerBook } from '../components/StickerBook';
 
 export function BuildingScreen({ id, onScene, onMission }: { id: BuildingId; onScene: (s: SceneId) => void; onMission: (m: string) => void }) {
   const { game } = useGame();
@@ -84,6 +85,8 @@ export function Passport() {
             </div>
           </div>
         </section>
+
+        <StickerBook />
 
         <section className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4 sm:p-6">
           <h2 className="font-display text-2xl font-extrabold text-ink mb-3">Careers explored</h2>

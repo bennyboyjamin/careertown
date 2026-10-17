@@ -47,6 +47,7 @@ export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => voi
   const pet = game.pets[0];
   const phase = useDayPhase();
   const strollers = game.characters.filter((c) => c.id !== walker?.id);
+  useEffect(() => { if (phase === 'night' && !game.owned.includes('did:night')) dispatch({ type: 'OWN', id: 'did:night' }); }, [phase, game.owned, dispatch]);
 
   const tap = (b: BuildingDef) => {
     setBump(b.id);

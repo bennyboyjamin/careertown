@@ -12,6 +12,8 @@ import { FAMILY_DOLLS, FAMILY_PAPER, lookToDoll } from '../data/dollLooks';
 import { localSave, SAVE_VERSION, ACTIVE_PROFILE, migrate, type SaveAdapter } from './save';
 import { uid } from './ids';
 import { setSoundEnabled, sfx } from './sfx';
+import { setMusicEnabled } from './music';
+import { nextDailySticker, stickerById } from '../data/stickers';
 
 // ── Defaults ───────────────────────────────────────────
 const L = { skin: '#E8AE7E', face: 'round', eyes: 'dot', hair: 'long', hairColor: '#24160E', top: 'tee', topColor: '#FF5D5D', bottom: 'jeans', bottomColor: '#6E95DB', shoes: '#FFFFFF', glasses: 'none', hat: 'none', accessory: 'none' } as CharacterData['look'];
@@ -129,7 +131,7 @@ export function freshGame(): GameState {
     completedMissions: {}, owned: [...STARTER, 'pack:accessories-1', 'pack:no-old-acc-1'], characters: DEFAULT_CHARACTERS, pets: DEFAULT_PETS,
     scenes: { 'home-kitchen': kitchen, 'home-living': living }, secrets: [],
     daily: { date, id: dailyFor(date).id, progress: 0, done: false },
-    stats: {}, settings: { sound: true }, activeCharacterId: 'yuna', seenIntro: false,
+    stats: {}, settings: { sound: true, music: true, petFollow: true }, activeCharacterId: 'yuna', seenIntro: false, stickers: [],
   };
 }
 
@@ -159,6 +161,10 @@ export type Action =
   | { type: 'BUY'; id: string; price: number }
   | { type: 'SET_PET'; pet: PetData }
   | { type: 'TOGGLE_SOUND' }
+  | { type: 'TOGGLE_MUSIC' }
+  | { type: 'TOGGLE_PET_FOLLOW' }
+  | { type: 'NEW_DAY'; date: string }
+  | { type: 'STICKER'; id: string }
   | { type: 'SEEN_INTRO' }
   | { type: 'DISMISS_POPUP' }
   | { type: 'TOAST'; text: string }
@@ -305,6 +311,21 @@ function reducer(root: Root, a: Action): Root {
       return { ...root, game: { ...g, coins: g.coins - a.price, owned: [...g.owned, a.id] }, toast: { id: uid('t'), text: 'Bought! Find it in your stuff.' } };
     }
     case 'SET_PET': return { ...root, game: { ...g, pets: g.pets.map((p) => (p.id === a.pet.id ? a.pet : p)) } };
+    case 'TOGGLE_MUSIC': return { ...root, game: { ...g, settings: { ...g.settings, music: g.settings.music === false } } };
+    case 'TOGGLE_PET_FOLLOW': return { ...root, game: { ...g, settings: { ...g.settings, petFollow: g.settings.petFollow === false } } };
+    case 'NEW_DAY': {
+      if (g.lastPlayed === a.date) return root;
+      const have = g.stickers ?? [];
+      const s = nextDailySticker(have);
+      const game = { ...g, lastPlayed: a.date, stickers: s ? [...have, s.id] : have };
+      return withPopup(root, game, { coins: 5 }, s ? `Daily sticker: ${s.icon} ${s.name}!` : 'Welcome back! Here are 5 coins.');
+    }
+    case 'STICKER': {
+      const have = g.stickers ?? [];
+      if (have.includes(a.id)) return root;
+      const s = stickerById(a.id);
+      return { ...root, game: { ...g, stickers: [...have, a.id] }, toast: { id: uid('t'), text: `New sticker: ${s?.icon ?? '⭐'} ${s?.name ?? ''}! Find it in your sticker book.` } };
+    }
     case 'TOGGLE_SOUND': return { ...root, game: { ...g, settings: { ...g.settings, sound: !g.settings.sound } } };
     case 'SEEN_INTRO': return { ...root, game: { ...g, seenIntro: true } };
     case 'DISMISS_POPUP': return { ...root, queue: root.queue.slice(1) };
@@ -342,6 +363,7 @@ export function GameProvider({ children, adapter = localSave }: { children: Reac
 
   useEffect(() => {
     setSoundEnabled(root.game.settings.sound);
+    setMusicEnabled(root.game.settings.music !== false);
     if (!loaded) return;
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => void adapter.save(ACTIVE_PROFILE, root.game), 400);

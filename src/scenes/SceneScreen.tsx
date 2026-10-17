@@ -20,6 +20,7 @@ import { sfx } from '../engine/sfx';
 import { MISSIONS } from '../data/missions';
 import { Worker } from '../components/Worker';
 import { useDayPhase } from '../engine/dayPhase';
+import { PhotoMode } from '../components/PhotoMode';
 
 export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId; onScene: (s: SceneId) => void; onMission: (id: string) => void }) {
   const { game, dispatch } = useGame();
@@ -28,9 +29,21 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
   const [wardrobe, setWardrobe] = useState<string | null>(null);
   const [drawOn, setDrawOn] = useState<Entity | null>(null);
   const [petCloset, setPetCloset] = useState<string | null>(null);
+  const [photo, setPhoto] = useState(false);
   const here = sceneOf(game, sceneId);
   const isHome = b.id === 'home';
   const phase = useDayPhase();
+  // your pet follows you into every room (next to your character, if they're here)
+  const followPet = game.settings.petFollow !== false ? game.pets[0] : undefined;
+  useEffect(() => {
+    if (!followPet) return;
+    const inRoom = sceneOf(game, sceneId);
+    if (inRoom.some((e) => e.kind === 'pet' && e.ref === followPet.id)) return;
+    const me = inRoom.find((e) => e.kind === 'character' && e.ref === game.activeCharacterId);
+    dispatch({ type: 'PLACE_ACTOR', to: sceneId, entity: { id: uid('pet'), kind: 'pet', ref: followPet.id, x: me ? Math.min(900, me.x + 110) : 430, y: me ? me.y + 6 : 662, pose: 'stand' } });
+    sfx('pop');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sceneId, followPet?.id]);
   const night = phase === 'night' && isHome;
   useEffect(() => {
     if (night && sceneId === 'home-bedroom') dispatch({ type: 'TOAST', text: 'It’s nighttime! 🌙 Drag everyone onto the bed to sleep, or tap the lamp for a night light.' });
@@ -62,6 +75,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
 
       <div className="scene-actions absolute bottom-2 flex items-center gap-2">
         <Btn tone="sky" onClick={() => setTray(tray === 'people' ? null : 'people')}>🧑‍🤝‍🧑 People{game.pets.length ? ' & pets' : ''}</Btn>
+        <Btn tone="white" onClick={() => { setTray(null); setPhoto(true); }} aria-label="Photo mode">📸</Btn>
         {isHome && <Btn tone="mint" onClick={() => setTray(tray === 'stuff' ? null : 'stuff')}>📦 My stuff{stuff.length ? ` (${stuff.length})` : ''}</Btn>}
         <Hint building={b.id} />
       </div>
@@ -70,6 +84,12 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
         <div className="tray-in fixed inset-x-2 bottom-20 z-[45] mx-auto max-w-2xl rounded-[24px] border-[4px] border-ink bg-white shadow-chunky p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="font-display font-extrabold text-ink text-lg">{tray === 'people' ? 'Tap someone to bring them here (tap a pet again to dress it)' : 'Tap to place in this room'}</div>
+            {tray === 'people' && game.pets.length > 0 && (
+              <button onClick={() => { sfx('tap'); dispatch({ type: 'TOGGLE_PET_FOLLOW' }); }} aria-pressed={game.settings.petFollow !== false}
+                className={`shrink-0 rounded-full border-[3px] border-ink px-3 h-10 font-display font-bold text-ink text-sm ${game.settings.petFollow !== false ? 'bg-mint' : 'bg-white'}`}>
+                🐾 {game.pets[0].name} follows me: {game.settings.petFollow !== false ? 'On' : 'Off'}
+              </button>
+            )}
             <button onClick={() => setTray(null)} className="w-10 h-10 rounded-full border-[3px] border-ink bg-berry text-white font-display" aria-label="Close tray">✕</button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-1">
@@ -105,6 +125,7 @@ export function SceneScreen({ sceneId, onScene, onMission }: { sceneId: SceneId;
       )}
 
       <Worker building={b.id} />
+      {photo && <PhotoMode title={b.rooms.find((r) => r.sceneId === sceneId)?.label ?? b.name} onClose={() => setPhoto(false)} />}
 
       {wardrobe && <WardrobeSheet characterId={wardrobe} onClose={() => setWardrobe(null)} />}
       {petCloset && <Modal title="Pet closet" onClose={() => setPetCloset(null)}><PetCloset only={petCloset} /></Modal>}

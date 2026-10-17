@@ -7,6 +7,8 @@ let ctx: AudioContext | null = null;
 let enabled = true;
 export const setSoundEnabled = (on: boolean) => { enabled = on; };
 
+/** The shared audio context (also used by the background music). */
+export function audioCtx() { return ac(); }
 function ac() {
   if (!ctx) {
     const C = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
