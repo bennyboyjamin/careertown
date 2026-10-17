@@ -58,13 +58,21 @@ export function PaperArt({ p, face = 'happy' }: { p: PaperLook; face?: string })
   };
   const overTop = p.bottom && PAPER_CLOTHES[p.bottom]?.overTop;
   const headClip = `inset(0 0 ${Math.max(0, ((B.at[1] + B.at[3] - B.neck) / B.at[3]) * 100)}% 0)`;
+  // Tops drawn with their own arms and hands (they have a version per skin tone): hide the body's own
+  // shoulders and arms behind them, keeping only the neck, so nothing sticks out at the sides.
+  const topC = p.top ? PAPER_CLOTHES[p.top] : undefined; const topAt = p.top ? clothBox(p.top, p.base) : undefined;
+  const bodyClip = topC?.srcTone && topAt ? (() => {
+    const [bx, by, bw, bh] = B.at; const X = (v: number) => `${((v - bx) / bw) * 100}%`; const Y = (v: number) => `${((v - by) / bh) * 100}%`;
+    const y0 = B.neck + 12, y1 = topAt[1] + topAt[3] - 24, n0 = 512 - 56, n1 = 512 + 56;
+    return `polygon(0 0, 100% 0, 100% ${Y(y0)}, ${X(n1)} ${Y(y0)}, ${X(n1)} ${Y(y1)}, 100% ${Y(y1)}, 100% 100%, 0 100%, 0 ${Y(y1)}, ${X(n0)} ${Y(y1)}, ${X(n0)} ${Y(y0)}, 0 ${Y(y0)})`;
+  })() : undefined;
   const f = PAPER_FACES[face] ?? PAPER_FACES.happy;
   const headAcc = ['ears', 'eyes', 'hair', 'head'].map((s) => { const a = acc(s); return a ? <Piece key={s} src={a.src} at={a.at[p.base]} cv={cv} /> : null; });
   const bag = acc('bag');
   return (
     <div className="w-full h-full" style={{ position: 'relative' }}>
       {hc('back') && <Piece src={hc('back')!} at={hair!.back.at[p.base]} cv={cv} />}
-      <Piece src={skin} at={B.at} cv={cv} />
+      <Piece src={skin} at={B.at} cv={cv} clip={bodyClip} />
       {cloth(p.shoes)}
       {!overTop && cloth(p.bottom)}
       {cloth(p.top)}

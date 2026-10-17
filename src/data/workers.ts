@@ -17,9 +17,9 @@ export const WORKERS: Partial<Record<BuildingId, Worker>> = {
     ],
   },
   hospital: {
-    name: 'Nurse Ray', job: 'Nurse', look: A({ tone: 3, hair: 'dadshort', hairColor: 'black', top: 'mom-striped-sweater', bottom: 'gray-trousers', shoes: 'mom-white-sneakers' }),
+    name: 'Nurse Rae', job: 'Nurse', look: A({ tone: 3, hair: 'sleekbob', hairColor: 'black', top: 'mom-pink-sweater', bottom: 'gray-trousers', shoes: 'mom-white-sneakers' }),
     lines: [
-      'Hi! I’m Nurse Ray. I help doctors take care of patients.',
+      'Hi! I’m Nurse Rae. I help doctors take care of patients.',
       'Nurses check temperatures, give medicine, and help people feel calm and safe.',
       'Washing your hands is the number one way to stop germs!',
       'Try it: drag the thermometer onto someone, or give Pip a check-up mission.',
@@ -35,7 +35,7 @@ export const WORKERS: Partial<Record<BuildingId, Worker>> = {
     ],
   },
   engineering: {
-    name: 'Max', job: 'Engineer', look: A({ tone: 2, hair: 'dadshort', hairColor: 'brown', top: 'dad-navy-hoodie', bottom: 'dad-blue-jeans', shoes: 'dad-brown-loafers' }),
+    name: 'Max', job: 'Engineer', look: A({ tone: 2, hair: 'dadshort', hairColor: 'brown', top: 'dad-navy-hoodie', bottom: 'gray-trousers', shoes: 'mom-white-sneakers' }),
     lines: [
       'Hey, builder! I’m Max, an engineer.',
       'Engineers design bridges, buildings and machines, and test them to make them strong.',
@@ -53,7 +53,7 @@ export const WORKERS: Partial<Record<BuildingId, Worker>> = {
     ],
   },
   'tech-lab': {
-    name: 'Priya', job: 'Software engineer', look: A({ tone: 2, hair: 'momwaves', hairColor: 'black', top: 'mom-black-zip-jacket', bottom: 'mom-gray-leggings', shoes: 'mom-white-sneakers' }),
+    name: 'Priya', job: 'Software engineer', look: A({ tone: 2, hair: 'momwaves', hairColor: 'black', top: 'mom-pink-sweater', bottom: 'mom-blue-jeans', shoes: 'mom-white-sneakers' }),
     lines: [
       'Hi, coder! I’m Priya. I write programs for computers and robots.',
       'Code is a list of steps. Computers follow them exactly, in order.',
