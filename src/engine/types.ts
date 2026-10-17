@@ -149,7 +149,7 @@ export interface GameState {
   secrets: string[];
   daily: DailyState;
   stats: Record<string, number>; // event counters (eat, sleep, cook…)
-  settings: { sound: boolean; music?: boolean; petFollow?: boolean; breakMins?: number };
+  settings: { sound: boolean; music?: boolean; petFollow?: boolean; breakMins?: number; playdates?: boolean };
   /** Sticker book (daily stickers and special ones). */
   stickers?: string[];
   /** Last day (yyyy-mm-dd) a daily sticker was given. */
@@ -166,4 +166,5 @@ export type Screen =
   | { name: 'creator'; editId?: string }
   | { name: 'passport' }
   | { name: 'visit'; id: BuildingId }
+  | { name: 'playdate' }
   | { name: 'shop' };

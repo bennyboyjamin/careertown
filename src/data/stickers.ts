@@ -20,6 +20,7 @@ export const SPECIAL_STICKERS: (Sticker & { got: (g: GameState) => boolean })[] 
   { id: 'sp-workers', icon: '💬', name: 'Good listener', how: 'Talk to the worker in every building', got: (g) => Object.keys(WORKERS).every((b) => g.owned.includes(`talk:${b}`)) },
   { id: 'sp-townfolk', icon: '🤝', name: 'Town helper', how: 'Help every town person find their things', got: (g) => Object.keys(TOWNFOLK).every((b) => g.owned.includes(`visit:${b}`)) },
   { id: 'sp-photo', icon: '📸', name: 'Photographer', how: 'Take a photo in photo mode', got: (g) => g.owned.includes('did:photo') },
+  { id: 'sp-playdate', icon: '👯', name: 'Best buddies', how: 'Have a playdate with a friend', got: (g) => g.owned.includes('did:playdate') },
   { id: 'sp-night', icon: '🌙', name: 'Night owl', how: 'Visit town at night', got: (g) => g.owned.includes('did:night') },
   { id: 'sp-week', icon: '📅', name: 'One whole week', how: 'Collect 7 daily stickers', got: (g) => (g.stickers ?? []).filter((s) => s.startsWith('day-')).length >= 7 },
   { id: 'sp-rich', icon: '💰', name: 'Coin collector', how: 'Have 200 coins at once', got: (g) => g.coins >= 200 },
