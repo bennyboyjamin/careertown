@@ -39,14 +39,15 @@ export function VisitScreen({ id, onBack }: { id: BuildingId; onBack: () => void
   }, [id]);
   // hiding places, away from the person on the left
   const round = found.length === 0 && step === 'find';
-  const spots = useMemo(() => t.find.map((_, i) => ({ x: 36 + ((i * 19 + Math.random() * 14) % 54), y: 38 + ((i * 17 + Math.random() * 30) % 44), r: Math.round(Math.random() * 40 - 20), d: 2.5 + Math.random() * 2 })), [t, round]);
+  const items = useMemo(() => (t.pick ? [...t.find].sort(() => Math.random() - 0.5).slice(0, t.pick) : t.find), [t, round]);
+  const spots = useMemo(() => items.map((_, i) => ({ x: 36 + ((i * 19 + Math.random() * 14) % 54), y: 38 + ((i * 17 + Math.random() * 30) % 44), r: Math.round(Math.random() * 40 - 20), d: 2.5 + Math.random() * 2 })), [t, round]);
 
   const line = step === 'hello' ? t.hello : step === 'fact' ? t.fact : step === 'find' ? t.ask : t.thanks;
 
   const tapItem = (i: number) => {
     if (found.includes(i)) return;
     sfx('pop'); const next = [...found, i]; setFound(next);
-    if (next.length === t.find.length) {
+    if (next.length === items.length) {
       const first = !game.owned.includes(`visit:${id}`);
       window.setTimeout(() => {
         sfx('success'); setStep('done');
@@ -76,7 +77,7 @@ export function VisitScreen({ id, onBack }: { id: BuildingId; onBack: () => void
           <div className="flex-1">
             <div className="font-display font-bold text-ink">{t.name} · {t.job} at {WHERE[id] ?? `the ${b.name}`}</div>
             <p className="font-body text-ink text-lg mt-1" style={{ lineHeight: 1.35 }}>{line}</p>
-            {step === 'find' && <p className="font-display font-bold text-ink mt-1">Found {found.length} of {t.find.length}</p>}
+            {step === 'find' && <p className="font-display font-bold text-ink mt-1">Found {found.length} of {items.length}</p>}
           </div>
           {canSpeak() && <button aria-label="Read to me" onClick={() => say(line)} className="shrink-0 h-11 w-11 rounded-2xl border-[3px] border-ink bg-white shadow-chunkysm">🔊</button>}
         </div>
@@ -88,11 +89,11 @@ export function VisitScreen({ id, onBack }: { id: BuildingId; onBack: () => void
       </div>
 
       {/* things to find */}
-      {step === 'find' && t.find.map((e, i) => (
-        <button key={i} aria-label={`Hidden ${e}`} onClick={() => tapItem(i)}
+      {step === 'find' && items.map((e, i) => (
+        <button key={i} aria-label={`Hidden ${e.includes('/') || e.includes('.') ? 'thing' : e} ${i + 1}`} onClick={() => tapItem(i)}
           className={`visit-item absolute ${t.moving ? 'visit-move' : ''} ${found.includes(i) ? 'visit-found' : ''}`}
           style={{ left: `${spots[i].x}%`, top: `${spots[i].y}%`, transform: `rotate(${spots[i].r}deg)`, animationDuration: `${spots[i].d}s` }}>
-          {e}
+          {e.includes('/') || e.startsWith('data:') ? <img src={e} alt="" draggable={false} className="visit-pic" /> : e}
         </button>
       ))}
     </div>

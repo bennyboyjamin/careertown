@@ -1,4 +1,5 @@
 import type { BuildingId, CareerId, PaperLook } from '../engine/types';
+import { KPOP_PROPS } from './kpopProps';
 import kpopStudio from '../assets/places/kpop-studio-2.webp';  // kpop-studio.webp is kept for the dance room
 
 /**
@@ -13,8 +14,10 @@ export interface Townie {
   /** One kid-sized line about what this job is really like. */
   fact: string;
   ask: string;
-  /** What to find (emoji), scattered around the place. Different emoji = different things to spot. */
+  /** What to find (emoji or a picture), scattered around the place. */
   find: string[];
+  /** Pick this many from `find` each round (so it changes every time). */
+  pick?: number;
   /** A picture of the inside (otherwise the place's piece of the town map is shown). */
   inside?: string;
   /** Things to find move around (fish swim, butterflies flutter). */
@@ -79,7 +82,7 @@ export const TOWNFOLK: Partial<Record<BuildingId, Townie>> = {
     inside: kpopStudio, name: 'Luna', job: 'Dance trainer', look: A({ tone: 2, hair: 'sleekbob', hairColor: 'pink', top: 'mom-black-zip-jacket', bottom: 'mom-gray-leggings', shoes: 'mom-white-sneakers' }),
     hello: 'Hi, future star! I’m Luna. I teach dance at the K-pop Training Academy.',
     fact: 'Trainers help singers and dancers practise every day. Choreographers make up the dance moves, and producers make the music.',
-    ask: 'Our 3 stage things went missing before the show! Can you find them?', find: ['🎤', '🎧', '⭐'],
+    ask: 'Our 3 stage things went missing before the show! Can you find them?', find: KPOP_PROPS, pick: 3,
     thanks: 'Showtime! The full academy with dance and music training is coming soon.',
   },
   bank: {

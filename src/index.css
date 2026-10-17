@@ -272,3 +272,4 @@ button { touch-action: manipulation; }
 .visit-person { transition: transform .2s; }
 .visit-person:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) { .visit-item, .visit-move { animation: none; } }
+.visit-pic { width: clamp(52px, 10vmin, 96px); height: clamp(52px, 10vmin, 96px); object-fit: contain; pointer-events: none; }
