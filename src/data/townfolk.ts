@@ -51,14 +51,14 @@ export const TOWNFOLK: Partial<Record<BuildingId, Townie>> = {
     thanks: 'Yay, the window looks perfect now. Thanks, helper!', career: 'entrepreneur',
   },
   fishing: {
-    name: 'Leo', job: 'Fisher', look: A({ tone: 2, hair: 'dadshort', hairColor: 'brown', top: 'dad-navy-hoodie', bottom: 'mom-black-trousers', shoes: 'dad-brown-loafers' }),
+    name: 'Leo', job: 'Fisher', look: A({ tone: 2, hair: 'dadshort', hairColor: 'brown', top: 'dad-navy-hoodie', bottom: 'gray-trousers', shoes: 'dad-brown-loafers' }),
     hello: 'Ahoy! I’m Leo. I go out on my boat to catch fish.',
     fact: 'Fishers check the weather and the tides, and they put back fish that are too small so more can grow.',
     ask: '3 fish are swimming around the dock. Can you catch them? Tap fast!', find: ['🐟', '🐠', '🐟'], moving: true,
     thanks: 'What a catch! I’ll let them swim home now.',
   },
   playground: {
-    name: 'Jay', job: 'Coach', look: A({ tone: 3, hair: 'dadshort', hairColor: 'black', top: 'mom-black-zip-jacket', bottom: 'mom-gray-leggings', shoes: 'mom-white-sneakers' }),
+    name: 'Jay', job: 'Coach', look: A({ tone: 3, hair: 'lowbun', hairColor: 'black', top: 'mom-black-zip-jacket', bottom: 'mom-gray-leggings', shoes: 'mom-white-sneakers' }),
     hello: 'Hey there! I’m Coach Jay. I help kids play games and stay active.',
     fact: 'Coaches plan fun practices and cheer everyone on, especially when something feels hard.',
     ask: 'Our 3 balls bounced all over the playground. Can you find them?', find: ['⚽', '🏀', '⚾'],
