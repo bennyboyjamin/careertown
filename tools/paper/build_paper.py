@@ -126,7 +126,8 @@ for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
                'at': {b: place(hair_fit(style, bb), transform(heads[drawn_on], heads[b])) for b in BASES}}
 
 # one-piece hairstyles drawn loose: fitted onto one head (w = width, top = top edge), drawn over the face (front only)
-HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38)), 'dadshort': ('adult', dict(w=530, cx=512, top=12), (47, 40, 38))}
+HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38)), 'dadshort': ('adult', dict(w=530, cx=512, top=12), (47, 40, 38)),
+              'boyshort': ('kid', dict(w=600, cx=512, top=200), (67, 54, 53))}
 for style, (drawn_on, fit, ref) in HAIR_LOOSE.items():
     img, bb = trim(load(os.path.join(SRC, 'hair-loose', style + '.png'))); kb = fit_box(bb, **fit)
     box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
@@ -177,14 +178,14 @@ TOP_FIT_EACH = {'heart-crop-tee': dict(w=420, top=724), 'jersey-23': dict(w=410,
                    'cream-bow-cardigan', 'pink-off-shoulder-sweater', 'white-butterfly-sweater', 'white-pink-puff-top', 'black-layered-top')},
                 # Style Pack tops redrawn one per picture (loose)
                 'black-layered-top': dict(w=500, top=745), 'white-pink-puff-top': dict(w=470, top=745), 'white-butterfly-sweater': dict(w=450, top=716),
-                'black-pink-zip-hoodie': dict(w=455, top=700), 'cream-bow-cardigan': dict(w=455, top=716), 'pink-off-shoulder-sweater': dict(w=455, top=716)}
+                'black-pink-zip-hoodie': dict(w=455, top=700), 'dino-tee': dict(w=450, top=700), 'blue-hoodie': dict(w=460, top=698), 'cream-bow-cardigan': dict(w=455, top=716), 'pink-off-shoulder-sweater': dict(w=455, top=716)}
 # bottoms: ChatGPT draws long legs, so width follows the waist and length the ankles (on every body)
 BOTTOM_FIT = {'baggy-jeans': dict(w=340, top=975, bottom=1398), 'cargo-pants': dict(w=330, top=975, bottom=1396),
               'black-shorts': dict(w=300, top=975), 'lavender-skirt': dict(w=370, top=975), 'blue-skirt': dict(w=370, top=975),
               'plaid-skirt': dict(w=370, top=975), 'overalls': dict(w=300, top=742),
               # Style Pack
               'black-chain-cargos': dict(w=340, top=975, bottom=1398), 'olive-cargos': dict(w=340, top=975, bottom=1398),
-              'pink-cargos': dict(w=340, top=975, bottom=1398), 'star-baggy-jeans': dict(w=340, top=975, bottom=1398),
+              'pink-cargos': dict(w=340, top=975, bottom=1398), 'khaki-cargo-shorts': dict(w=330, top=970), 'star-baggy-jeans': dict(w=340, top=975, bottom=1398),
               'black-belted-shorts': dict(w=320, top=970), 'ivory-ruffle-skirt': dict(w=370, top=975), 'cream-ruffle-skirt': dict(w=370, top=975),
               'navy-pleated-skirt': dict(w=370, top=975), 'blue-lace-skirt': dict(w=370, top=975), 'pink-bow-skirt': dict(w=370, top=975)}
 OVER_TOP = {'overalls'}          # drawn over the top (bib and straps)
@@ -194,7 +195,7 @@ def feet_of(b):
     a = base_img[b].getchannel('A'); f = a.point(lambda v: 255 if v > 60 else 0).getbbox()[3]
     xs = [x for x in range(1024) if a.getpixel((x, f - 30)) > 128]
     return xs[0], xs[-1], f
-SHOE_W = {'bow-shoes': 1.0, 'loafers': 1.0}       # width as a share of the feet span (chunky sneakers a bit wider)
+SHOE_W = {'bow-shoes': 1.0, 'loafers': 1.0, 'gray-low-sneakers': 1.05}       # width as a share of the feet span (chunky sneakers a bit wider)
 def place_xy(bb, b):
     """Kid body -> body b for bottoms: x by hip width, y by neck-to-feet height."""
     if b == 'kid': return place(bb, ident)

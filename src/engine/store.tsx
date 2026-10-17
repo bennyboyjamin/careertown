@@ -66,6 +66,10 @@ export function addStarterPack(g: GameState): GameState {
     g = { ...g, owned: [...g.owned, 'pack:paper-family-1'],
       characters: g.characters.map((c) => (c.sprite && FAMILY_PAPER[c.sprite] && !c.paper ? { ...c, paper: { ...FAMILY_PAPER[c.sprite] } } : c)) };
   }
+  if (!g.owned.includes('pack:paper-brother-1')) {
+    g = { ...g, owned: [...g.owned, 'pack:paper-brother-1'],
+      characters: g.characters.map((c) => (c.sprite === 'brother' && !c.paper ? { ...c, paper: { ...FAMILY_PAPER.brother } } : c)) };
+  }
   if (!g.owned.includes('pack:paper-dad-1')) {
     g = { ...g, owned: [...g.owned, 'pack:paper-dad-1'],
       characters: g.characters.map((c) => (c.sprite === 'dad' && !c.paper ? { ...c, paper: { ...FAMILY_PAPER.dad } } : c)) };
