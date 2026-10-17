@@ -12,6 +12,30 @@ export interface MissionDef {
 }
 
 export const MISSIONS: Record<string, MissionDef> = {
+  'lifeguard-duty': {
+    id: 'lifeguard-duty', career: 'lifeguard', building: 'beach',
+    title: 'Lifeguard on Duty',
+    pitch: 'Help Kai keep the beach safe: raise the right flag, spot swimmers who need help and teach beach safety.',
+    minutes: 5,
+    reward: { coins: 55, xp: 75, career: 'lifeguard', careerXp: 120, badge: 'beach-hero', title: 'Everyone is safe at the beach!' },
+    repeatReward: { coins: 15, xp: 20, career: 'lifeguard', careerXp: 40, title: 'Another safe day at the beach!' },
+  },
+  'bank-saver': {
+    id: 'bank-saver', career: 'entrepreneur', building: 'bank',
+    title: 'Super Saver',
+    pitch: 'Help Sam the bank teller count coins for customers, then save your pocket money for something big.',
+    minutes: 5,
+    reward: { coins: 55, xp: 75, career: 'entrepreneur', careerXp: 120, badge: 'super-saver', title: 'You’re a super saver!' },
+    repeatReward: { coins: 15, xp: 20, career: 'entrepreneur', careerXp: 40, title: 'Saved again!' },
+  },
+  'shop-owner': {
+    id: 'shop-owner', career: 'entrepreneur', building: 'shopping',
+    title: 'Run Nia’s Shop',
+    pitch: 'Nia needs a helper! Set fair prices, serve customers and give the right change.',
+    minutes: 5,
+    reward: { coins: 55, xp: 75, career: 'entrepreneur', careerXp: 120, badge: 'shop-star', title: 'The shop had a great day!' },
+    repeatReward: { coins: 15, xp: 20, career: 'entrepreneur', careerXp: 40, title: 'Another busy day at the shop!' },
+  },
   'kpop-star': {
     id: 'kpop-star', career: 'performer', building: 'kpop',
     title: 'Rising Star Training',

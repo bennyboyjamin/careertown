@@ -35,7 +35,10 @@ export const CAREERS: Record<CareerId, CareerDef> = {
   performer: { id: 'performer', title: 'Performer', icon: '🎤', color: '#C77DFF', building: 'kpop', available: true,
     blurb: 'Singers, dancers and music producers practise hard and put on shows that make people happy.',
     strength: 'You have great rhythm and love making music.' },
-  entrepreneur: { id: 'entrepreneur', title: 'Business Owner', icon: '🏪', color: '#FFC93C', building: 'shopping', available: false,
+  lifeguard: { id: 'lifeguard', title: 'Lifeguard', icon: '🛟', color: '#7FD3F7', building: 'beach', available: true,
+    blurb: 'Lifeguards watch the water, keep swimmers safe and help anyone in trouble.',
+    strength: 'You stay alert and look out for others.' },
+  entrepreneur: { id: 'entrepreneur', title: 'Business Owner', icon: '🏪', color: '#FFC93C', building: 'shopping', available: true,
     blurb: 'Business owners make and sell things people need.', strength: 'You like making smart choices with coins.' },
 };
 
