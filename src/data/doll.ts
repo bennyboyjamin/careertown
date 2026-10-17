@@ -108,70 +108,87 @@ import d_g_pink_hoodie_0 from '../assets/doll/g-pink-hoodie-0.webp';
 import d_g_pink_hoodie_1 from '../assets/doll/g-pink-hoodie-1.webp';
 import d_g_pink_hoodie_2 from '../assets/doll/g-pink-hoodie-2.webp';
 import d_g_pink_hoodie_3 from '../assets/doll/g-pink-hoodie-3.webp';
+import d_hide_pink_hoodie from '../assets/doll/hide-pink-hoodie.webp';
 import d_g_puff_top_0 from '../assets/doll/g-puff-top-0.webp';
 import d_g_puff_top_1 from '../assets/doll/g-puff-top-1.webp';
 import d_g_puff_top_2 from '../assets/doll/g-puff-top-2.webp';
 import d_g_puff_top_3 from '../assets/doll/g-puff-top-3.webp';
+import d_hide_puff_top from '../assets/doll/hide-puff-top.webp';
 import d_g_cami_0 from '../assets/doll/g-cami-0.webp';
 import d_g_cami_1 from '../assets/doll/g-cami-1.webp';
 import d_g_cami_2 from '../assets/doll/g-cami-2.webp';
 import d_g_cami_3 from '../assets/doll/g-cami-3.webp';
+import d_hide_cami from '../assets/doll/hide-cami.webp';
 import d_g_smocked_0 from '../assets/doll/g-smocked-0.webp';
 import d_g_smocked_1 from '../assets/doll/g-smocked-1.webp';
 import d_g_smocked_2 from '../assets/doll/g-smocked-2.webp';
 import d_g_smocked_3 from '../assets/doll/g-smocked-3.webp';
+import d_hide_smocked from '../assets/doll/hide-smocked.webp';
 import d_g_pocket_tee_0 from '../assets/doll/g-pocket-tee-0.webp';
 import d_g_pocket_tee_1 from '../assets/doll/g-pocket-tee-1.webp';
 import d_g_pocket_tee_2 from '../assets/doll/g-pocket-tee-2.webp';
 import d_g_pocket_tee_3 from '../assets/doll/g-pocket-tee-3.webp';
+import d_hide_pocket_tee from '../assets/doll/hide-pocket-tee.webp';
 import d_g_floral_0 from '../assets/doll/g-floral-0.webp';
 import d_g_floral_1 from '../assets/doll/g-floral-1.webp';
 import d_g_floral_2 from '../assets/doll/g-floral-2.webp';
 import d_g_floral_3 from '../assets/doll/g-floral-3.webp';
+import d_hide_floral from '../assets/doll/hide-floral.webp';
 import d_g_bow_tee_0 from '../assets/doll/g-bow-tee-0.webp';
 import d_g_bow_tee_1 from '../assets/doll/g-bow-tee-1.webp';
 import d_g_bow_tee_2 from '../assets/doll/g-bow-tee-2.webp';
 import d_g_bow_tee_3 from '../assets/doll/g-bow-tee-3.webp';
+import d_hide_bow_tee from '../assets/doll/hide-bow-tee.webp';
 import d_g_blue_hoodie_0 from '../assets/doll/g-blue-hoodie-0.webp';
 import d_g_blue_hoodie_1 from '../assets/doll/g-blue-hoodie-1.webp';
 import d_g_blue_hoodie_2 from '../assets/doll/g-blue-hoodie-2.webp';
 import d_g_blue_hoodie_3 from '../assets/doll/g-blue-hoodie-3.webp';
+import d_hide_blue_hoodie from '../assets/doll/hide-blue-hoodie.webp';
 import d_g_green_tee_0 from '../assets/doll/g-green-tee-0.webp';
 import d_g_green_tee_1 from '../assets/doll/g-green-tee-1.webp';
 import d_g_green_tee_2 from '../assets/doll/g-green-tee-2.webp';
 import d_g_green_tee_3 from '../assets/doll/g-green-tee-3.webp';
+import d_hide_green_tee from '../assets/doll/hide-green-tee.webp';
 import d_g_sport_tee_0 from '../assets/doll/g-sport-tee-0.webp';
 import d_g_sport_tee_1 from '../assets/doll/g-sport-tee-1.webp';
 import d_g_sport_tee_2 from '../assets/doll/g-sport-tee-2.webp';
 import d_g_sport_tee_3 from '../assets/doll/g-sport-tee-3.webp';
+import d_hide_sport_tee from '../assets/doll/hide-sport-tee.webp';
 import d_g_wide_jeans_0 from '../assets/doll/g-wide-jeans-0.webp';
 import d_g_wide_jeans_1 from '../assets/doll/g-wide-jeans-1.webp';
 import d_g_wide_jeans_2 from '../assets/doll/g-wide-jeans-2.webp';
 import d_g_wide_jeans_3 from '../assets/doll/g-wide-jeans-3.webp';
+import d_hide_wide_jeans from '../assets/doll/hide-wide-jeans.webp';
 import d_g_leggings_0 from '../assets/doll/g-leggings-0.webp';
 import d_g_leggings_1 from '../assets/doll/g-leggings-1.webp';
 import d_g_leggings_2 from '../assets/doll/g-leggings-2.webp';
 import d_g_leggings_3 from '../assets/doll/g-leggings-3.webp';
+import d_hide_leggings from '../assets/doll/hide-leggings.webp';
 import d_g_pleat_skirt_0 from '../assets/doll/g-pleat-skirt-0.webp';
 import d_g_pleat_skirt_1 from '../assets/doll/g-pleat-skirt-1.webp';
 import d_g_pleat_skirt_2 from '../assets/doll/g-pleat-skirt-2.webp';
 import d_g_pleat_skirt_3 from '../assets/doll/g-pleat-skirt-3.webp';
+import d_hide_pleat_skirt from '../assets/doll/hide-pleat-skirt.webp';
 import d_g_jeans_0 from '../assets/doll/g-jeans-0.webp';
 import d_g_jeans_1 from '../assets/doll/g-jeans-1.webp';
 import d_g_jeans_2 from '../assets/doll/g-jeans-2.webp';
 import d_g_jeans_3 from '../assets/doll/g-jeans-3.webp';
+import d_hide_jeans from '../assets/doll/hide-jeans.webp';
 import d_g_mary_janes_0 from '../assets/doll/g-mary-janes-0.webp';
 import d_g_mary_janes_1 from '../assets/doll/g-mary-janes-1.webp';
 import d_g_mary_janes_2 from '../assets/doll/g-mary-janes-2.webp';
 import d_g_mary_janes_3 from '../assets/doll/g-mary-janes-3.webp';
+import d_hide_mary_janes from '../assets/doll/hide-mary-janes.webp';
 import d_g_white_sneakers_0 from '../assets/doll/g-white-sneakers-0.webp';
 import d_g_white_sneakers_1 from '../assets/doll/g-white-sneakers-1.webp';
 import d_g_white_sneakers_2 from '../assets/doll/g-white-sneakers-2.webp';
 import d_g_white_sneakers_3 from '../assets/doll/g-white-sneakers-3.webp';
+import d_hide_white_sneakers from '../assets/doll/hide-white-sneakers.webp';
 import d_g_clogs_0 from '../assets/doll/g-clogs-0.webp';
 import d_g_clogs_1 from '../assets/doll/g-clogs-1.webp';
 import d_g_clogs_2 from '../assets/doll/g-clogs-2.webp';
 import d_g_clogs_3 from '../assets/doll/g-clogs-3.webp';
+import d_hide_clogs from '../assets/doll/hide-clogs.webp';
 
 export const DOLL_W = 384;
 export const DOLL_PAD = 130;
@@ -299,22 +316,22 @@ export const DOLL_BASIC: Record<string, { src: string; box: number[] }> = {
 
 export type GarmentKind = 'top' | 'bottom' | 'shoes';
 
-export const DOLL_GARMENTS: Record<string, { kind: GarmentKind; label: string; srcs: string[]; boxes: number[][] }> = {
-  'pink-hoodie': { kind: 'top', label: 'Pink hoodie', srcs: [d_g_pink_hoodie_0, d_g_pink_hoodie_1, d_g_pink_hoodie_2, d_g_pink_hoodie_3], boxes: [[0, 274, 383, 337], [0, 274, 383, 337], [0, 274, 383, 337], [0, 274, 383, 337]] },
-  'puff-top': { kind: 'top', label: 'Puff-sleeve top', srcs: [d_g_puff_top_0, d_g_puff_top_1, d_g_puff_top_2, d_g_puff_top_3], boxes: [[43, 295, 313, 312], [43, 295, 313, 312], [43, 295, 313, 312], [43, 295, 313, 312]] },
-  'cami': { kind: 'top', label: 'Cami top', srcs: [d_g_cami_0, d_g_cami_1, d_g_cami_2, d_g_cami_3], boxes: [[0, 295, 306, 312], [0, 295, 306, 312], [0, 295, 306, 312], [0, 295, 306, 312]] },
-  'smocked': { kind: 'top', label: 'Ruffle top', srcs: [d_g_smocked_0, d_g_smocked_1, d_g_smocked_2, d_g_smocked_3], boxes: [[59, 285, 271, 244], [59, 285, 271, 244], [59, 285, 271, 244], [59, 285, 271, 244]] },
-  'pocket-tee': { kind: 'top', label: 'Pocket tee', srcs: [d_g_pocket_tee_0, d_g_pocket_tee_1, d_g_pocket_tee_2, d_g_pocket_tee_3], boxes: [[53, 284, 286, 252], [53, 284, 286, 257], [53, 284, 286, 258], [53, 284, 286, 258]] },
-  'floral': { kind: 'top', label: 'Flower blouse', srcs: [d_g_floral_0, d_g_floral_1, d_g_floral_2, d_g_floral_3], boxes: [[47, 291, 297, 238], [47, 291, 297, 243], [47, 291, 297, 243], [47, 291, 297, 244]] },
-  'bow-tee': { kind: 'top', label: 'Bow tee', srcs: [d_g_bow_tee_0, d_g_bow_tee_1, d_g_bow_tee_2, d_g_bow_tee_3], boxes: [[52, 289, 285, 239], [52, 289, 285, 252], [52, 289, 285, 253], [52, 289, 285, 253]] },
-  'blue-hoodie': { kind: 'top', label: 'Blue hoodie', srcs: [d_g_blue_hoodie_0, d_g_blue_hoodie_1, d_g_blue_hoodie_2, d_g_blue_hoodie_3], boxes: [[0, 274, 384, 376], [0, 274, 384, 376], [0, 274, 384, 376], [0, 274, 384, 376]] },
-  'green-tee': { kind: 'top', label: 'Green tee', srcs: [d_g_green_tee_0, d_g_green_tee_1, d_g_green_tee_2, d_g_green_tee_3], boxes: [[0, 274, 384, 571], [0, 274, 384, 571], [0, 274, 384, 571], [0, 274, 384, 571]] },
-  'sport-tee': { kind: 'top', label: 'Sport tee', srcs: [d_g_sport_tee_0, d_g_sport_tee_1, d_g_sport_tee_2, d_g_sport_tee_3], boxes: [[0, 274, 384, 372], [0, 274, 384, 372], [0, 274, 384, 372], [0, 274, 384, 372]] },
-  'wide-jeans': { kind: 'bottom', label: 'Wide jeans', srcs: [d_g_wide_jeans_0, d_g_wide_jeans_1, d_g_wide_jeans_2, d_g_wide_jeans_3], boxes: [[17, 346, 355, 590], [18, 345, 353, 591], [18, 345, 353, 591], [18, 345, 353, 591]] },
-  'leggings': { kind: 'bottom', label: 'Leggings', srcs: [d_g_leggings_0, d_g_leggings_1, d_g_leggings_2, d_g_leggings_3], boxes: [[58, 401, 272, 482], [58, 401, 272, 482], [58, 401, 272, 482], [58, 401, 272, 482]] },
-  'pleat-skirt': { kind: 'bottom', label: 'Pleated skirt', srcs: [d_g_pleat_skirt_0, d_g_pleat_skirt_1, d_g_pleat_skirt_2, d_g_pleat_skirt_3], boxes: [[50, 404, 289, 254], [51, 404, 287, 254], [51, 404, 286, 254], [51, 404, 286, 254]] },
-  'jeans': { kind: 'bottom', label: 'Jeans', srcs: [d_g_jeans_0, d_g_jeans_1, d_g_jeans_2, d_g_jeans_3], boxes: [[55, 347, 276, 557], [56, 347, 275, 557], [56, 347, 275, 557], [56, 347, 275, 557]] },
-  'mary-janes': { kind: 'shoes', label: 'Mary Janes', srcs: [d_g_mary_janes_0, d_g_mary_janes_1, d_g_mary_janes_2, d_g_mary_janes_3], boxes: [[66, 864, 254, 96], [66, 864, 254, 96], [66, 864, 254, 96], [66, 864, 254, 96]] },
-  'white-sneakers': { kind: 'shoes', label: 'White sneakers', srcs: [d_g_white_sneakers_0, d_g_white_sneakers_1, d_g_white_sneakers_2, d_g_white_sneakers_3], boxes: [[60, 863, 266, 97], [60, 863, 266, 97], [60, 863, 266, 97], [60, 863, 266, 97]] },
-  'clogs': { kind: 'shoes', label: 'Clogs', srcs: [d_g_clogs_0, d_g_clogs_1, d_g_clogs_2, d_g_clogs_3], boxes: [[59, 864, 269, 96], [59, 864, 269, 96], [59, 864, 269, 96], [59, 864, 269, 96]] },
+export const DOLL_GARMENTS: Record<string, { kind: GarmentKind; label: string; srcs: string[]; boxes: number[][]; hide?: string }> = {
+  'pink-hoodie': { kind: 'top', label: 'Pink hoodie', srcs: [d_g_pink_hoodie_0, d_g_pink_hoodie_1, d_g_pink_hoodie_2, d_g_pink_hoodie_3], boxes: [[13, 274, 370, 274], [13, 274, 370, 274], [13, 274, 370, 274], [13, 274, 370, 274]], hide: d_hide_pink_hoodie },
+  'puff-top': { kind: 'top', label: 'Puff-sleeve top', srcs: [d_g_puff_top_0, d_g_puff_top_1, d_g_puff_top_2, d_g_puff_top_3], boxes: [[43, 295, 302, 237], [43, 295, 302, 237], [43, 295, 302, 237], [43, 295, 302, 237]], hide: d_hide_puff_top },
+  'cami': { kind: 'top', label: 'Cami top', srcs: [d_g_cami_0, d_g_cami_1, d_g_cami_2, d_g_cami_3], boxes: [[0, 296, 297, 257], [0, 296, 297, 257], [0, 296, 297, 257], [0, 296, 297, 257]], hide: d_hide_cami },
+  'smocked': { kind: 'top', label: 'Ruffle top', srcs: [d_g_smocked_0, d_g_smocked_1, d_g_smocked_2, d_g_smocked_3], boxes: [[60, 286, 270, 243], [60, 286, 270, 243], [60, 286, 270, 243], [60, 286, 270, 243]], hide: d_hide_smocked },
+  'pocket-tee': { kind: 'top', label: 'Pocket tee', srcs: [d_g_pocket_tee_0, d_g_pocket_tee_1, d_g_pocket_tee_2, d_g_pocket_tee_3], boxes: [[54, 287, 283, 241], [54, 287, 283, 241], [54, 287, 283, 241], [54, 287, 283, 241]], hide: d_hide_pocket_tee },
+  'floral': { kind: 'top', label: 'Flower blouse', srcs: [d_g_floral_0, d_g_floral_1, d_g_floral_2, d_g_floral_3], boxes: [[47, 294, 296, 211], [47, 294, 296, 211], [47, 294, 296, 211], [47, 294, 296, 211]], hide: d_hide_floral },
+  'bow-tee': { kind: 'top', label: 'Bow tee', srcs: [d_g_bow_tee_0, d_g_bow_tee_1, d_g_bow_tee_2, d_g_bow_tee_3], boxes: [[54, 289, 283, 239], [54, 289, 283, 239], [54, 289, 283, 239], [54, 289, 283, 239]], hide: d_hide_bow_tee },
+  'blue-hoodie': { kind: 'top', label: 'Blue hoodie', srcs: [d_g_blue_hoodie_0, d_g_blue_hoodie_1, d_g_blue_hoodie_2, d_g_blue_hoodie_3], boxes: [[13, 274, 371, 274], [13, 274, 371, 274], [13, 274, 371, 274], [13, 274, 371, 274]], hide: d_hide_blue_hoodie },
+  'green-tee': { kind: 'top', label: 'Green tee', srcs: [d_g_green_tee_0, d_g_green_tee_1, d_g_green_tee_2, d_g_green_tee_3], boxes: [[50, 287, 334, 256], [50, 287, 334, 256], [50, 287, 334, 256], [50, 287, 334, 256]], hide: d_hide_green_tee },
+  'sport-tee': { kind: 'top', label: 'Sport tee', srcs: [d_g_sport_tee_0, d_g_sport_tee_1, d_g_sport_tee_2, d_g_sport_tee_3], boxes: [[49, 288, 294, 259], [49, 288, 294, 259], [49, 288, 294, 259], [49, 288, 294, 259]], hide: d_hide_sport_tee },
+  'wide-jeans': { kind: 'bottom', label: 'Wide jeans', srcs: [d_g_wide_jeans_0, d_g_wide_jeans_1, d_g_wide_jeans_2, d_g_wide_jeans_3], boxes: [[17, 496, 355, 440], [18, 496, 353, 440], [18, 496, 353, 440], [18, 496, 353, 440]], hide: d_hide_wide_jeans },
+  'leggings': { kind: 'bottom', label: 'Leggings', srcs: [d_g_leggings_0, d_g_leggings_1, d_g_leggings_2, d_g_leggings_3], boxes: [[58, 513, 272, 365], [59, 513, 270, 365], [59, 513, 270, 365], [59, 513, 270, 365]], hide: d_hide_leggings },
+  'pleat-skirt': { kind: 'bottom', label: 'Pleated skirt', srcs: [d_g_pleat_skirt_0, d_g_pleat_skirt_1, d_g_pleat_skirt_2, d_g_pleat_skirt_3], boxes: [[51, 491, 287, 167], [52, 491, 285, 167], [53, 491, 283, 167], [53, 491, 283, 167]], hide: d_hide_pleat_skirt },
+  'jeans': { kind: 'bottom', label: 'Jeans', srcs: [d_g_jeans_0, d_g_jeans_1, d_g_jeans_2, d_g_jeans_3], boxes: [[56, 499, 275, 405], [56, 499, 274, 405], [56, 499, 274, 405], [56, 499, 274, 405]], hide: d_hide_jeans },
+  'mary-janes': { kind: 'shoes', label: 'Mary Janes', srcs: [d_g_mary_janes_0, d_g_mary_janes_1, d_g_mary_janes_2, d_g_mary_janes_3], boxes: [[66, 864, 254, 98], [66, 864, 254, 98], [66, 864, 254, 98], [66, 864, 254, 98]], hide: d_hide_mary_janes },
+  'white-sneakers': { kind: 'shoes', label: 'White sneakers', srcs: [d_g_white_sneakers_0, d_g_white_sneakers_1, d_g_white_sneakers_2, d_g_white_sneakers_3], boxes: [[60, 863, 266, 99], [60, 863, 266, 99], [60, 863, 266, 99], [60, 863, 266, 99]], hide: d_hide_white_sneakers },
+  'clogs': { kind: 'shoes', label: 'Clogs', srcs: [d_g_clogs_0, d_g_clogs_1, d_g_clogs_2, d_g_clogs_3], boxes: [[59, 864, 269, 98], [59, 864, 269, 98], [59, 864, 269, 98], [59, 864, 269, 98]], hide: d_hide_clogs },
 };
