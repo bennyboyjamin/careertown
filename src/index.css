@@ -354,8 +354,8 @@ button { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { .stroller, .stroller-body, .stroller-hop, .glow.lamp, .star { animation: none !important; } }
 /* Sticker book (components/StickerBook.tsx). */
 .sticker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 8px; }
-.sticker { aspect-ratio: 1; border-radius: 50%; border: 3px dashed rgba(43,35,80,.3); background: #F6F2FF; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 800; font-size: 20px; color: rgba(43,35,80,.35); display: grid; place-items: center; }
-.sticker.got { border: 3px solid #2B2350; background: #fff; font-size: 32px; color: inherit; box-shadow: 0 3px 0 #2B2350; animation: sticker-in .4s cubic-bezier(.3,1.6,.6,1); }
+.sbook-sticker { aspect-ratio: 1; border-radius: 50%; border: 3px dashed rgba(43,35,80,.3); background: #F6F2FF; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 800; font-size: 20px; color: rgba(43,35,80,.35); display: grid; place-items: center; }
+.sbook-sticker.got { border: 3px solid #2B2350; background: #fff; font-size: 32px; color: inherit; box-shadow: 0 3px 0 #2B2350; animation: sticker-in .4s cubic-bezier(.3,1.6,.6,1); }
 @keyframes sticker-in { from { transform: scale(.4); } }
 /* Photo mode (components/PhotoMode.tsx): hide the buttons, add a frame. */
 body.photo-mode .hud-float, body.photo-mode .room-tabs, body.photo-mode .scene-actions, body.photo-mode .trash, body.photo-mode .phase-btn, body.photo-mode .worker-tag, body.photo-mode .worker-bubble { display: none !important; }

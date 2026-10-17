@@ -11,7 +11,7 @@ export function StickerBook() {
   const days = DAILY_STICKERS.filter((s) => have.has(s.id)).length;
   const sticker = (id: string, icon: string, name: string, how: string | undefined, got: boolean, i: number) => (
     <button key={id} aria-label={got ? name : `Locked: ${how ?? 'play another day'}`} onClick={() => { sfx(got ? 'sparkle' : 'tap'); setInfo(got ? `${icon} ${name}` : `🔒 ${how ?? 'Come back another day for a new sticker!'}`); }}
-      className={`sticker ${got ? 'got' : ''}`} style={{ rotate: `${((i * 37) % 13) - 6}deg` }}>
+      className={`sbook-sticker ${got ? 'got' : ''}`} style={{ rotate: `${((i * 37) % 13) - 6}deg` }}>
       {got ? icon : '?'}
     </button>
   );

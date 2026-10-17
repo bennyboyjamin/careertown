@@ -40,12 +40,32 @@ export const SCENES: Record<SceneId, SceneDef> = {
   'engineering-lab': { id: 'engineering-lab', label: 'Workshop', wall: '#D8EEFF', wallPattern: 'grid', floor: '#9AA6B8', floorPattern: 'checker', horizon: 450, art: artEngineering, anchors: { window: { box: [300, 130, 300, 240], hide: true } } },
 };
 
+
+/** Things added to every room in Oct 2026 (also added once to saved games, see store.tsx). */
+export const EXTRA_ITEMS: Partial<Record<SceneId, [string, number, number][]>> = {
+  'home-kitchen': [['kettle', 230, 690], ['strawberry', 420, 700], ['grapes', 610, 700], ['spoon', 980, 700]],
+  'home-bedroom': [['guitar', 200, 700], ['dino', 385, 705], ['piggybank', 555, 700], ['unicorn', 960, 700]],
+  'home-living': [['photo', 590, 300], ['books', 340, 705], ['gamepad', 560, 705], ['puzzle', 880, 700]],
+  'home-bathroom': [['shampoo', 700, 670], ['sponge', 270, 690], ['bubbles', 330, 640]],
+  'school-classroom': [['crayons', 70, 700], ['abacus', 760, 705], ['microscope', 960, 690], ['books', 40, 600]],
+  'hospital-exam': [['xray', 760, 270], ['clipboard', 560, 690], ['icepack', 260, 690], ['lollipop', 160, 690]],
+  'courthouse-room': [['camera', 480, 690], ['notebook', 120, 690], ['footprints', 600, 695], ['key', 790, 690]],
+  'vet-clinic': [['hay', 200, 690], ['tennisball', 470, 700], ['mousetoy', 880, 700]],
+  'restaurant-kitchen': [['orderbell', 600, 700], ['pineapple', 560, 690], ['olive', 640, 695], ['onion', 240, 690]],
+  'tech-lab': [['laptop', 430, 690], ['joystick', 690, 695], ['battery', 330, 700]],
+  'engineering-lab': [['magnet', 300, 700], ['screwdriver', 960, 700], ['bolts', 820, 705], ['ladder', 70, 680]],
+};
+export const extraFor = (id: SceneId): Entity[] => (EXTRA_ITEMS[id] ?? []).map(([ref, x, y]) => ({ id: `${ref}-x${x}`, kind: 'item', ref, x, y }));
+
 let n = 0;
 const it = (ref: string, x: number, y: number, state?: Record<string, unknown>): Entity =>
   ({ id: `${ref}-${++n}`, kind: 'item', ref, x, y, state });
 
 /** Starting furniture for each room. Characters and pets are added by the player. */
 export function initialScene(id: SceneId): Entity[] {
+  return [...baseScene(id), ...extraFor(id)];
+}
+function baseScene(id: SceneId): Entity[] {
   n = 0;
   switch (id) {
     case 'home-kitchen': {
