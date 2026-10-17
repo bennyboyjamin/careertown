@@ -18,6 +18,9 @@ import { VetMission } from './missions/VetMission';
 import { RobotMission } from './missions/RobotMission';
 import { ChefMission } from './missions/ChefMission';
 import { KpopMission } from './missions/KpopMission';
+import { BeachMission } from './missions/BeachMission';
+import { BankMission } from './missions/BankMission';
+import { ShopMission } from './missions/ShopMission';
 import { Person } from './components/Person';
 import { SPRITES } from './data/sprites';
 import { sfx } from './engine/sfx';
@@ -31,6 +34,9 @@ const MISSION_VIEWS: Record<string, (p: { onExit: () => void }) => ReactElement>
   'software-robot': RobotMission,
   'chef-pizza': ChefMission,
   'kpop-star': KpopMission,
+  'lifeguard-duty': BeachMission,
+  'bank-saver': BankMission,
+  'shop-owner': ShopMission,
 };
 
 function Game() {

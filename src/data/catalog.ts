@@ -93,6 +93,9 @@ export const BADGES: Record<string, { label: string; icon: string; desc: string 
   'code-cadet': { label: 'Code Cadet', icon: '🤖', desc: 'Programmed Bolt to the charger' },
   'explorer': { label: 'Explorer', icon: '🧭', desc: 'Found 3 secrets around town' },
   'chef': { label: 'Little Chef', icon: '👩‍🍳', desc: 'Cooked 3 dishes at home' },
+  'beach-hero': { label: 'Beach Hero', icon: '🛟', desc: 'Kept everyone safe as a lifeguard' },
+  'super-saver': { label: 'Super Saver', icon: '🐷', desc: 'Counted coins and saved up at the bank' },
+  'shop-star': { label: 'Shop Star', icon: '🛍️', desc: 'Ran Nia’s shop for a day' },
   'rising-star': { label: 'Rising Star', icon: '🌟', desc: 'Trained and performed at the K-pop Academy' },
   'pizza-chef': { label: 'Pizza Chef', icon: '🍕', desc: 'Served the pizza party at Café Sunny' },
 };
