@@ -14,6 +14,7 @@ const V = (h: number, adult = false): Sprite => ({ src: DOLL_PIC, w: Math.round(
 export const SPRITES: Record<string, Sprite> = {
   doll: { src: DOLL_PIC, w: 133, h: 270, head: 0.45 },
   // the family, from tallest to smallest
+  'doll-adult': V(298, true),
   dad: V(300, true), mom: V(290, true),
   natalie: V(262), yuna: V(256), brother: V(232), nene: V(208),
   snowy: S(snowy, 113, 136), coco: S(coco, 104, 140),
@@ -72,6 +73,6 @@ const DOLL_ADULT: Layered = {
   fit: DOLL_FIT,
 };
 for (const k of ['yuna', 'natalie', 'brother', 'nene']) LAYERED[k] = LAYERED.doll;
-for (const k of ['mom', 'dad']) LAYERED[k] = DOLL_ADULT;
+for (const k of ['mom', 'dad', 'doll-adult']) LAYERED[k] = DOLL_ADULT;
 /** Rig for a dress-up look (kid or grown-up). */
 export const dollRig = (adult?: boolean) => (adult ? DOLL_ADULT : LAYERED.doll);

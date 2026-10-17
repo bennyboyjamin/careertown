@@ -245,3 +245,20 @@ button { touch-action: manipulation; }
 .painted-night { background: radial-gradient(circle at 70% 30%, #FFF6C8 0 4%, transparent 5%), radial-gradient(circle at 20% 25%, #fff 0 1.2%, transparent 1.6%), radial-gradient(circle at 45% 60%, #fff 0 1%, transparent 1.4%), radial-gradient(circle at 80% 70%, #fff 0 1%, transparent 1.4%), linear-gradient(#232059, #3B3A8C); opacity: .92; transition: opacity .7s; }
 .tv-screen { border-radius: 3px; background: linear-gradient(135deg, #7FD3F7, #FF7FB5 40%, #FFC93C 70%, #8BD46E); animation: tv 3s linear infinite; box-shadow: 0 0 18px rgba(127,211,247,.7); }
 .lamp-glow { left: -60%; right: -60%; top: -25%; height: 75%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,236,160,.85), rgba(255,236,160,0)); }
+
+/* ── Plain CSS added Oct 2026 (no Tailwind classes below this line) ── */
+/* Missions: centre the content in tall screens (iPad) instead of leaving the bottom empty. */
+.mission-body { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
+/* Phones: keep the character maker's preview small enough to see the options. */
+@media (max-width: 767px) and (orientation: landscape) {
+  .creator-grid { grid-template-columns: 210px 1fr; }
+  .creator-side { position: sticky; top: 0; align-self: start; }
+  .creator-stage { max-height: 50vh; }
+}
+@media (max-width: 767px) and (orientation: portrait) { .creator-stage { max-height: 42vh; } }
+/* Read-to-me button in missions. */
+.read-btn[aria-pressed="true"] { background: #FFC93C; }
+/* Café Sunny (restaurant mission) colours. */
+.bg-cafe { background: #FFE3D1; }
+.bg-cafe-floor { background: #E9B98F; }
+.bg-order { background: #FFF6E0; }

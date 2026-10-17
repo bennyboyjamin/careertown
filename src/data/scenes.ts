@@ -35,6 +35,7 @@ export const SCENES: Record<SceneId, SceneDef> = {
   'hospital-exam': { id: 'hospital-exam', label: 'Exam room', wall: '#E3F6F1', wallPattern: 'plain', floor: '#BFE3EA', floorPattern: 'tiles', horizon: 500, art: artHospital, anchors: { window: { box: [220, 140, 360, 250], hide: true } } },
   'courthouse-room': { id: 'courthouse-room', label: 'Courtroom', wall: '#E6DDF8', wallPattern: 'panels', floor: '#8E5B3F', floorPattern: 'boards', horizon: 450, art: artCourt, anchors: { window: { box: [10, 40, 140, 320], hide: true }, scales: { hide: true } } },
   'vet-clinic': { id: 'vet-clinic', label: 'Pet clinic', wall: '#D4F7E8', wallPattern: 'dots', floor: '#FFE3B3', floorPattern: 'checker', horizon: 450, art: artVet, anchors: { window: { box: [250, 130, 370, 250], hide: true }, pawposter: { hide: true } } },
+  'restaurant-kitchen': { id: 'restaurant-kitchen', label: 'Café kitchen', wall: '#FFE3D1', wallPattern: 'tiles', floor: '#E9B98F', floorPattern: 'checker', horizon: 460 },
   'tech-lab': { id: 'tech-lab', label: 'Coding lab', wall: '#DCE6FF', wallPattern: 'grid', floor: '#B7C6D6', floorPattern: 'tiles', horizon: 440 },
   'engineering-lab': { id: 'engineering-lab', label: 'Workshop', wall: '#D8EEFF', wallPattern: 'grid', floor: '#9AA6B8', floorPattern: 'checker', horizon: 450, art: artEngineering, anchors: { window: { box: [300, 130, 300, 240], hide: true } } },
 };
@@ -110,6 +111,17 @@ export function initialScene(id: SceneId): Entity[] {
         { id: 'visitor-bunny-ent', kind: 'pet', ref: 'visitor-bunny', x: 330, y: 660, pose: 'stand' },
         { id: 'visitor-puppy-ent', kind: 'pet', ref: 'visitor-puppy', x: 560, y: 690, pose: 'stand' },
       ];
+    case 'restaurant-kitchen': {
+      const counter = it('counter', 330, 470);
+      const table = it('table', 700, 610);
+      return [
+        it('window', 520, 245), it('fridge', 110, 470), counter, it('stove', 520, 470),
+        { ...it('dough', 290, 300), state: { on: counter.id } }, { ...it('tomato', 360, 300), state: { on: counter.id } },
+        table, it('chair', 540, 625), it('chair', 870, 625),
+        { ...it('plate', 660, 478), state: { on: table.id } }, { ...it('cup', 740, 478), state: { on: table.id } },
+        it('cheese', 300, 680), it('mushroom', 400, 690), it('pepper', 480, 685),
+      ];
+    }
     case 'tech-lab':
       return [
         it('codeposter', 470, 250), it('serverrack', 110, 480), it('window', 800, 240),

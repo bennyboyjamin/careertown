@@ -33,7 +33,8 @@ export const BUILDINGS: BuildingDef[] = [
     rooms: [{ sceneId: 'vet-clinic', label: 'Pet clinic', icon: '🐾' }], missions: ['vet-checkup'] },
   { id: 'tech-lab', name: 'Technology Lab', icon: '💻', career: 'software', playable: true, x: 550, y: 610, w: 150, wall: '#DCE6FF', roof: '#3D7BFF', shape: 'lab',
     rooms: [{ sceneId: 'tech-lab', label: 'Coding lab', icon: '💻' }], missions: ['software-robot'] },
-  { id: 'restaurant', name: 'Restaurant', icon: '🍕', playable: false, x: 715, y: 610, w: 150, wall: '#FFE3D1', roof: '#FF8A3D', shape: 'shop', rooms: [], missions: [] },
+  { id: 'restaurant', name: 'Restaurant', icon: '🍕', career: 'chef', playable: true, x: 715, y: 610, w: 150, wall: '#FFE3D1', roof: '#FF8A3D', shape: 'shop',
+    rooms: [{ sceneId: 'restaurant-kitchen', label: 'Café kitchen', icon: '🍕' }], missions: ['chef-pizza'] },
   { id: 'shopping', name: 'Shopping Center', icon: '🛍️', career: 'entrepreneur', playable: false, x: 880, y: 610, w: 160, wall: '#FFE0F0', roof: '#FF7FB5', shape: 'shop', rooms: [], missions: [] },
   { id: 'bank', name: 'Bank', icon: '🏦', playable: false, x: 925, y: 280, w: 120, wall: '#EFEFEF', roof: '#8E8E9A', shape: 'civic', rooms: [], missions: [] },
 ];

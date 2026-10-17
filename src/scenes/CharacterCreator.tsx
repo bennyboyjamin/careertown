@@ -115,8 +115,8 @@ export function CharacterCreator({ editId, onDone }: { editId?: string; onDone: 
 
   return (
     <div className="h-full overflow-auto p-3 sm:p-5">
-      <div className="mx-auto max-w-5xl grid md:grid-cols-[280px_1fr] gap-4">
-        <div className="rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4 flex flex-col items-center md:sticky md:top-0 md:self-start">
+      <div className="creator-grid mx-auto max-w-5xl grid md:grid-cols-[280px_1fr] gap-4">
+        <div className="creator-side rounded-[28px] border-[4px] border-ink bg-white shadow-chunky p-4 flex flex-col items-center md:sticky md:top-0 md:self-start">
           <div className="w-full flex gap-2 overflow-x-auto pb-2">
             {game.characters.map((c) => (
               <button key={c.id} onClick={() => { sfx('tap'); setDraft(c); }} aria-label={`Edit ${c.name}`} className={`rounded-full ${c.id === draft.id ? 'ring-4 ring-berry' : ''}`}><Face c={c} size={48} /></button>

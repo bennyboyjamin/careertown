@@ -12,6 +12,14 @@ export interface MissionDef {
 }
 
 export const MISSIONS: Record<string, MissionDef> = {
+  'chef-pizza': {
+    id: 'chef-pizza', career: 'chef', building: 'restaurant',
+    title: 'Pizza Party at Café Sunny',
+    pitch: 'Café Sunny is busy! Help Chef Sunny get ready, follow the recipe and make pizzas just the way each customer ordered.',
+    minutes: 6,
+    reward: { coins: 55, xp: 75, career: 'chef', careerXp: 120, badge: 'pizza-chef', unlocks: ['wear:top:chef', 'dough'], title: 'Pizza party served!' },
+    repeatReward: { coins: 15, xp: 20, career: 'chef', careerXp: 40, title: 'Another happy table!' },
+  },
   'vet-checkup': {
     id: 'vet-checkup', career: 'vet', building: 'animal-hospital',
     title: 'Clover’s Clinic Visit',

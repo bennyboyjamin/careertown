@@ -9,16 +9,27 @@ export interface SaveAdapter {
   load(profileId: string): Promise<GameState | null>;
   save(profileId: string, state: GameState): Promise<void>;
   clear(profileId: string): Promise<void>;
+  /** Keep a copy of a save the game can't use (damaged, or from a newer version) so it is never lost. */
+  backup?(profileId: string, raw: unknown): Promise<void>;
 }
 
 const KEY = (id: string) => `careertown:save:${id}`;
+const BACKUP_KEY = (id: string) => `careertown:backup:${id}:${Date.now()}`;
 
 export const localSave: SaveAdapter = {
   async load(id) {
+    let raw: string | null = null;
     try {
-      const raw = localStorage.getItem(KEY(id));
+      raw = localStorage.getItem(KEY(id));
       return raw ? (JSON.parse(raw) as GameState) : null;
-    } catch { return null; }
+    } catch {
+      // Damaged save: keep the text so it can be recovered, then start fresh.
+      if (raw) try { localStorage.setItem(BACKUP_KEY(id), raw); } catch { /* storage full */ }
+      return null;
+    }
+  },
+  async backup(id, raw) {
+    try { localStorage.setItem(BACKUP_KEY(id), typeof raw === 'string' ? raw : JSON.stringify(raw)); } catch { /* storage full or blocked */ }
   },
   async save(id, state) {
     try { localStorage.setItem(KEY(id), JSON.stringify(state)); } catch { /* storage full or blocked */ }
@@ -47,4 +58,15 @@ export const localSave: SaveAdapter = {
  */
 
 export const SAVE_VERSION = 1;
+
+/**
+ * Save upgrades. When the save format changes, bump SAVE_VERSION and add a step here that turns a
+ * version-N save into a version-N+1 save. Older saves are upgraded step by step instead of being dropped.
+ */
+export const MIGRATIONS: Record<number, (g: GameState) => GameState> = {};
+export function migrate(g: GameState): GameState {
+  let v = g.version ?? 1;
+  while (v < SAVE_VERSION) { g = (MIGRATIONS[v] ?? ((x) => x))({ ...g }); v += 1; g = { ...g, version: v }; }
+  return g;
+}
 export const ACTIVE_PROFILE = 'local-child-1';

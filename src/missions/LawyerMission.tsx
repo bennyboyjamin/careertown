@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import { useGame } from '../engine/store';
-import type { Look } from '../engine/types';
-import { CharacterArt } from '../components/art/Character';
+import { Person } from '../components/Person';
+import { npc } from '../data/dollLooks';
 import { DragChip } from '../ui/DragChip';
 import { Btn, Modal } from '../ui/kit';
 import { MissionShell, Panel, Feedback, Stars } from './MissionShell';
 import { sfx } from '../engine/sfx';
 
 // ── Case data (fictional, playful, no real-world law) ─────
-const PEOPLE: Record<string, { name: string; look: Look }> = {
-  ava: { name: 'Ava', look: { skin: '#A0663F', face: 'oval', eyes: 'lashes', hair: 'ponytail', hairColor: '#2B1B12', top: 'polo', topColor: '#A98BFF', bottom: 'skirt', bottomColor: '#FF7FB5', shoes: '#FFFFFF', glasses: 'none', hat: 'none', accessory: 'bow' } },
-  ben: { name: 'Ben', look: { skin: '#FCE3CF', face: 'round', eyes: 'dot', hair: 'spiky', hairColor: '#E9B44C', top: 'hoodie', topColor: '#8BD46E', bottom: 'shorts', bottomColor: '#3D7BFF', shoes: '#FF8A3D', glasses: 'none', hat: 'none', accessory: 'none' } },
-  chloe: { name: 'Chloe', look: { skin: '#E8AE7E', face: 'square', eyes: 'big', hair: 'curly', hairColor: '#5B3A21', top: 'star', topColor: '#FF5D8F', bottom: 'jeans', bottomColor: '#3D7BFF', shoes: '#FFC93C', glasses: 'round', hat: 'none', accessory: 'none' } },
-  judge: { name: 'Judge Marigold', look: { skin: '#C98B5B', face: 'oval', eyes: 'happy', hair: 'bob', hairColor: '#8E8E9A', top: 'suit', topColor: '#FFC93C', bottom: 'pants', bottomColor: '#34355E', shoes: '#2B2350', glasses: 'square', hat: 'none', accessory: 'none' } },
+const PEOPLE: Record<string, { name: string }> = {
+  ava: { name: 'Ava' }, ben: { name: 'Ben' }, chloe: { name: 'Chloe' }, judge: { name: 'Judge Marigold' },
 };
 
 const STATEMENTS = [
@@ -53,7 +50,7 @@ const ARG = {
 const STEPS = ['Case', 'Witnesses', 'Evidence', 'Fact or opinion', 'Contradiction', 'Questions', 'Best evidence', 'Argument', 'Verdict'];
 
 function Portrait({ who, size = 'w-20 h-28' }: { who: string; size?: string }) {
-  return <div className={`${size} shrink-0 rounded-2xl border-[3px] border-ink bg-[#E6DDF8] overflow-hidden`}><div className="w-full h-[150%]"><CharacterArt look={PEOPLE[who].look} age={who === 'judge' ? 'adult' : 'child'} /></div></div>;
+  return <div className={`${size} shrink-0 rounded-2xl border-[3px] border-ink bg-[#E6DDF8] overflow-hidden`}><div className="w-full" style={{ aspectRatio: who === 'judge' ? '384 / 881' : '384 / 780', marginTop: '-6%' }}><Person c={npc(who, PEOPLE[who].name)} mood="happy" /></div></div>;
 }
 
 export function LawyerMission({ onExit }: { onExit: () => void }) {

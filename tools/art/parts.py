@@ -611,3 +611,60 @@ def grow(svg):
         out.append(f'<{tag}{attrs}{selfclose}>')
     out.append(svg[pos:])
     return ''.join(out)
+
+# ───────────────────────── career outfits (unlocked by missions) ─────────────────────────
+def lab_coat():
+    c, o, u = '#FFFFFF', '#AEB6C4', '#8EC9F5'
+    s = tee(u)
+    # long coat: shoulders to mid-thigh, open at the front over the tee
+    s += g('M126 350 C146 334 238 334 258 350 C280 368 292 400 300 434 C302 446 290 452 280 448 L266 444 L262 412 '
+           'L270 560 C250 568 222 570 204 566 L200 380 L184 380 L180 566 C162 570 134 568 114 560 L122 412 L118 444 L104 448 '
+           'C94 452 82 446 84 434 C92 400 104 368 126 350 Z', c, o)
+    s += g('M84 432 C94 444 108 448 120 442 L118 456 C106 462 90 458 82 448 Z M300 432 C290 444 276 448 264 442 L266 456 C278 462 294 458 302 448 Z', '#F2F4F8', o)
+    s += g('M156 342 L182 384 L172 400 L146 360 Z M228 342 L202 384 L212 400 L238 360 Z', '#F2F4F8', o)  # lapels
+    s += g('M214 470 L248 470 L250 500 L216 500 Z M136 470 L170 470 L168 500 L134 500 Z', '#F6F7FA', o, 2.5)  # pockets
+    s += g('M222 404 L246 404 L246 426 L222 426 Z', '#F6F7FA', o, 2.5) + ln('M230 396 L230 416', '#3D7BFF', 4)  # chest pocket + pen
+    s += ln('M122 412 C126 380 132 364 140 356 M262 412 C258 380 252 364 244 356', o, 2.5, .7)
+    return s
+
+def suit_jacket():
+    c, o = '#34406E', '#1F2747'
+    s = (g('M164 344 C174 360 210 360 220 344 L208 494 L176 494 Z', '#FFFFFF', '#B8BECC') +
+         g('M186 362 L198 362 L202 372 L196 440 L192 448 L188 440 L182 372 Z', '#E2483B', '#9E2C24', 2))  # shirt + tie
+    s += (g(HOOD_SHAPE, c, o) + g('M164 344 C174 360 210 360 220 344 L208 494 L176 494 Z', '#FFFFFF', '#B8BECC') +
+          g('M186 362 L198 362 L202 372 L196 440 L192 448 L188 440 L182 372 Z', '#E2483B', '#9E2C24', 2) +
+          ln('M164 344 L176 494 M220 344 L208 494', o, 3) +
+          g('M150 340 L164 344 L176 404 L150 372 Z M234 340 L220 344 L208 404 L234 372 Z', '#2A3460', o) +
+          g('M84 432 C94 444 108 448 120 442 L118 456 C106 462 90 458 82 448 Z M300 432 C290 444 276 448 264 442 L266 456 C278 462 294 458 302 448 Z', '#FFFFFF', '#B8BECC') +
+          '<circle cx="214" cy="452" r="4" fill="#1F2747"/><circle cx="215" cy="472" r="4" fill="#1F2747"/>' +
+          ln('M232 410 L252 408', '#FFFFFF', 4) +
+          ln('M122 412 C126 380 132 364 140 356 M262 412 C258 380 252 364 244 356', o, 2.5, .6))
+    return s
+
+def safety_vest():
+    s = tee('#9AA6B8')
+    v, o, r = '#FF8A1F', '#C25E0A', '#E9EEF6'
+    s += g('M132 352 C146 344 158 342 164 344 C172 380 176 420 176 488 L124 482 C122 440 124 390 132 352 Z', v, o)
+    s += g('M252 352 C238 344 226 342 220 344 C212 380 208 420 208 488 L260 482 C262 440 260 390 252 352 Z', v, o)
+    for y in (420, 456):
+        s += g(f'M124 {y} L176 {y+2} L176 {y+12} L124 {y+10} Z M208 {y+2} L260 {y} L260 {y+10} L208 {y+12} Z', r, '#AEB6C4', 2)
+    return s
+
+def chef_coat():
+    c, o = '#FFFFFF', '#AEB6C4'
+    s = g(HOOD_SHAPE, c, o)
+    s += g('M84 432 C94 444 108 448 120 442 L118 456 C106 462 90 458 82 448 Z M300 432 C290 444 276 448 264 442 L266 456 C278 462 294 458 302 448 Z', '#F2F4F8', o)
+    s += g('M158 340 C170 334 214 334 226 340 L224 356 C210 350 174 350 160 356 Z', '#F2F4F8', o)   # stand collar
+    s += g('M176 352 C186 366 198 366 208 352 L214 368 C200 380 184 380 170 368 Z', '#E2483B', '#9E2C24', 2)  # neckerchief
+    s += ln('M200 380 C206 420 206 460 200 488', o, 2.5, .8)   # wrap edge
+    for y in (398, 430, 462):
+        s += f'<circle cx="172" cy="{y}" r="4.5" fill="#E9EEF6" stroke="{o}" stroke-width="2"/><circle cx="222" cy="{y}" r="4.5" fill="#E9EEF6" stroke="{o}" stroke-width="2"/>'
+    s += ln('M122 412 C126 380 132 364 140 356 M262 412 C258 380 252 364 244 356', o, 2.5, .7)
+    return s
+
+GARMENTS.update({
+    'lab-coat':    ('top', 'Lab coat', lab_coat(), ''),
+    'suit-jacket': ('top', 'Suit jacket', suit_jacket(), ''),
+    'safety-vest': ('top', 'Safety vest', safety_vest(), ''),
+    'chef-coat':   ('top', 'Chef coat', chef_coat(), ''),
+})

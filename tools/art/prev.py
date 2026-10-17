@@ -2,7 +2,7 @@ import sys, subprocess, os
 sys.path.insert(0, os.path.dirname(__file__))
 from parts import *
 SKINS = ['#FAD5B8', '#F3BE97', '#DDA071', '#A8693F']
-HAIRC = {'darkbrown': '#6B3D26', 'black': '#2E2628', 'blonde': '#E8BC70', 'pink': '#F496BE', 'lavender': '#AC8EE6', 'ginger': '#D46E3A', 'brown': '#8A5A3A', 'blue': '#6092E0'}
+HAIRC = {'darkbrown': '#6B3D26', 'black': '#2E2628', 'blonde': '#E8BC70', 'pink': '#F496BE', 'lavender': '#AC8EE6', 'ginger': '#D46E3A', 'brown': '#8A5A3A', 'blue': '#6092E0', 'silver': '#A9ABB6'}
 EYEC = {'brown': '#7A4424', 'green': '#3F8A55', 'blue': '#3F7FCC', 'hazel': '#967837', 'gray': '#7C8792', 'purple': '#8B5CC4'}
 
 def tokens(d, uid='x'):

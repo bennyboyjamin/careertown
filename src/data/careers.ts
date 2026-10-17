@@ -29,6 +29,9 @@ export const CAREERS: Record<CareerId, CareerDef> = {
     blurb: 'Vets take care of animals.', strength: 'You are kind and patient with pets.' },
   software: { id: 'software', title: 'Software Engineer', icon: '💻', color: '#3D7BFF', building: 'tech-lab', available: true,
     blurb: 'Software engineers give computers step-by-step instructions.', strength: 'You enjoy logic puzzles.' },
+  chef: { id: 'chef', title: 'Chef', icon: '🧑‍🍳', color: '#FF8A3D', building: 'restaurant', available: true,
+    blurb: 'Chefs plan meals, cook safely and make food that people love.',
+    strength: 'You follow recipes step by step and pay attention to what people order.' },
   entrepreneur: { id: 'entrepreneur', title: 'Business Owner', icon: '🏪', color: '#FFC93C', building: 'shopping', available: false,
     blurb: 'Business owners make and sell things people need.', strength: 'You like making smart choices with coins.' },
 };

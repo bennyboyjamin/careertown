@@ -87,6 +87,11 @@ export const ITEMS: Record<string, ItemDef> = Object.fromEntries(
     food('cupcake', 'Cupcake', '🧁', { tags: ['food', 'small'] }),
     food('juice', 'Juice box', '🧃', { tags: ['food', 'small'] }),
     food('cookie', 'Golden cookie', '🍪', { tags: ['food', 'small'] }),
+    food('dough', 'Pizza dough', '🫓', { tags: ['food', 'small', 'cookable'], cooksInto: 'pizza' }),
+    food('pizza', 'Pizza', '🍕', { tags: ['food', 'small'] }),
+    food('tomato', 'Tomato', '🍅'),
+    food('pepper', 'Pepper', '🫑'),
+    food('mushroom', 'Mushroom', '🍄'),
     { id: 'petfood', name: 'Pet food', emoji: '🦴', w: 60, h: 60, tags: ['petfood', 'small'] },
 
     // ── Small props ───────────────────────────────────
