@@ -327,3 +327,28 @@ button { touch-action: manipulation; }
 .shop-btn { width: 44px; height: 44px; border-radius: 14px; border: 3px solid #2B2350; background: #FFC93C; font-family: Grandstander, ui-rounded, system-ui, sans-serif; font-weight: 800; font-size: 24px; line-height: 1; color: #2B2350; }
 .shop-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 14px; }
 @media (prefers-reduced-motion: reduce) { .beach-swimmer, .beach-swimmer.help { animation: none; } }
+/* Town life: people strolling on the map, and the time of day. */
+.stroller { animation: stroll 30s linear infinite; left: var(--x0); }
+@keyframes stroll { 0% { left: var(--x0); } 49% { left: var(--x1); } 51% { left: var(--x1); } 100% { left: var(--x0); } }
+.stroller-body { display: block; animation: stroll-face 30s steps(1) infinite; }
+@keyframes stroll-face { 0% { transform: scaleX(1); } 50% { transform: scaleX(-1); } }
+.stroller-hop { animation: hop .5s ease-in-out infinite; }
+.stroller:hover, .stroller:has(.stroller-say) { animation-play-state: paused; }
+.stroller:has(.stroller-say) .stroller-body { animation-play-state: paused; }
+.stroller-say { position: absolute; bottom: 102%; left: 50%; transform: translateX(-50%); width: max-content; max-width: 22cqw; background: #fff; border: 0.2cqw solid #2B2350; border-radius: 1cqw; padding: 0.3cqw 0.7cqw; font-family: Lexend, ui-rounded, system-ui, sans-serif; font-size: 1.1cqw; color: #2B2350; box-shadow: 0 0.25cqw 0 #2B2350; z-index: 30; }
+.daynight { position: absolute; inset: 0; pointer-events: none; z-index: 14; }
+.daynight-tint { position: absolute; inset: 0; transition: background 1s; }
+.daynight.morning .daynight-tint { background: linear-gradient(180deg, rgba(255,190,150,.35), rgba(255,220,180,.12)); mix-blend-mode: multiply; }
+.daynight.sunset .daynight-tint { background: linear-gradient(180deg, rgba(255,120,80,.45), rgba(255,150,120,.25) 40%, rgba(120,80,160,.25)); mix-blend-mode: multiply; }
+.daynight.night .daynight-tint { background: linear-gradient(180deg, rgba(20,20,80,.72), rgba(30,40,110,.62)); mix-blend-mode: multiply; }
+.glow { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; }
+.glow.window { aspect-ratio: 1.6; background: radial-gradient(closest-side, rgba(255,210,120,.55), rgba(255,190,90,0)); }
+.daynight.sunset .glow.window { opacity: .55; }
+.glow.lamp { width: 3.2%; aspect-ratio: 1; background: radial-gradient(closest-side, rgba(255,236,160,.95), rgba(255,210,110,.35) 45%, rgba(255,200,100,0)); animation: lamp 3s ease-in-out infinite alternate; }
+@keyframes lamp { from { opacity: .85; } to { opacity: 1; } }
+.moon { position: absolute; right: 6%; top: 1%; font-size: 3.4cqw; filter: drop-shadow(0 0 1cqw rgba(255,240,180,.9)); }
+.star { position: absolute; color: #FFF6C8; font-size: 1.2cqw; animation: twinkle 1.8s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: .3; } to { opacity: 1; } }
+.phase-btn { position: fixed; left: 10px; bottom: 10px; z-index: 40; height: 48px; padding: 0 12px; display: flex; align-items: center; gap: 6px; }
+@media (max-width: 640px), (max-height: 500px) { .phase-label { display: none; } }
+@media (prefers-reduced-motion: reduce) { .stroller, .stroller-body, .stroller-hop, .glow.lamp, .star { animation: none !important; } }

@@ -7,6 +7,8 @@ import { Person, PetPic } from '../components/Person';
 import { sfx } from '../engine/sfx';
 import type { BuildingId } from '../engine/types';
 import { TOWNFOLK } from '../data/townfolk';
+import { TownWalkers, DayNight, PhaseButton } from '../components/TownLife';
+import { useDayPhase } from '../engine/dayPhase';
 
 /** Where each building sits in the painted town picture (px in a 1536 × 1024 image): [x, y, w, h]. */
 export const IMG_W = 1536, IMG_H = 1024;
@@ -43,6 +45,8 @@ export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => voi
   }, []);
   const walker = game.characters.find((c) => c.id === game.activeCharacterId) ?? game.characters[0];
   const pet = game.pets[0];
+  const phase = useDayPhase();
+  const strollers = game.characters.filter((c) => c.id !== walker?.id);
 
   const tap = (b: BuildingDef) => {
     setBump(b.id);
@@ -54,6 +58,8 @@ export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => voi
   };
 
   return (
+    <>
+    <PhaseButton phase={phase} />
     <div ref={scroller} className="map-scroll h-full w-full overflow-auto">
       <div className="town town-full town-art relative overflow-hidden select-none">
         <img src={townArt} alt="" draggable={false} className="absolute inset-0 w-full h-full" style={{ objectFit: 'fill' }} />
@@ -90,7 +96,10 @@ export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => voi
             </button>
           );
         })}
+        <TownWalkers people={strollers} night={phase === 'night'} />
+        <DayNight phase={phase} />
       </div>
     </div>
+    </>
   );
 }

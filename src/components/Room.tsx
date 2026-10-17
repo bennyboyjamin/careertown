@@ -30,7 +30,9 @@ interface Drag {
 const pct = (v: number, of: number) => `${(v / of) * 100}%`;
 const GREET = ['Hi there!', 'What should we do?', 'Let’s play!', 'I’m ready!', 'Hehe!', 'Wheee!'];
 
-export function Room({ sceneId, onCustomTap, onWardrobe }: {
+export function Room({ sceneId, onCustomTap, onWardrobe, townNight = false }: {
+  /** It's night in town (the map's day/night): rooms get dark and windows show the night sky. */
+  townNight?: boolean;
   sceneId: SceneId;
   onCustomTap?: (e: Entity) => void;
   onWardrobe?: (characterId: string) => void;
@@ -345,7 +347,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
   };
 
   // ── Render helpers ──
-  const night = entities.some((e) => e.ref === 'window' && isOn(e));
+  const night = townNight || entities.some((e) => e.ref === 'window' && isOn(e));
   const lampOn = entities.some((e) => (e.ref === 'lamp' || e.ref === 'lamp-pink') && isOn(e));
   const isActive = (e: Entity) =>
     (e.ref === 'stove' && entities.some((v) => getState<string>(v, 'on') === e.id && getState<boolean>(v, 'cooking'))) ||
@@ -417,6 +419,10 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       <div className="room room-ext relative pointer-events-none" aria-hidden><RoomBackdrop def={def} extend /></div>
       <div ref={roomRef} className="room relative select-none" style={{ touchAction: 'none' }}>
         <RoomBackdrop def={def} />
+        {/* night in town: the painted window shows the night sky (even in rooms saved without a window item) */}
+        {townNight && def.anchors?.window?.box && !entities.some((e) => e.ref === 'window') && (() => { const b = def.anchors!.window!.box!; return (
+          <div className="painted-night absolute rounded-md pointer-events-none" style={{ left: pct(b[0] + b[2] * 0.04, ROOM_W), top: pct(b[1] + b[3] * 0.04, ROOM_H), width: pct(b[2] * 0.92, ROOM_W), height: pct(b[3] * 0.92, ROOM_H) }} />
+        ); })()}
         {sorted.map((e) => {
           if (e.heldBy && byId.get(e.heldBy) && drag?.id !== e.id) return null; // drawn in the holder's hand
           const anchor = e.kind === 'item' ? def.anchors?.[e.ref] : undefined;
@@ -457,7 +463,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
             >
               {active && e.pose !== 'sleep' && <div className="active-ring absolute left-1/2 -translate-x-1/2 -bottom-[3%] w-[90%] h-[8%] rounded-[50%]" />}
               <div className={`w-full h-full relative ${anims[e.id] ? `anim-${anims[e.id]}` : ''}`}>{anchor?.hide
-                ? (e.ref === 'window' && isOn(e) ? <div className="painted-night absolute inset-[4%] rounded-md" /> : null)
+                ? (e.ref === 'window' && (isOn(e) || townNight) ? <div className="painted-night absolute inset-[4%] rounded-md" /> : null)
                 : renderInner(e)}</div>
               {held && (() => {
                 const hs = sizeOf(held, look);
@@ -497,7 +503,7 @@ export function Room({ sceneId, onCustomTap, onWardrobe }: {
       <div ref={trashRef} className={`trash absolute rounded-2xl border-[3px] border-ink px-3 py-2 font-display font-bold text-ink transition-all ${drag?.moved ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${drag?.overTrash ? 'bg-berry text-white scale-110' : 'bg-white'}`} style={{ zIndex: 950, right: 'max(12px, env(safe-area-inset-right, 0px))', bottom: 12 }}>
         {drag && byId.get(drag.id)?.kind !== 'item' ? '👋 Leave room' : '📦 Put away'}
       </div>
-      {night && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? 'rgba(43,35,80,.18)' : 'rgba(43,35,80,.42)', zIndex: 900 }} />}
+      {night && <div className="pointer-events-none absolute inset-0 transition-colors duration-700" style={{ background: lampOn ? `rgba(43,35,80,${townNight ? 0.3 : 0.18})` : `rgba(30,28,80,${townNight ? 0.5 : 0.42})`, zIndex: 900 }} />}
     </div>
   );
 }
