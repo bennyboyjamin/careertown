@@ -10,7 +10,7 @@ export type CareerId =
 export type BuildingId =
   | 'home' | 'school' | 'hospital' | 'courthouse' | 'engineering'
   | 'animal-hospital' | 'tech-lab' | 'restaurant' | 'shopping' | 'bank'
-  | 'park' | 'beach' | 'cafe' | 'fishing' | 'playground' | 'nature-trail';
+  | 'park' | 'beach' | 'cafe' | 'fishing' | 'playground' | 'nature-trail' | 'kpop';
 
 export type FaceShape = 'round' | 'oval' | 'square';
 export type EyeStyle = 'dot' | 'happy' | 'big' | 'lashes' | 'sleepy';

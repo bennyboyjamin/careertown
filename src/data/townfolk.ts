@@ -72,6 +72,13 @@ export const TOWNFOLK: Partial<Record<BuildingId, Townie>> = {
     ask: 'I need 3 things for my window display. Can you find them?', find: ['👗', '👟', '🎀'],
     thanks: 'My window looks amazing! Thank you!', career: 'entrepreneur',
   },
+  kpop: {
+    name: 'Luna', job: 'Dance trainer', look: A({ tone: 2, hair: 'sleekbob', hairColor: 'pink', top: 'mom-black-zip-jacket', bottom: 'mom-gray-leggings', shoes: 'mom-white-sneakers' }),
+    hello: 'Hi, future star! I’m Luna. I teach dance at the K-pop Training Academy.',
+    fact: 'Trainers help singers and dancers practise every day. Choreographers make up the dance moves, and producers make the music.',
+    ask: 'Our 3 stage things went missing before the show! Can you find them?', find: ['🎤', '🎧', '⭐'],
+    thanks: 'Showtime! The full academy with dance and music training is coming soon.',
+  },
   bank: {
     name: 'Sam', job: 'Bank teller', look: A({ tone: 0, hair: 'dadshort', hairColor: 'blonde', top: 'judge-suit', bottom: 'gray-trousers', shoes: 'black-shoes' }),
     hello: 'Hi! I’m Sam. I help people keep their money safe at the bank.',
