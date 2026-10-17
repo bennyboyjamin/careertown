@@ -11,7 +11,6 @@ import { ItemIcon } from '../components/ItemIcon';
 import { ClothesPicker } from '../components/ClothesPicker';
 import { DollEditor } from '../components/DollEditor';
 import { PaperEditor } from '../components/PaperEditor';
-import { WearPicker } from '../components/WearPicker';
 import { PetCloset } from '../components/PetCloset';
 import { LAYERED } from '../data/sprites';
 import { FurnitureArt } from '../components/art/Furniture';
@@ -201,7 +200,6 @@ function OutfitPicker({ c }: { c: import('../engine/types').CharacterData }) {
         </div>
       ) : c.doll && <DollEditor d={c.doll} onChange={(doll) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, doll } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
       {!c.paper && <ClothesPicker c={c} onChange={(colors) => { dispatch({ type: 'SAVE_CHARACTER', character: { ...c, colors } }); dispatch({ type: 'EVENT', name: 'dress' }); }} />}
-      {!c.paper && <WearPicker wear={c.wear} onChange={(slot, item) => dispatch({ type: 'WEAR', character: c.id, slot, item })} />}
       <PetCloset />
     </div>
   );
