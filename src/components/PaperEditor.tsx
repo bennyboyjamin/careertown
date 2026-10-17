@@ -13,7 +13,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 ];
 const HAIR_LABELS: Record<string, string> = {
   wavy: 'Long wavy', bob: 'Bob with clip', bobbangs: 'Bob with bangs', bowwaves: 'Waves with bow', braids: 'Two braids', locs: 'Locs',
-  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns',
+  long: 'Long straight', longwaves: 'Long waves', messy: 'Messy', sideswept: 'Side-swept', spacebuns: 'Space buns', ponytail: 'High ponytail',
 };
 const COLOUR_LABELS: Record<string, string> = { black: 'Black', darkbrown: 'Dark brown', brown: 'Brown', blonde: 'Blonde', ginger: 'Ginger', pink: 'Pink' };
 const SKIN_LABELS = ['Light', 'Medium', 'Tan', 'Deep brown'];
