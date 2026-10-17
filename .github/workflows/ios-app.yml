@@ -11,6 +11,8 @@
 # The app is built unsigned; Apple signs it while uploading (cloud-managed signing via the App Store Connect key).
 # Nothing is revoked, and no certificate or profile files need to be stored in the repo.
 # The ASC key must be a Team Key with the Admin role.
+# In-app purchase: create a Non-Consumable with Product ID careertown.stylepack in App Store Connect
+# (your app > Monetization > In-App Purchases), price $2.99, and sign the Paid Apps agreement.
 # Also uses index.html + assets/ (the built game), app-icon.png (1024x1024) and app-splash.png (2732x2732) from the repo root.
 
 name: Build iPhone app
@@ -124,6 +126,84 @@ jobs:
           EOF
           ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
           ruby /tmp/settings.rb
+
+      - name: Add in-app purchases (Style Pack)
+        run: |
+          # The game asks the app through a "store" message handler; StoreKit 2 does the rest.
+          D=app/ios/App/App
+          cat >> "$D/AppDelegate.swift" <<'EOF'
+
+          // MARK: - In-app purchases (Style Pack), used by src/engine/iap.ts
+          import StoreKit
+          import WebKit
+
+          class StoreBridgeViewController: CAPBridgeViewController {
+              private let store = StoreBridge()
+              override func capacitorDidLoad() {
+                  super.capacitorDidLoad()
+                  webView?.configuration.userContentController.addScriptMessageHandler(store, contentWorld: .page, name: "store")
+              }
+          }
+
+          final class StoreBridge: NSObject, WKScriptMessageHandlerWithReply {
+              private var updates: Task<Void, Never>?
+              override init() {
+                  super.init()
+                  // Purchases approved later (Ask to Buy) or made on another device arrive here.
+                  updates = Task.detached {
+                      for await result in Transaction.updates { if case .verified(let t) = result { await t.finish() } }
+                  }
+              }
+              private func owned() async -> [String] {
+                  var ids: [String] = []
+                  for await result in Transaction.currentEntitlements {
+                      if case .verified(let t) = result, t.revocationDate == nil { ids.append(t.productID) }
+                  }
+                  return ids
+              }
+              func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
+                                         replyHandler: @escaping (Any?, String?) -> Void) {
+                  let body = message.body as? [String: Any] ?? [:]
+                  let action = body["action"] as? String ?? ""
+                  let id = body["id"] as? String ?? ""
+                  Task { @MainActor in
+                      do {
+                          switch action {
+                          case "owned":
+                              replyHandler(["owned": await self.owned()], nil)
+                          case "products":
+                              let ps = try await Product.products(for: [id])
+                              replyHandler(["products": ps.map { ["id": $0.id, "price": $0.displayPrice] }], nil)
+                          case "buy":
+                              guard let p = try await Product.products(for: [id]).first else {
+                                  replyHandler(["error": "The Style Pack isn't available right now. Please try again later."], nil); return
+                              }
+                              switch try await p.purchase() {
+                              case .success(let v):
+                                  if case .verified(let t) = v { await t.finish(); replyHandler(["ok": true], nil) }
+                                  else { replyHandler(["error": "Apple couldn't confirm the purchase."], nil) }
+                              case .userCancelled: replyHandler(["cancelled": true], nil)
+                              case .pending: replyHandler(["pending": true], nil)
+                              @unknown default: replyHandler(["error": "Something went wrong."], nil)
+                              }
+                          case "restore":
+                              try await AppStore.sync()
+                              replyHandler(["owned": await self.owned()], nil)
+                          default:
+                              replyHandler(["error": "Unknown store action"], nil)
+                          }
+                      } catch {
+                          replyHandler(["error": error.localizedDescription], nil)
+                      }
+                  }
+              }
+          }
+          EOF
+          # Use the view controller above instead of Capacitor's plain one
+          SB="$D/Base.lproj/Main.storyboard"
+          sed -i '' 's/customClass="CAPBridgeViewController" customModule="Capacitor"/customClass="StoreBridgeViewController" customModule="App" customModuleProvider="target"/' "$SB"
+          grep -q StoreBridgeViewController "$SB" || { echo "::error::Could not hook up in-app purchases (Main.storyboard changed)"; exit 1; }
+          grep -q "^import Capacitor" "$D/AppDelegate.swift" || { echo "::error::AppDelegate.swift no longer imports Capacitor"; exit 1; }
 
       - name: App Store Connect key
         run: |
