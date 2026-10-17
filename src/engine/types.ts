@@ -161,4 +161,5 @@ export type Screen =
   | { name: 'mission'; id: string }
   | { name: 'creator'; editId?: string }
   | { name: 'passport' }
+  | { name: 'visit'; id: BuildingId }
   | { name: 'shop' };

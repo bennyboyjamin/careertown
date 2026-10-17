@@ -6,10 +6,11 @@ import balloonArt from '../assets/town/balloon.webp';
 import { Person, PetPic } from '../components/Person';
 import { sfx } from '../engine/sfx';
 import type { BuildingId } from '../engine/types';
+import { TOWNFOLK } from '../data/townfolk';
 
 /** Where each building sits in the painted town picture (px in a 1536 × 1024 image): [x, y, w, h]. */
-const IMG_W = 1536, IMG_H = 1024;
-const SPOTS: Record<string, [number, number, number, number]> = {
+export const IMG_W = 1536, IMG_H = 1024;
+export const SPOTS: Record<string, [number, number, number, number]> = {
   home: [50, 120, 260, 230],
   school: [395, 95, 290, 250],
   hospital: [690, 95, 330, 260],
@@ -31,7 +32,7 @@ const SPOTS: Record<string, [number, number, number, number]> = {
 const PAINTED_LABELS = true;
 const px = (v: number, of: number) => `${(v / of) * 100}%`;
 
-export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
+export function TownMap({ onEnter, onVisit }: { onEnter: (id: BuildingId) => void; onVisit: (id: BuildingId) => void }) {
   const { game, dispatch } = useGame();
   const [bump, setBump] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -45,6 +46,7 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
   const tap = (b: BuildingDef) => {
     setBump(b.id);
     window.setTimeout(() => setBump(null), 400);
+    if (!b.playable && TOWNFOLK[b.id]) { sfx('pop'); window.setTimeout(() => onVisit(b.id), 260); return; }
     if (!b.playable) { sfx('fail'); dispatch({ type: 'TOAST', text: `${b.name} is coming soon!` }); return; }
     sfx('pop');
     window.setTimeout(() => onEnter(b.id), 260);
@@ -73,8 +75,8 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
           const sp = SPOTS[b.id]; if (!sp) return null;
           const [x, y, w, h] = sp;
           return (
-            <button key={b.id} onClick={() => tap(b)} aria-label={b.playable ? `Enter ${b.name}` : `${b.name}, coming soon`}
-              className={`building art-building absolute ${b.playable ? '' : 'soon'} ${bump === b.id ? 'bump' : ''}`}
+            <button key={b.id} onClick={() => tap(b)} aria-label={b.playable || TOWNFOLK[b.id] ? `Enter ${b.name}` : `${b.name}, coming soon`}
+              className={`building art-building absolute ${b.playable || TOWNFOLK[b.id] ? '' : 'soon'} ${bump === b.id ? 'bump' : ''}`}
               style={{ left: px(x, IMG_W), top: px(y, IMG_H), width: px(w, IMG_W), height: px(h, IMG_H) }}>
               {/* the building's own piece of the picture, so it can bounce when tapped */}
               <span className="art-crop absolute inset-0" style={{ backgroundImage: `url(${townArt})`, backgroundSize: `${(IMG_W / w) * 100}% ${(IMG_H / h) * 100}%`, backgroundPosition: `${(x / (IMG_W - w)) * 100}% ${(y / (IMG_H - h)) * 100}%` }} />
@@ -82,7 +84,7 @@ export function TownMap({ onEnter }: { onEnter: (id: BuildingId) => void }) {
                 style={{ bottom: '-6%', fontSize: '1.25cqw', padding: '0.15cqw 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid', borderRadius: '1cqw' }}>
                 {b.icon} {b.name}
               </span>}
-              {!b.playable && <span className="absolute rounded-full border-ink bg-lilac text-white font-display font-bold rotate-6" style={{ top: '6%', right: '4%', fontSize: '1.2cqw', padding: '0 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>Soon</span>}
+              {!b.playable && !TOWNFOLK[b.id] && <span className="absolute rounded-full border-ink bg-lilac text-white font-display font-bold rotate-6" style={{ top: '6%', right: '4%', fontSize: '1.2cqw', padding: '0 0.8cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>Soon</span>}
               {b.playable && b.missions.some((m) => !game.completedMissions[m]) && <span className="mission-dot absolute rounded-full bg-berry border-ink grid place-items-center text-white font-display font-extrabold" style={{ top: '6%', left: '6%', width: '2.4cqw', height: '2.4cqw', fontSize: '1.5cqw', borderWidth: '0.22cqw', borderStyle: 'solid' }}>!</span>}
             </button>
           );

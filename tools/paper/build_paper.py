@@ -128,6 +128,7 @@ for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
 # one-piece hairstyles drawn loose: fitted onto one head (w = width, top = top edge), drawn over the face (front only)
 HAIR_LOOSE = {'momwaves': ('adult', dict(w=620, cx=512, top=10), (47, 40, 38)), 'dadshort': ('adult', dict(w=530, cx=512, top=12), (47, 40, 38)),
               'scrunchieponytail': ('kid', dict(w=1027, cx=594, top=-62), (79, 47, 39)),
+              'sleekbob': ('adult', dict(w=740, cx=512, top=-50), (87, 54, 44)),
               'boyshort': ('kid', dict(w=600, cx=512, top=200), (67, 54, 53))}
 for style, (drawn_on, fit, ref) in HAIR_LOOSE.items():
     img, bb = trim(load(os.path.join(SRC, 'hair-loose', style + '.png'))); kb = fit_box(bb, **fit)
@@ -180,14 +181,14 @@ TOP_FIT_EACH = {'ghost-hoodie': dict(w=420, top=690), 'pink-hoodie': dict(w=420,
                    'cream-bow-cardigan', 'pink-off-shoulder-sweater', 'white-butterfly-sweater', 'white-pink-puff-top', 'black-layered-top')},
                 # Style Pack tops redrawn one per picture (loose)
                 'black-layered-top': dict(w=500, top=745), 'white-pink-puff-top': dict(w=470, top=745), 'white-butterfly-sweater': dict(w=450, top=716),
-                'black-pink-zip-hoodie': dict(w=430, top=692), 'dino-tee': dict(w=450, top=700), 'cream-bow-sweater': dict(w=470, top=712), 'taekwondo-uniform': dict(w=470, top=695, bottom=1400), 'blue-hoodie': dict(w=430, top=690), 'cream-bow-cardigan': dict(w=455, top=716), 'pink-off-shoulder-sweater': dict(w=455, top=716)}
+                'black-pink-zip-hoodie': dict(w=430, top=692), 'dino-tee': dict(w=450, top=700), 'cream-bow-sweater': dict(w=470, top=712), 'pink-overall-dress': dict(w=440, top=712), 'rainbow-tee': dict(w=440, top=712), 'taekwondo-uniform': dict(w=470, top=695, bottom=1400), 'blue-hoodie': dict(w=430, top=690), 'cream-bow-cardigan': dict(w=455, top=716), 'pink-off-shoulder-sweater': dict(w=455, top=716)}
 # bottoms: ChatGPT draws long legs, so width follows the waist and length the ankles (on every body)
 BOTTOM_FIT = {'baggy-jeans': dict(w=340, top=975, bottom=1398), 'cargo-pants': dict(w=330, top=975, bottom=1396),
               'black-shorts': dict(w=300, top=975), 'lavender-skirt': dict(w=370, top=975), 'blue-skirt': dict(w=370, top=975),
               'plaid-skirt': dict(w=370, top=975), 'overalls': dict(w=300, top=742),
               # Style Pack
               'black-chain-cargos': dict(w=340, top=975, bottom=1398), 'olive-cargos': dict(w=340, top=975, bottom=1398),
-              'pink-cargos': dict(w=340, top=975, bottom=1398), 'khaki-cargo-shorts': dict(w=330, top=970), 'cream-cargos': dict(w=340, top=975, bottom=1398), 'star-baggy-jeans': dict(w=340, top=975, bottom=1398),
+              'pink-cargos': dict(w=340, top=975, bottom=1398), 'khaki-cargo-shorts': dict(w=330, top=970), 'cream-cargos': dict(w=340, top=975, bottom=1398), 'pink-leggings': dict(w=320, top=975, bottom=1340), 'star-baggy-jeans': dict(w=340, top=975, bottom=1398),
               'black-belted-shorts': dict(w=320, top=970), 'ivory-ruffle-skirt': dict(w=370, top=975), 'cream-ruffle-skirt': dict(w=370, top=975),
               'navy-pleated-skirt': dict(w=370, top=975), 'blue-lace-skirt': dict(w=370, top=975), 'pink-bow-skirt': dict(w=370, top=975)}
 OVER_TOP = {'overalls'}          # drawn over the top (bib and straps)
@@ -237,6 +238,8 @@ ADULT_FIT = {
     'mom-blue-jeans': dict(w=330, top=845, bottom=1450), 'mom-black-trousers': dict(w=330, top=845, bottom=1450),
     'mom-gray-leggings': dict(w=375, top=845, bottom=1450), 'mom-beige-skirt': dict(w=390, top=845),
     'mom-white-sneakers': {}, 'mom-pink-flats': {},
+    'judge-suit': dict(w=580, top=455), 'chef-coat': dict(w=580, top=455), 'gray-trousers': dict(w=335, top=845, bottom=1450),
+    'blue-jeans': dict(w=335, top=845, bottom=1450), 'black-shoes': {}, 'white-clogs': {},
     'dad-navy-hoodie': dict(w=560, top=440), 'dad-blue-jeans': dict(w=335, top=845, bottom=1450), 'dad-brown-loafers': {},
 }
 SKIN = {'mom-pink-sweater', 'mom-striped-sweater', 'mom-pink-cardigan', 'mom-blue-bow-blouse', 'mom-pink-flats'}

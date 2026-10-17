@@ -262,3 +262,13 @@ button { touch-action: manipulation; }
 .bg-cafe { background: #FFE3D1; }
 .bg-cafe-floor { background: #E9B98F; }
 .bg-order { background: #FFF6E0; }
+/* Town people (VisitScreen): things to find, gently bobbing or swimming around. */
+.visit-item { font-size: clamp(34px, 6.5vmin, 64px); line-height: 1; filter: drop-shadow(0 3px 0 rgba(0,0,0,.18)); transition: transform .25s, opacity .25s; }
+.visit-item.visit-found { opacity: 0; transform: scale(1.8) !important; pointer-events: none; }
+.visit-item:not(.visit-move) { animation: visit-bob 2.6s ease-in-out infinite; }
+.visit-move { animation: visit-swim 3s ease-in-out infinite alternate; }
+@keyframes visit-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes visit-swim { 0% { translate: -6vmin 0; } 50% { translate: 0 -2vmin; } 100% { translate: 6vmin 1vmin; } }
+.visit-person { transition: transform .2s; }
+.visit-person:active { transform: scale(.97); }
+@media (prefers-reduced-motion: reduce) { .visit-item, .visit-move { animation: none; } }

@@ -10,6 +10,7 @@ import { TownMap } from './scenes/TownMap';
 import { SceneScreen } from './scenes/SceneScreen';
 import { BuildingScreen, Passport, Shop } from './scenes/Menus';
 import { CharacterCreator } from './scenes/CharacterCreator';
+import { VisitScreen } from './scenes/VisitScreen';
 import { LawyerMission } from './missions/LawyerMission';
 import { EngineerMission } from './missions/EngineerMission';
 import { DoctorMission } from './missions/DoctorMission';
@@ -47,13 +48,15 @@ function Game() {
 
   const title =
     screen.name === 'building' ? building(screen.id).name :
+    screen.name === 'visit' ? building(screen.id).name :
     screen.name === 'scene' ? undefined :
     screen.name === 'creator' ? 'Characters' :
     screen.name === 'passport' ? 'Passport' : undefined;
 
   let body: ReactElement;
   switch (screen.name) {
-    case 'map': body = <TownMap onEnter={enter} />; break;
+    case 'map': body = <TownMap onEnter={enter} onVisit={(id) => setScreen({ name: 'visit', id })} />; break;
+    case 'visit': body = <VisitScreen key={screen.id} id={screen.id} onBack={() => setScreen({ name: 'map' })} />; break;
     case 'building': body = <BuildingScreen id={screen.id} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'scene': body = <SceneScreen key={screen.sceneId} sceneId={screen.sceneId} onScene={(sceneId) => setScreen({ name: 'scene', sceneId })} onMission={(id) => setScreen({ name: 'mission', id })} />; break;
     case 'mission': {
@@ -63,7 +66,7 @@ function Game() {
     }
     case 'creator': body = <CharacterCreator editId={screen.editId} onDone={() => setScreen({ name: 'map' })} />; break;
     case 'passport': body = <Passport />; break;
-    default: body = <TownMap onEnter={enter} />;
+    default: body = <TownMap onEnter={enter} onVisit={(id) => setScreen({ name: 'visit', id })} />;
   }
 
   return (
