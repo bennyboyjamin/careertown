@@ -149,7 +149,11 @@ export interface GameState {
   secrets: string[];
   daily: DailyState;
   stats: Record<string, number>; // event counters (eat, sleep, cook…)
-  settings: { sound: boolean };
+  settings: { sound: boolean; music?: boolean; petFollow?: boolean };
+  /** Sticker book (daily stickers and special ones). */
+  stickers?: string[];
+  /** Last day (yyyy-mm-dd) a daily sticker was given. */
+  lastPlayed?: string;
   activeCharacterId?: string;
   seenIntro: boolean;
 }
