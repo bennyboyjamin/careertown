@@ -1,51 +1,58 @@
-import type { CSSProperties } from 'react';
+import { useId, useMemo } from 'react';
 import type { DollLook } from '../engine/types';
 import type { Face } from '../data/sprites';
-import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_OX, DOLL_BODY, DOLL_HEADS, DOLL_IRIS, DOLL_HAIR, DOLL_BASIC, DOLL_GARMENTS } from '../data/doll';
-import { HAIR_TINTS, EYE_TINTS, BASIC_TINTS } from '../data/dollLooks';
-import { useTint } from './tint';
+import { DOLL_PAD, DOLL_H, DOLL_W } from '../data/doll';
+import { ART_DEFS, ART_BODY, ART_HEAD, ART_TEE, ART_SHORTS, ART_FACES, ART_HAIR, ART_GARMENTS } from '../data/dollArt';
+import { SKIN_SWATCH, HAIR_TINTS, EYE_TINTS, BASIC_TINTS } from '../data/dollLooks';
 
-const pct = (v: number, of: number) => `${(v / of) * 100}%`;
-/** A picture placed at [x, y, w, h] in doll canvas px (y measured from the body top; the canvas has DOLL_PAD above). */
-function Piece({ src, box, dx = 0, tint }: { src: string; box: number[]; dx?: number; tint?: string | null }) {
-  const url = useTint(src, tint ?? undefined);
-  const [x, y, w, h] = box;
-  return <img src={url} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: pct(x + dx, DOLL_W), top: pct(y + DOLL_PAD, DOLL_H), width: pct(w, DOLL_W), height: pct(h, DOLL_H), filter: 'none' }} />;
+/* ── colours ── */
+function rgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.replace('#', ''), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
-const tone = (d: DollLook) => Math.max(0, Math.min(3, d.tone | 0));
+const hx = (r: number, g: number, b: number) => '#' + [r, g, b].map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const darker = (hex: string, f: number) => { const [r, g, b] = rgb(hex); return hx(r * f, g * f, b * f); };
+const lighter = (hex: string, f: number) => { const [r, g, b] = rgb(hex); return hx(r + (255 - r) * f, g + (255 - g) * f, b + (255 - b) * f); };
 
-/** Body, underclothes, shoes and outfit (clipped with the body when sitting). */
-export function DollBody({ d }: { d: DollLook }) {
-  const t = tone(d);
-  const g = (id: string | null) => (id && DOLL_GARMENTS[id] ? <Piece key={id} src={DOLL_GARMENTS[id].srcs[t]} box={DOLL_GARMENTS[id].boxes[t]} /> : null);
-  const tee = d.teeColor ? BASIC_TINTS[d.teeColor] : null;
-  const shorts = d.shortsColor ? BASIC_TINTS[d.shortsColor] : null;
-  // Hide the body (and plain tee/shorts) wherever a garment is worn, so no skin or outlines peek out at the edges.
-  const hides = [d.shoes, d.top, d.bottom].map((id) => (id ? DOLL_GARMENTS[id]?.hide : undefined)).filter(Boolean) as string[];
-  const under: CSSProperties = { position: 'absolute', inset: 0 };
-  if (hides.length) {
-    const img = hides.map((u) => `url(${u})`).join(', ');
-    const size = hides.map(() => `100% ${pct(DOLL_H - DOLL_PAD, DOLL_H)}`).join(', ');
-    const pos = hides.map(() => '0 100%').join(', ');
-    Object.assign(under, {
-      WebkitMaskImage: img, maskImage: img, WebkitMaskSize: size, maskSize: size,
-      WebkitMaskPosition: pos, maskPosition: pos, WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat',
-      WebkitMaskComposite: hides.map(() => 'source-in').join(', '), maskComposite: 'intersect',
-    });
-  }
+function colours(d: DollLook, uid: string): Record<string, string> {
+  const s = SKIN_SWATCH[Math.max(0, Math.min(3, d.tone | 0))];
+  const h = HAIR_TINTS[d.hairColor]?.hex ?? HAIR_TINTS.darkbrown.hex;
+  const e = EYE_TINTS[d.eyes]?.hex ?? EYE_TINTS.brown.hex;
+  const t = (d.teeColor && BASIC_TINTS[d.teeColor]) || '#FFFFFF';
+  const b = (d.shortsColor && BASIC_TINTS[d.shortsColor]) || '#FFFFFF';
+  return {
+    S: s, SD: darker(s, 0.86), SO: darker(s, 0.62),
+    H: h, HD: darker(h, 0.82), HO: darker(h, 0.55), HL: lighter(h, 0.4),
+    E: e, EL: lighter(e, 0.35), ED: darker(e, 0.5), EDD: darker(e, 0.7),
+    T: t, TO: darker(t, 0.7), B: b, BO: darker(b, 0.7), U: uid,
+  };
+}
+const paint = (svg: string, c: Record<string, string>) => svg.replace(/\{(\w+)\}/g, (_, k: string) => c[k] ?? '');
+
+/** One drawing layer covering the whole doll canvas (the canvas has DOLL_PAD px of headroom above the drawing). */
+function Layer({ markup, className }: { markup: string; className?: string }) {
   return (
-    <>
-      <div style={under}>
-        <img src={DOLL_BODY[t]} alt="" draggable={false} className="sprite-img" style={{ position: 'absolute', left: 0, top: pct(DOLL_PAD, DOLL_H), width: '100%', height: pct(DOLL_H - DOLL_PAD, DOLL_H) }} />
-        {tee && <Piece src={DOLL_BASIC[`tee-${t}`].src} box={DOLL_BASIC[`tee-${t}`].box} tint={tee} />}
-        {shorts && <Piece src={DOLL_BASIC[`shorts-${t}`].src} box={DOLL_BASIC[`shorts-${t}`].box} tint={shorts} />}
-      </div>
-      {g(d.shoes)}{g(d.top)}{g(d.bottom)}
-    </>
+    <svg viewBox={`0 ${-DOLL_PAD} ${DOLL_W} ${DOLL_H}`} preserveAspectRatio="xMidYMid meet" className={className}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}
+      dangerouslySetInnerHTML={{ __html: markup }} />
   );
 }
+const useUid = () => useId().replace(/[^a-zA-Z0-9]/g, '');
 
-/** Head with the chosen face and mood, eye colour and hair. */
+/** Back hair, body, and outfit (top over bottoms; overall bibs over the top). */
+export function DollBody({ d }: { d: DollLook }) {
+  const uid = useUid();
+  const markup = useMemo(() => {
+    const c = colours(d, uid);
+    const g = (id: string | null) => (id ? ART_GARMENTS[id] : undefined);
+    const top = g(d.top), bottom = g(d.bottom), shoes = g(d.shoes);
+    const hair = d.hair ? ART_HAIR[d.hair] : undefined;
+    return paint(ART_DEFS + (hair?.back ?? '') + ART_BODY + (bottom ? '' : ART_SHORTS) + (top ? '' : ART_TEE)
+      + (shoes?.svg ?? '') + (bottom?.svg ?? '') + (top?.svg ?? '') + (bottom?.over ?? ''), c);
+  }, [d, uid]);
+  return <Layer markup={markup} className="sprite-img" />;
+}
+
 /** The 8 drawn expressions: the 4 shared faces plus laugh, cry, grumpy and silly for dress-up characters. */
 function exprFor(face: Face, mood?: string) {
   if (mood === 'silly') return face === 'wink' ? 'silly' : 'laugh';   // tickled: giggle and stick tongue out
@@ -54,18 +61,23 @@ function exprFor(face: Face, mood?: string) {
   return face;
 }
 
+/** Head with the chosen face and mood, eye colour and front hair. */
 export function DollHead({ d, face, mood }: { d: DollLook; face: Face; mood?: string }) {
-  const t = tone(d);
+  const uid = useUid();
   const expr = exprFor(face, mood);
-  const head = DOLL_HEADS[`${d.face}-${expr}-${t}`] ?? DOLL_HEADS[`${d.face}-${face}-${t}`] ?? DOLL_HEADS[`${d.face}-happy-${t}`];
-  const iris = DOLL_IRIS[`${d.face}-${expr}`];
-  const eye = EYE_TINTS[d.eyes]?.hex;
-  const hair = d.hair ? DOLL_HAIR[d.hair] : undefined;
-  return (
-    <>
-      <Piece src={head.src} box={head.box} />
-      {iris && eye && <Piece src={iris.src} box={iris.box} dx={DOLL_OX[t]} tint={eye} />}
-      {hair && <Piece src={hair.src} box={hair.box} dx={DOLL_OX[t]} tint={HAIR_TINTS[d.hairColor]?.hex} />}
-    </>
-  );
+  const markup = useMemo(() => {
+    const c = colours(d, uid);
+    const faces = ART_FACES[d.face] ?? ART_FACES.girl;
+    const hair = d.hair ? ART_HAIR[d.hair] : undefined;
+    return paint(ART_DEFS + ART_HEAD + (faces[expr] ?? faces.happy) + (hair?.front ?? ''), c);
+  }, [d, uid, expr]);
+  return <Layer markup={markup} className="layered-head" />;
+}
+
+/** A single garment drawn on its own, for the character maker's picker tiles. */
+export function GarmentPic({ id }: { id: string }) {
+  const g = ART_GARMENTS[id];
+  if (!g) return null;
+  const vb = g.kind === 'top' ? '70 318 244 196' : g.kind === 'bottom' ? '86 340 212 330' : '104 600 176 96';
+  return <svg viewBox={vb} style={{ width: '100%', height: '100%' }} dangerouslySetInnerHTML={{ __html: g.svg + (g.over ?? '') }} />;
 }

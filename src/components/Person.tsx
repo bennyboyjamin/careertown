@@ -58,10 +58,10 @@ export function PetPic({ p, sleeping = false, bandage = false }: { p: PetData; s
 
 /** Round face icon for a dress-up character: the head (with hair) cropped from their own art. */
 export function DollFace({ d, size }: { d: NonNullable<CharacterData['doll']>; size: number }) {
-  const lay = LAYERED.doll; const k = size / 390;
+  const lay = LAYERED.doll; const k = size / 330;
   return (
     <div style={{ width: size, height: size, overflow: 'hidden', position: 'relative' }}>
-      <div style={{ position: 'absolute', width: lay.W * k, height: lay.H * k, left: (size - lay.W * k) / 2, top: -(lay.crown - 40) * k }}>
+      <div style={{ position: 'absolute', width: lay.W * k, height: lay.H * k, left: (size - lay.W * k) / 2, top: -(lay.crown - 30) * k }}>
         <LayeredArt lay={lay} outfit={0} face="happy" doll={d} />
       </div>
     </div>

@@ -3,6 +3,7 @@ import type { DollLook } from '../engine/types';
 import { DOLL_GARMENTS, DOLL_HAIR, type GarmentKind } from '../data/doll';
 import { SKIN_LABELS, SKIN_SWATCH, HAIR_TINTS, EYE_TINTS, BASIC_TINTS } from '../data/dollLooks';
 import { DollFace } from './Person';
+import { GarmentPic } from './Doll';
 import { sfx } from '../engine/sfx';
 
 type Tab = 'look' | 'hair' | 'top' | 'bottom' | 'shoes';
@@ -41,10 +42,10 @@ export function DollEditor({ d, onChange }: { d: DollLook; onChange: (d: DollLoo
       {tile('none', !d[field], none, () => set({ [field]: null } as Partial<DollLook>), <span style={{ fontSize: 30 }}>{field === 'shoes' ? '🦶' : field === 'top' ? '👕' : '🩳'}</span>)}
       {Object.entries(DOLL_GARMENTS).filter(([, g]) => g.kind === kind).map(([id, g]) =>
         tile(id, d[field] === id, g.label, () => set({ [field]: id } as Partial<DollLook>),
-          <img src={g.srcs[d.tone]} alt="" draggable={false} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />))}
+          <GarmentPic id={id} />))}
     </div>
   );
-  const basic = Object.entries(BASIC_TINTS).map(([id, hex]) => [id, hex ?? '#FFFFFF', id] as [string, string, string]);
+  const basic = Object.entries(BASIC_TINTS).map(([id, hex]) => [id, hex, id] as [string, string, string]);
   return (
     <div>
       <div className="flex gap-2 overflow-x-auto pb-2">

@@ -1,7 +1,7 @@
 // Family artwork. Each family member is a headless body (one per outfit) plus four
 // interchangeable faces, positioned by a rig measured from the source sheets.
 // `h` is standing height in room units.
-import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_OX, DOLL_EYES, DOLL_BODY, DOLL_HEADS } from './doll';
+import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_EYES, DOLL_CROWN, DOLL_WAIST, DOLL_PIC } from './doll';
 import snowy from '../assets/yuna/snowy.webp';
 import coco from '../assets/yuna/coco.webp';
 import yunaBody from '../assets/yuna/yuna-body.webp';
@@ -40,7 +40,7 @@ const S = (src: string, pw: number, ph: number, head = 0.42): Sprite => ({ src, 
 
 export const SPRITES: Record<string, Sprite> = {
   yuna: { src: yunaHappy, w: 96, h: 245, head: 0.4 },
-  doll: { src: DOLL_HEADS['girl-happy-1'].src, w: 96, h: 272, head: 0.4 },
+  doll: { src: DOLL_PIC, w: 133, h: 270, head: 0.45 },
   natalie: { src: natalieHappy, w: 99, h: 252, head: 0.4 },
   brother: { src: brotherHappy, w: 85, h: 205, head: 0.4 },
   nene: { src: neneHappy, w: 86, h: 182, head: 0.4 },
@@ -77,11 +77,11 @@ export const LAYERED: Record<string, Layered> = {
   /** Dress-up characters from the character maker: the parts come from data/doll.ts (see components/Doll.tsx). */
   doll: {
     W: DOLL_W, H: DOLL_H, body: [0, DOLL_PAD, DOLL_W, DOLL_H - DOLL_PAD],
-    head: [DOLL_HEADS['girl-happy-1'].box[0], DOLL_PAD, DOLL_HEADS['girl-happy-1'].box[2], DOLL_HEADS['girl-happy-1'].box[3]],
-    outfits: [{ id: 'doll', label: 'Outfit', src: DOLL_BODY[1] }],
-    faces: { happy: DOLL_HEADS['girl-happy-1'].src, wink: DOLL_HEADS['girl-wink-1'].src, sad: DOLL_HEADS['girl-sad-1'].src, wow: DOLL_HEADS['girl-wow-1'].src },
-    eyes: [[DOLL_EYES[0][0] + DOLL_OX[1], DOLL_EYES[0][1] + DOLL_PAD], [DOLL_EYES[1][0] + DOLL_OX[1], DOLL_EYES[1][1] + DOLL_PAD]],
-    crown: DOLL_PAD + 6, hip: (DOLL_PAD + 508) / DOLL_H,
+    head: [40, DOLL_PAD + 40, 304, 300],
+    outfits: [{ id: 'doll', label: 'Outfit', src: DOLL_PIC }],
+    faces: { happy: DOLL_PIC, wink: DOLL_PIC, sad: DOLL_PIC, wow: DOLL_PIC },
+    eyes: [[DOLL_EYES[0][0], DOLL_EYES[0][1] + DOLL_PAD], [DOLL_EYES[1][0], DOLL_EYES[1][1] + DOLL_PAD]],
+    crown: DOLL_PAD + DOLL_CROWN, hip: (DOLL_PAD + DOLL_WAIST) / DOLL_H,
   },
   yuna: {
     W: 527, H: 1343, body: [0, 283, 527, 1060], head: [47, 0, 429, 416],
