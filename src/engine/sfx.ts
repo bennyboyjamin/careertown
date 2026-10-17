@@ -81,3 +81,24 @@ export function sfx(name: SfxName) {
     }
   } catch { /* audio is optional */ }
 }
+
+/* ── Music for the K-pop Academy (same tiny synth, no audio files) ── */
+export type Drum = 'kick' | 'clap' | 'hat';
+/** A drum hit, `when` seconds from now. */
+export function drum(kind: Drum, when = 0) {
+  if (!enabled) return;
+  try {
+    if (kind === 'kick') tone(150, 0.18, 'sine', when, 0.45, 45);
+    else if (kind === 'clap') { noise(0.09, 0.22, when); noise(0.06, 0.16, when + 0.02); }
+    else noise(0.03, 0.08, when);
+  } catch { /* no audio */ }
+}
+/** A musical note (Hz), `when` seconds from now. */
+export function note(freq: number, dur = 0.22, when = 0, kind: 'sing' | 'bass' | 'bell' = 'sing') {
+  if (!enabled) return;
+  try {
+    if (kind === 'bass') tone(freq, dur, 'triangle', when, 0.3);
+    else if (kind === 'bell') { tone(freq, dur, 'sine', when, 0.16); tone(freq * 2, dur * 0.6, 'sine', when, 0.05); }
+    else { tone(freq, dur, 'square', when, 0.06); tone(freq, dur, 'triangle', when, 0.12); }
+  } catch { /* no audio */ }
+}

@@ -83,7 +83,7 @@ export const TOWNFOLK: Partial<Record<BuildingId, Townie>> = {
     hello: 'Hi, future star! I’m Luna. I teach dance at the K-pop Training Academy.',
     fact: 'Trainers help singers and dancers practise every day. Choreographers make up the dance moves, and producers make the music.',
     ask: 'Our 3 stage things went missing before the show! Can you find them?', find: KPOP_PROPS, pick: 3,
-    thanks: 'Showtime! The full academy with dance and music training is coming soon.',
+    thanks: 'Showtime! Ready for real training? Tap ⭐ Rising Star Training.',
   },
   bank: {
     name: 'Sam', job: 'Bank teller', look: A({ tone: 0, hair: 'dadshort', hairColor: 'blonde', top: 'judge-suit', bottom: 'gray-trousers', shoes: 'black-shoes' }),

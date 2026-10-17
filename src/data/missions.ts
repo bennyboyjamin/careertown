@@ -12,6 +12,14 @@ export interface MissionDef {
 }
 
 export const MISSIONS: Record<string, MissionDef> = {
+  'kpop-star': {
+    id: 'kpop-star', career: 'performer', building: 'kpop',
+    title: 'Rising Star Training',
+    pitch: 'Train with Luna at the K-pop Academy: learn a dance, make your own song, then put on a show with your friends!',
+    minutes: 6,
+    reward: { coins: 55, xp: 75, career: 'performer', careerXp: 120, badge: 'rising-star', title: 'What a show! You’re a rising star!' },
+    repeatReward: { coins: 15, xp: 20, career: 'performer', careerXp: 40, title: 'Encore! Another great show!' },
+  },
   'chef-pizza': {
     id: 'chef-pizza', career: 'chef', building: 'restaurant',
     title: 'Pizza Party at Café Sunny',

@@ -32,6 +32,9 @@ export const CAREERS: Record<CareerId, CareerDef> = {
   chef: { id: 'chef', title: 'Chef', icon: '🧑‍🍳', color: '#FF8A3D', building: 'restaurant', available: true,
     blurb: 'Chefs plan meals, cook safely and make food that people love.',
     strength: 'You follow recipes step by step and pay attention to what people order.' },
+  performer: { id: 'performer', title: 'Performer', icon: '🎤', color: '#C77DFF', building: 'kpop', available: true,
+    blurb: 'Singers, dancers and music producers practise hard and put on shows that make people happy.',
+    strength: 'You have great rhythm and love making music.' },
   entrepreneur: { id: 'entrepreneur', title: 'Business Owner', icon: '🏪', color: '#FFC93C', building: 'shopping', available: false,
     blurb: 'Business owners make and sell things people need.', strength: 'You like making smart choices with coins.' },
 };
