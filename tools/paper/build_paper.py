@@ -76,7 +76,7 @@ def is_not_hair(rgb):
 os.makedirs(OUT, exist_ok=True)
 for f in glob.glob(os.path.join(OUT, '*.webp')): os.remove(f)
 imports, names = [], {}
-SCALE = 0.6        # images are stored smaller than the source; positions stay in source units
+SCALE = 0.5        # images are stored smaller than the source; positions stay in source units
 def save(img, name):
     img = img.resize((max(1, round(img.width * SCALE)), max(1, round(img.height * SCALE))), Image.LANCZOS)
     img.save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=86, method=6)
@@ -94,13 +94,23 @@ for p in sorted(glob.glob(os.path.join(SRC, 'faces', '*.png'))):
     expr = os.path.basename(p)[:-4]; img, bb = trim(load(p))
     faces[expr] = {'src': save(img, 'face-' + expr), 'at': {b: place(bb, transform(heads['kid'], heads[b])) for b in BASES}}
 
-# hair: each style drawn on one base, recoloured, fitted to every head
+# hair: each style drawn on one base, recoloured, fitted to every head.
+# ChatGPT often draws hair too big/low; HAIR_FIT = (scale, nudge down) puts the hair top at y=220 on the kid head.
+HAIR_FIT = {'bobbangs': (0.73, 0), 'bowwaves': (0.86, 0), 'braids': (0.72, -15), 'locs': (0.95, 0), 'messy': (0.7, 0),
+            'sideswept': (0.75, 0), 'spacebuns': (0.74, 0)}
+hair_top = {}
+for p in glob.glob(os.path.join(SRC, 'hair', '*_front.*.png')):
+    hair_top[os.path.basename(p).split('_front')[0]] = load(p).getchannel('A').point(lambda v: 255 if v > 100 else 0).getbbox()[1]
+def hair_fit(style, bb):
+    if style not in HAIR_FIT: return bb
+    k, dy = HAIR_FIT[style]; t = hair_top[style]
+    return (512 + (bb[0] - 512) * k, 220 + dy + (bb[1] - t) * k, 512 + (bb[2] - 512) * k, 220 + dy + (bb[3] - t) * k)
 hair = {}
 for p in sorted(glob.glob(os.path.join(SRC, 'hair', '*.png'))):
     m = re.match(r'(.+)_(front|back)\.(\w+)\.png$', os.path.basename(p)); style, part, drawn_on = m.groups()
     img, bb = trim(load(p)); h = hair.setdefault(style, {})
     h[part] = {'src': {c: save(recolour(img, HAIR_REF, hexrgb(hx), is_not_hair), f'hair-{style}-{part}-{c}') for c, hx in HAIR_COLOURS.items()},
-               'at': {b: place(bb, transform(heads[drawn_on], heads[b])) for b in BASES}}
+               'at': {b: place(hair_fit(style, bb), transform(heads[drawn_on], heads[b])) for b in BASES}}
 
 # clothes: for one base only
 clothes = {}
@@ -151,18 +161,38 @@ BOTTOM_FIT = {'baggy-jeans': dict(w=340, top=975, bottom=1398), 'cargo-pants': d
               'black-shorts': dict(w=300, top=975), 'lavender-skirt': dict(w=370, top=975), 'blue-skirt': dict(w=370, top=975),
               'plaid-skirt': dict(w=370, top=975), 'overalls': dict(w=300, top=742)}
 OVER_TOP = {'overalls'}          # drawn over the top (bib and straps)
+# shoes: fitted to each body's own feet
+FEET = {}
+def feet_of(b):
+    a = base_img[b].getchannel('A'); f = a.point(lambda v: 255 if v > 60 else 0).getbbox()[3]
+    xs = [x for x in range(1024) if a.getpixel((x, f - 30)) > 128]
+    return xs[0], xs[-1], f
+SHOE_W = {'bow-shoes': 1.0, 'loafers': 1.0}       # width as a share of the feet span (chunky sneakers a bit wider)
 def place_xy(bb, b):
     """Kid body -> body b for bottoms: x by hip width, y by neck-to-feet height."""
     if b == 'kid': return place(bb, ident)
     kx = body_transform(b, 'width')[0]; ky = body_transform(b, 'height')[0]
     oy = heads[b][1] - heads['kid'][1] * ky
     return [round(512 + (bb[0] - 512) * kx), round(bb[1] * ky + oy), round((bb[2] - bb[0]) * kx), round((bb[3] - bb[1]) * ky)]
+def short_bottom(bb, b):
+    """Shorts and skirts: same hem height above the knees on every body, slightly smaller on smaller bodies."""
+    if b == 'kid': return place(bb, ident)
+    kx = body_transform(b, 'width')[0]; h = (bb[3] - bb[1]) * 0.85; bottom = bb[3] + 15 - (feet_of('kid')[2] - feet_of(b)[2]) * 0
+    return [round(512 + (bb[0] - 512) * kx), round(bottom - h), round((bb[2] - bb[0]) * kx), round(h)]
 for p in sorted(glob.glob(os.path.join(SRC, 'clothes-fit', '*.png'))):
     kind, cid = os.path.basename(p)[:-4].split('.'); img, bb = trim(load(p))
+    if kind == 'shoes':
+        at = {}
+        for b in BASES:
+            x0, x1, f = feet_of(b); k = SHOE_W.get(cid, 1.1); fb = fit_box(bb, (x1 - x0) * k, (x0 + x1) / 2, bottom=f + 10)
+            at[b] = [round(v) for v in fb]
+        clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': at['kid'], 'atBase': at}
+        continue
     t = (BOTTOM_FIT if kind == 'bottom' else TOP_FIT_EACH).get(cid, TOP_FIT); kb = fit_box(bb, t['w'], 512, top=t['top'], bottom=t.get('bottom'))
     box = (kb[0], kb[1], kb[0] + kb[2], kb[1] + kb[3])
     clothes[cid] = {'kind': kind, 'base': 'any', 'src': save(img, f'cloth-{cid}'), 'at': place(box, ident), 'overTop': cid in OVER_TOP,
-                    'atBase': {b: (place_xy(box, b) if kind == 'bottom' else place(box, body_transform(b, 'width'))) for b in BASES}}
+                    'atBase': {b: (short_bottom(box, b) if kind == 'bottom' and 'bottom' not in t and cid not in OVER_TOP else place_xy(box, b) if kind == 'bottom'
+                                   else place(box, body_transform(b, 'width'))) for b in BASES}}
 
 # bases: one image per skin tone + the rig numbers the game needs
 bases = {}

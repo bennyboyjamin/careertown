@@ -9,7 +9,8 @@ export type CareerId =
 
 export type BuildingId =
   | 'home' | 'school' | 'hospital' | 'courthouse' | 'engineering'
-  | 'animal-hospital' | 'tech-lab' | 'restaurant' | 'shopping' | 'bank';
+  | 'animal-hospital' | 'tech-lab' | 'restaurant' | 'shopping' | 'bank'
+  | 'park' | 'beach' | 'cafe' | 'fishing' | 'playground' | 'nature-trail';
 
 export type FaceShape = 'round' | 'oval' | 'square';
 export type EyeStyle = 'dot' | 'happy' | 'big' | 'lashes' | 'sleepy';
@@ -53,6 +54,8 @@ export interface CharacterData {
   wear?: Partial<Record<'head' | 'eyes' | 'ears' | 'bag', string>>;
   /** Dress-up character made in the character maker (drawn from data/doll.ts). */
   doll?: DollLook;
+  /** YunaVerse character (painted pieces from data/paperArt.ts). Drawn instead of `doll` when set. */
+  paper?: PaperLook;
   /** Recolored top / bottom (swatch names from data/clothes.ts) for layered artwork characters. */
   colors?: { top?: string; bottom?: string };
 }
@@ -70,6 +73,17 @@ export interface DollLook {
   shortsColor?: string;
   /** Grown-up build: same head, longer body (dollArt ART_ADULT_*). */
   adult?: boolean;
+}
+
+export interface PaperLook {
+  base: 'kid' | 'preschool';
+  tone: number;                  // skin tone index (data/paperArt.ts PAPER_SKIN_TONES)
+  hair: string | null;           // PAPER_HAIR id
+  hairColor: string;             // PAPER_HAIR_COLOURS key
+  top: string | null;            // PAPER_CLOTHES ids
+  bottom: string | null;
+  shoes: string | null;
+  acc?: Partial<Record<'head' | 'eyes' | 'ears' | 'hair' | 'bag', string>>;
 }
 
 export type PetSpecies = 'puppy' | 'kitten' | 'bunny';

@@ -4,6 +4,7 @@
 import { DOLL_W, DOLL_H, DOLL_PAD, DOLL_EYES, DOLL_CROWN, DOLL_WAIST, DOLL_PIC, DOLL_H_ADULT, DOLL_WAIST_ADULT } from './doll';
 import snowy from '../assets/yuna/snowy.webp';
 import coco from '../assets/yuna/coco.webp';
+import { PAPER_BASES, type PaperBase } from './paperArt';
 
 export interface Sprite { src: string; w: number; h: number; head: number }
 const S = (src: string, pw: number, ph: number, head = 0.42): Sprite => ({ src, w: Math.round(ph * 0.82 * pw / ph), h: Math.round(ph * 0.82), head });
@@ -76,3 +77,26 @@ for (const k of ['yuna', 'natalie', 'brother', 'nene']) LAYERED[k] = LAYERED.dol
 for (const k of ['mom', 'dad', 'doll-adult']) LAYERED[k] = DOLL_ADULT;
 /** Rig for a dress-up look (kid or grown-up). */
 export const dollRig = (adult?: boolean) => (adult ? DOLL_ADULT : LAYERED.doll);
+
+/* ── YunaVerse characters (painted pieces, data/paperArt.ts) ── */
+/** Room height of a kid on the YunaVerse kid body; every body uses the same scale so sizes stay true. */
+const PAPER_KID_H = 256;
+const paperScale = PAPER_KID_H / PAPER_BASES.kid.canvas[3];
+function paperRig(b: PaperBase): Layered {
+  const B = PAPER_BASES[b]; const [cx, cy, W, H] = B.canvas;
+  const headW = (B.neck - B.crown) * 1.25;
+  return {
+    W, H, body: [0, 0, W, H], head: [512 - cx - headW / 2, B.crown - cy, headW, B.neck - B.crown],
+    outfits: [{ id: 'paper', label: 'Outfit', src: DOLL_PIC }],
+    faces: { happy: DOLL_PIC, wink: DOLL_PIC, sad: DOLL_PIC, wow: DOLL_PIC },
+    eyes: [[B.eyes[0][0] - cx, B.eyes[0][1] - cy], [B.eyes[1][0] - cx, B.eyes[1][1] - cy]],
+    crown: B.crown - cy, hip: (B.hip - cy) / H,
+  };
+}
+const paperSprite = (b: PaperBase): Sprite => ({ src: DOLL_PIC, w: Math.round(PAPER_BASES[b].canvas[2] * paperScale), h: Math.round(PAPER_BASES[b].canvas[3] * paperScale), head: 0.45 });
+for (const b of ['kid', 'preschool'] as PaperBase[]) { LAYERED[`paper-${b}`] = paperRig(b); SPRITES[`paper-${b}`] = paperSprite(b); }
+/** Yuna and Nene are drawn in the YunaVerse style. */
+LAYERED.yuna = LAYERED['paper-kid']; SPRITES.yuna = SPRITES['paper-kid'];
+LAYERED.nene = LAYERED['paper-preschool']; SPRITES.nene = SPRITES['paper-preschool'];
+/** Rig/size key for a YunaVerse body. */
+export const paperSpriteKey = (b: PaperBase) => `paper-${b}`;
