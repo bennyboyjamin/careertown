@@ -97,7 +97,7 @@ for p in sorted(glob.glob(os.path.join(SRC, 'faces', '*.png'))):
 # hair: each style drawn on one base, recoloured, fitted to every head.
 # ChatGPT often draws hair too big/low; HAIR_FIT = (scale, nudge down) puts the hair top at y=220 on the kid head.
 HAIR_FIT = {'bobbangs': (0.73, 0), 'bowwaves': (0.86, 0), 'braids': (0.72, -15), 'locs': (0.95, 0), 'messy': (0.7, 0),
-            'sideswept': (0.75, 0), 'spacebuns': (0.74, 0)}
+            'sideswept': (0.75, 0), 'spacebuns': (0.74, 0), 'ponytail': (0.8, -55)}
 hair_top = {}
 for p in glob.glob(os.path.join(SRC, 'hair', '*_front.*.png')):
     hair_top[os.path.basename(p).split('_front')[0]] = load(p).getchannel('A').point(lambda v: 255 if v > 100 else 0).getbbox()[1]
